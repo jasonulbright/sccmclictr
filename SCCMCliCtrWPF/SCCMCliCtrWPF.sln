@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SCCMCliCtrTests", "SCCMCliC
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Customization", "..\Customization\Customization.csproj", "{2956A544-F6D5-4799-899F-583EE5F2DF58}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "sccmclictr.automation", "..\sccmclictr.automation\sccmclictr.automation.csproj", "{519B416F-38A2-4814-B4C7-173111C353A4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{2956A544-F6D5-4799-899F-583EE5F2DF58}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2956A544-F6D5-4799-899F-583EE5F2DF58}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2956A544-F6D5-4799-899F-583EE5F2DF58}.Release|Any CPU.Build.0 = Release|Any CPU
+		{519B416F-38A2-4814-B4C7-173111C353A4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{519B416F-38A2-4814-B4C7-173111C353A4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{519B416F-38A2-4814-B4C7-173111C353A4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{519B416F-38A2-4814-B4C7-173111C353A4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
