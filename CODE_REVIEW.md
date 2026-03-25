@@ -1,9 +1,9 @@
 # SCCMCliCtr Code Review — 2026-03-25
 
 ## Fork Details
-- **Upstream**: https://github.com/rzander/sccmclictr (v1.0.6.1)
+- **Upstream**: https://github.com/rzander/sccmclictr
 - **Fork**: https://github.com/jasonulbright/sccmclictr
-- **Latest upstream source**: v1.0.7.2 (27 commits ahead of our fork base)
+- **Fork base**: Latest upstream commit (includes all changes through v1.0.7.2)
 
 ## Project Status
 Original project effectively abandoned. Maintainer (rzander) stated in Jan 2026:
@@ -40,17 +40,17 @@ Original project effectively abandoned. Maintainer (rzander) stated in Jan 2026:
 - `System.Management.Automation` v3.0 — PS 3.0 era, hardcoded DLL path
 - Code signing references Sectigo cert with hardcoded path (non-functional)
 
-## Version Diff (1.0.6.1 to 1.0.7.2)
-27 commits. Cherry-pick candidates for a future release:
+## Upstream Fixes (already included)
+The fork base includes all 27 upstream commits through v1.0.7.2. These are already in our codebase:
 
-| Priority | Fix | Description |
-|----------|-----|-------------|
-| HIGH | Keyboard debounce | Rapid Enter triggered multiple connections |
-| HIGH | PSScripts UI freeze | Long scripts locked dropdown |
-| HIGH | IPC credential fix | Remote auth with explicit creds broken |
-| MEDIUM | Log access buttons | Quick open execmgr.log / smsts.log |
-| MEDIUM | System lock action | New agent action |
-| LOW | AppImport removed | Catalog import deprecated |
+| Fix | Commit | Status |
+|-----|--------|--------|
+| Keyboard debounce (100ms guard on Enter) | `3b5ae59` | Included |
+| PSScripts UI freeze (DoEvents + Sleep) | `e72f9e0` | Included |
+| IPC credential fix | `3b5ae59` | Included, further hardened in v1.1.0 |
+| Log access buttons (execmgr/smsts) | `d191bc1` | Included |
+| System lock action | `d556efa` | Included |
+| AppImport removed | `4677c80` | Included |
 
 ## GitHub Issues (60 open on upstream) -- Key Themes
 1. **SSL/HTTPS #1 pain point** — FQDN, cert validation, proxy broken (#199, #200, #203, #212). Partially addressed by v1.1.0 TLS fix.

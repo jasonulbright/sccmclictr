@@ -17,11 +17,7 @@ The closed-source `sccmclictrlib` NuGet package v1.0.1 has been decompiled via J
   - `SCCMAgent.cs`: `ref new NETRESOURCE()` -- extracted to local variable
   - `ScheduleDecoding.cs`: `DateTime& local3` (invalid C# ref syntax) -- rewritten as clean DateTime assignments
   - `ScheduleDecoding.cs`: unassigned locals via `ref DateTime` indirection -- simplified to direct initialization
-- 76 decompiler-generated variable names remain across 4 files (cosmetic, does not affect functionality):
-  - `softwareupdates.cs` -- 39 instances (`num1`-`num19` in state-checking methods)
-  - `ScheduleDecoding.cs` -- 22 instances (`num1`-`num16` in bit-packing methods)
-  - `softwaredistribution.cs` -- 9 instances (`str1`-`str3` in XML/string operations)
-  - `agentactions.cs` -- 6 instances (mixed `num`/`str` in service operations)
+- All decompiler-generated variable names cleaned up: 41 renames across `softwaredistribution.cs` (38) and `softwareupdates.cs` (3). `ScheduleDecoding.cs` and `agentactions.cs` were already clean.
 
 ### Project Reference Fixes
 - **Customization.dll**: was referencing `C:\Users\RogerZander\OneDrive\Dokumente\...`. Converted to a `ProjectReference` within the solution.
