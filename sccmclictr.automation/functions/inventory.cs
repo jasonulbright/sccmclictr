@@ -308,14 +308,14 @@ public class inventory : baseInit
     /// <returns>System.String.</returns>
     public string Uninstall()
     {
-      return this.SoftwareCode.StartsWith("{") ? this.oNewBase.GetStringFromPS($"Invoke-Expression(\"msiexec.exe /x '{this.SoftwareCode}' REBOOT=ReallySuppress /q\")") : (string) null;
+      return this.SoftwareCode.StartsWith("{") ? this.oNewBase.GetStringFromPS($"& msiexec.exe /x '{this.SoftwareCode}' REBOOT=ReallySuppress /q") : (string) null;
     }
 
     /// <summary>Repairs this instance.</summary>
     /// <returns>System.String.</returns>
     public string Repair()
     {
-      return this.SoftwareCode.StartsWith("{") ? this.oNewBase.GetStringFromPS($"Invoke-Expression(\"msiexec.exe /fpecmsu '{this.SoftwareCode}' REBOOT=ReallySuppress REINSTALL=ALL /q\")") : (string) null;
+      return this.SoftwareCode.StartsWith("{") ? this.oNewBase.GetStringFromPS($"& msiexec.exe /fpecmsu '{this.SoftwareCode}' REBOOT=ReallySuppress REINSTALL=ALL /q") : (string) null;
     }
   }
 
