@@ -48,7 +48,7 @@ public class agentactions : baseInit
   {
     try
     {
-      this.GetStringFromPS($"[wmi]\"ROOT\\ccm\\invagt:InventoryActionStatus.InventoryActionID='{ScheduleID}'\" | remove-wmiobject");
+      this.GetStringFromPS($"Get-CimInstance -Namespace \"ROOT\\ccm\\invagt\" -ClassName InventoryActionStatus -Filter \"InventoryActionID='{ScheduleID}'\" | Remove-CimInstance");
     }
     catch
     {

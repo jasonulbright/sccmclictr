@@ -89,6 +89,64 @@ public class baseInit : IDisposable
   /// <summary>Trace Source for PowerShell Commands</summary>
   private TraceSource tsPSCode { get; set; }
 
+  /// <summary>
+  /// Converts a WMI path like "ROOT\ccm:SMS_Client=@" or "ROOT\ccm\invagt:InventoryActionStatus.Key='Val'"
+  /// into a CIM Get-CimInstance command string. Handles singletons (=@), keyed instances (.Key='Val'),
+  /// and plain class references.
+  /// </summary>
+  internal static string WmiPathToCimQuery(string wmiPath)
+  {
+    int colonIdx = wmiPath.IndexOf(':');
+    if (colonIdx < 0)
+      return $"Get-CimInstance -Namespace \"{wmiPath}\"";
+
+    string ns = wmiPath.Substring(0, colonIdx);
+    string classAndKey = wmiPath.Substring(colonIdx + 1);
+
+    // Singleton: ROOT\ccm:SMS_Client=@
+    if (classAndKey.EndsWith("=@"))
+    {
+      string className = classAndKey.Substring(0, classAndKey.Length - 2);
+      return $"Get-CimInstance -Namespace \"{ns}\" -ClassName \"{className}\"";
+    }
+
+    // Keyed instance: ROOT\ccm\invagt:InventoryActionStatus.InventoryActionID='{guid}'
+    int dotIdx = classAndKey.IndexOf('.');
+    if (dotIdx > 0)
+    {
+      string className = classAndKey.Substring(0, dotIdx);
+      string filter = classAndKey.Substring(dotIdx + 1);
+      return $"Get-CimInstance -Namespace \"{ns}\" -ClassName \"{className}\" -Filter \"{filter}\"";
+    }
+
+    // Plain class: ROOT\ccm:SMS_Client
+    return $"Get-CimInstance -Namespace \"{ns}\" -ClassName \"{classAndKey}\"";
+  }
+
+  /// <summary>
+  /// Extracts namespace and class name from a WMI path for use with Invoke-CimMethod.
+  /// </summary>
+  internal static (string Namespace, string ClassName) ParseWmiPathForMethod(string wmiPath)
+  {
+    int colonIdx = wmiPath.IndexOf(':');
+    if (colonIdx < 0)
+      return (wmiPath, "");
+
+    string ns = wmiPath.Substring(0, colonIdx);
+    string classAndKey = wmiPath.Substring(colonIdx + 1);
+
+    // Strip =@ suffix if present
+    if (classAndKey.EndsWith("=@"))
+      classAndKey = classAndKey.Substring(0, classAndKey.Length - 2);
+
+    // Strip .Key=Value suffix if present
+    int dotIdx = classAndKey.IndexOf('.');
+    if (dotIdx > 0)
+      classAndKey = classAndKey.Substring(0, dotIdx);
+
+    return (ns, classAndKey);
+  }
+
   /// <summary>Constructor</summary>
   /// <param name="RemoteRunspace">PowerShell RunSpace</param>
   /// <param name="PSCode">TraceSource for PowerShell Commands</param>
@@ -128,7 +186,10 @@ public class baseInit : IDisposable
     if (!ResultProperty.StartsWith("."))
       ResultProperty = "." + ResultProperty;
     string stringFromClassMethod = "";
-    string str = $"([wmiclass]\"{WMIPath}\").{WMIMethod}{ResultProperty}";
+    var (ns, cls) = ParseWmiPathForMethod(WMIPath);
+    // Strip trailing () from method name if present
+    string methodName = WMIMethod.TrimEnd('(', ')');
+    string str = $"(Invoke-CimMethod -Namespace \"{ns}\" -ClassName \"{cls}\" -MethodName \"{methodName}\"){ResultProperty}";
     if (!this.bShowPSCodeOnly)
     {
       string hash = this.CreateHash(WMIPath + WMIMethod + ResultProperty);
@@ -194,7 +255,11 @@ public class baseInit : IDisposable
     if (!ResultProperty.StartsWith("("))
       ResultProperty = $"({ResultProperty})";
     string stringFromMethod = "";
-    string str = $"([wmi]\"{WMIPath}\").{WMIMethod}{ResultProperty}";
+    // Instance method: get the instance first, then invoke method on it
+    string cimGet = WmiPathToCimQuery(WMIPath);
+    // Strip trailing () from method name if present
+    string methodName = WMIMethod.TrimEnd('(', ')');
+    string str = $"({cimGet} | Invoke-CimMethod -MethodName \"{methodName}\"){ResultProperty}";
     if (!this.bShowPSCodeOnly)
     {
       string hash = this.CreateHash(WMIPath + WMIMethod + ResultProperty);
@@ -420,7 +485,7 @@ public class baseInit : IDisposable
     if (!ResultProperty.StartsWith("."))
       ResultProperty = "." + ResultProperty;
     string property = "";
-    string str = $"([wmi]\"{WMIPath}\"){ResultProperty}";
+    string str = $"({WmiPathToCimQuery(WMIPath)}){ResultProperty}";
     if (!this.bShowPSCodeOnly)
     {
       string hash = this.CreateHash(WMIPath + ResultProperty);
@@ -482,7 +547,7 @@ public class baseInit : IDisposable
     if (!ResultProperty.StartsWith("."))
       ResultProperty = "." + ResultProperty;
     List<PSObject> properties = new List<PSObject>();
-    string str = $"([wmi]'{WMIPath}'){ResultProperty}";
+    string str = $"({WmiPathToCimQuery(WMIPath)}){ResultProperty}";
     if (!this.bShowPSCodeOnly)
     {
       string hash = this.CreateHash(WMIPath + ResultProperty);
@@ -517,7 +582,7 @@ public class baseInit : IDisposable
   /// <example><code>base.SetProperty(@"ROOT\ccm:SMS_Client=@", "EnableAutoAssignment", "$True");</code></example>
   public void SetProperty(string WMIPath, string Property, string Value)
   {
-    string str = $"$a=([wmi]\"{WMIPath}\");$a.{Property}={Value};$a.Put()";
+    string str = $"{WmiPathToCimQuery(WMIPath)} | Set-CimInstance -Property @{{{Property}={Value}}}";
     this.tsPSCode.TraceInformation(str);
     if (!this.bShowPSCodeOnly)
     {
