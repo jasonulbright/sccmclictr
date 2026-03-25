@@ -30,7 +30,9 @@ The closed-source `sccmclictrlib` NuGet package v1.0.1 has been decompiled via J
 
 ### Security
 - **SSL/TLS**: Removed global `ServerCertificateValidationCallback` override. Added `SecurityProtocol = Tls12 | Tls13`.
-- **Documented but not yet fixed**: 107+ bare `catch { }` blocks, weak credential encryption (SHA1 + assembly name key), SecureString-to-plaintext conversion, command-line password exposure, unescaped `Invoke-Expression` calls in `inventory.cs` and `agentactions.cs`.
+- **Credential handling hardened**: Removed persistent `string Password` property from `SCCMAgent`. Credentials now stored only as `PSCredential`. `ConnectIPC()` signature changed from `(string, string)` to `(string, SecureString)` and `(PSCredential)`. IPC P/Invoke uses `Marshal.SecureStringToGlobalAllocUnicode` with immediate `ZeroFreeGlobalAllocUnicode` cleanup.
+- **Invoke-Expression removed**: 4 call sites in `inventory.cs` and `agentactions.cs` replaced with direct `& msiexec.exe` invocation, eliminating code injection surface.
+- **Remaining**: 238 bare `catch { }` blocks (mostly intentional defensive probes), weak saved-password encryption in UI layer (SHA1 + assembly name key).
 
 ### Build
 - All NuGet packages restored from nuget.org (WPFToolkit, NavigationPane, MSTest)

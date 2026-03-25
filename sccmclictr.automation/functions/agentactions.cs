@@ -867,7 +867,7 @@ public class agentactions : baseInit
     string productCode = this.baseClient.AgentProperties.ProductCode;
     if (!productCode.StartsWith("{"))
       return false;
-    this.baseClient.GetStringFromPS($"Invoke-Expression(\"msiexec.exe /fpecms '{productCode}'\")");
+    this.baseClient.GetStringFromPS($"& msiexec.exe /fpecms '{productCode}'");
     return true;
   }
 
@@ -878,7 +878,7 @@ public class agentactions : baseInit
     string productCode = this.baseClient.AgentProperties.ProductCode;
     if (!productCode.StartsWith("{"))
       return false;
-    this.baseClient.GetStringFromPS($"Invoke-Expression(\"msiexec.exe /x '{productCode}' REBOOT=ReallySuppress /q\")");
+    this.baseClient.GetStringFromPS($"& msiexec.exe /x '{productCode}' REBOOT=ReallySuppress /q");
     return true;
   }
 

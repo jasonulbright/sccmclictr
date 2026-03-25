@@ -23,9 +23,7 @@ public class SCCMAgent : IDisposable
   /// <summary>The client</summary>
   public ccm Client;
 
-  private string Username { get; set; }
-
-  private string Password { get; set; }
+  private PSCredential Credential { get; set; }
 
   private string Hostname { get; set; }
 
@@ -49,8 +47,7 @@ public class SCCMAgent : IDisposable
     {
     }
     this.connectionInfo = (WSManConnectionInfo) null;
-    this.Username = (string) null;
-    this.Password = (string) null;
+    this.Credential = (PSCredential) null;
     this.Hostname = (string) null;
     if (this.Client != null)
       this.Client.Dispose();
@@ -284,10 +281,11 @@ public class SCCMAgent : IDisposable
     bool Encryption)
   {
     this.Hostname = hostname;
-    SecureString password1 = new SecureString();
-    foreach (char c in password.ToCharArray())
-      password1.AppendChar(c);
-    PSCredential credential = new PSCredential(username, password1);
+    SecureString securePassword = new SecureString();
+    foreach (char c in password)
+      securePassword.AppendChar(c);
+    securePassword.MakeReadOnly();
+    PSCredential credential = new PSCredential(username, securePassword);
     this.Initialize(hostname, credential, wsManPort, bConnect, Encryption);
   }
 
@@ -305,6 +303,7 @@ public class SCCMAgent : IDisposable
     bool Encryption)
   {
     this.Hostname = hostname;
+    this.Credential = credential;
     this.ipcconnected = false;
     this.PSCode = new TraceSource("PSCode");
     this.PSCode.Switch.Level = SourceLevels.All;
@@ -360,19 +359,28 @@ public class SCCMAgent : IDisposable
 
   /// <summary>
   /// Connect the IPC$ share on a remote computer to preauthenticate.
+  /// Password is extracted from SecureString only for the P/Invoke call
+  /// and immediately freed from unmanaged memory.
   /// </summary>
-  /// <param name="Hostname"></param>
-  /// <param name="UserName"></param>
-  /// <param name="Password"></param>
-  /// <returns></returns>
-  internal int connectIPC(string Hostname, string UserName, string Password)
+  internal int connectIPC(string hostname, PSCredential credential)
   {
     var netResource = new SCCMAgent.NETRESOURCE()
     {
       dwType = 0,
-      RemoteName = "\\\\" + Hostname
+      RemoteName = "\\\\" + hostname
     };
-    return SCCMAgent.WNetAddConnection3(IntPtr.Zero, ref netResource, Password, UserName, 0);
+    IntPtr passwordPtr = IntPtr.Zero;
+    try
+    {
+      passwordPtr = Marshal.SecureStringToGlobalAllocUnicode(credential.Password);
+      return SCCMAgent.WNetAddConnection3(IntPtr.Zero, ref netResource,
+        Marshal.PtrToStringUni(passwordPtr), credential.UserName, 0);
+    }
+    finally
+    {
+      if (passwordPtr != IntPtr.Zero)
+        Marshal.ZeroFreeGlobalAllocUnicode(passwordPtr);
+    }
   }
 
   /// <summary>
@@ -387,8 +395,8 @@ public class SCCMAgent : IDisposable
         return;
       try
       {
-        if (!string.IsNullOrEmpty(this.Username))
-          this.connectIPC(this.Hostname, this.Username, this.Password);
+        if (this.Credential != null)
+          this.connectIPC(this.Hostname, this.Credential);
         this.ipcconnected = true;
       }
       catch
@@ -398,14 +406,13 @@ public class SCCMAgent : IDisposable
     }
   }
 
-  public bool ConnectIPC(string username, string password)
+  public bool ConnectIPC(PSCredential credential)
   {
     try
     {
-      this.Username = username;
-      this.Password = password;
-      if (!string.IsNullOrEmpty(this.Username))
-        this.connectIPC(this.Hostname, this.Username, this.Password);
+      this.Credential = credential;
+      if (this.Credential != null)
+        this.connectIPC(this.Hostname, this.Credential);
       this.ipcconnected = true;
     }
     catch
@@ -414,6 +421,11 @@ public class SCCMAgent : IDisposable
       return false;
     }
     return true;
+  }
+
+  public bool ConnectIPC(string username, SecureString password)
+  {
+    return this.ConnectIPC(new PSCredential(username, password));
   }
 
   [DllImport("mpr.dll")]
