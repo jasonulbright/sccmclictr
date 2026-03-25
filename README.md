@@ -101,11 +101,10 @@ These are inherited from the original project. Some have been fixed; others are 
 | Issue | Status | Details |
 |-------|--------|---------|
 | SSL cert validation globally disabled | **Fixed** | Replaced with TLS 1.2/1.3 enforcement |
-| 107+ bare `catch { }` blocks | Open | Silent exception swallowing across 42 files. No error logging. |
-| Weak credential encryption (SHA1 + assembly name as key) | Open | `common.cs` uses `DataProtectionScope.CurrentUser` with SHA1-derived entropy from DLL filename |
-| SecureString to plaintext conversion | Open | `MainPage.xaml.cs` extracts SecureString to string for IPC connection |
-| Command-line password exposure | Open | `/Password:` argument visible in process listings |
-| Unescaped strings in Invoke-Expression | Open | `inventory.cs`, `agentactions.cs` interpolate values into PS `Invoke-Expression` |
+| SecureString to plaintext conversion | **Fixed** | `SCCMAgent` no longer stores `string Password`; credentials stored as `PSCredential` only. IPC P/Invoke uses `SecureStringToGlobalAllocUnicode` with immediate zero-free. |
+| Unescaped strings in Invoke-Expression | **Fixed** | 4 call sites replaced with direct `& msiexec.exe` invocation |
+| 238 bare `catch { }` blocks | Open | Silent exception swallowing across 55 files. Most are intentional defensive probes against remote clients with varying configurations. Needs categorized review. |
+| Weak saved-password encryption (SHA1 + assembly name as key) | Open | UI layer (`common.cs`) uses assembly name as encryption key for saved credentials |
 | Outdated dependencies (WPFToolkit 2012, NavigationPane 2016) | Open | Both unmaintained; will block .NET 10 migration |
 
 **This tool is designed for use by trusted administrators on internal networks.** It is not suitable for untrusted or internet-facing environments without addressing the open security items above.
@@ -140,9 +139,10 @@ For reference when building SCCM client tooling:
 - [x] Remove dead plugins (RuckZuck, SelfUpdate)
 - [x] Fix SSL certificate validation
 - [x] Fix broken project references
+- [x] Harden credential handling (remove plaintext password storage, SecureString marshaling for IPC)
+- [x] Remove `Invoke-Expression` command injection surface (4 call sites)
 - [ ] Rename decompiler-generated variables (76 across 4 files)
-- [ ] Add error logging to replace bare `catch { }` blocks
-- [ ] Fix command injection in `Invoke-Expression` calls
+- [ ] Categorize bare `catch { }` blocks (238 across 55 files)
 
 ### Phase 2: .NET 10 Migration
 Target: .NET 10 LTS (supported through November 2028).
