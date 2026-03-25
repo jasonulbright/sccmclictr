@@ -23,7 +23,7 @@ internal sealed class Settings : ApplicationSettingsBase
 
   [ApplicationScopedSetting]
   [DebuggerNonUserCode]
-  [DefaultSettingValue("$Reg = [WMIClass]\"root\\default:StdRegProv\"\r\n$DCOM = $Reg.GetBinaryValue(2147483650,\"{0}\",\"{1}\").uValue\r\n$security = Get-WmiObject -Namespace root/cimv2 -Class __SystemSecurity\r\n$converter = new-object system.management.ManagementClass Win32_SecurityDescriptorHelper\r\n$converter.BinarySDToSDDL($DCOM).SDDL\r\n")]
+  [DefaultSettingValue("$Reg = [WMIClass]\"root\\default:StdRegProv\"\r\n$DCOM = $Reg.GetBinaryValue(2147483650,\"{0}\",\"{1}\").uValue\r\n$security = Get-CimInstance -Namespace root/cimv2 -ClassName __SystemSecurity\r\n$converter = new-object system.management.ManagementClass Win32_SecurityDescriptorHelper\r\n$converter.BinarySDToSDDL($DCOM).SDDL\r\n")]
   public string PSGetDCOMPerm => (string) this[nameof (PSGetDCOMPerm)];
 
   [ApplicationScopedSetting]
