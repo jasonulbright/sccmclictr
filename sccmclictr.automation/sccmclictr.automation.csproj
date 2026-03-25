@@ -1,0 +1,89 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <!--Project was exported from assembly: C:\Users\jason\Downloads\sccmclictrlib.1.0.1\lib\net48\sccmclictr.automation.dll-->
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{519B416F-38A2-4814-B4C7-173111C353A4}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AssemblyName>sccmclictr.automation</AssemblyName>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <LangVersion>latest</LangVersion>
+    <ApplicationVersion>1.0.1.0</ApplicationVersion>
+    <FileAlignment>512</FileAlignment>
+    <RootNamespace>sccmclictr.automation</RootNamespace>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Management" />
+    <Reference Include="System.Management.Automation" />
+    <Reference Include="System.Runtime.Caching" />
+    <Reference Include="System.Security" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="baseInit.cs" />
+    <Compile Include="ccm.cs" />
+    <Compile Include="common.cs" />
+    <Compile Include="DDRFile.cs" />
+    <Compile Include="SCCMAgent.cs" />
+    <Compile Include="WSMan.cs" />
+    <Compile Include="schedule\ScheduleDecoding.cs" />
+    <Compile Include="Properties\Settings.cs" />
+    <Compile Include="Properties\Resources.cs" />
+    <Compile Include="policy\requestedConfig.cs" />
+    <Compile Include="policy\actualConfig.cs" />
+    <Compile Include="policy\localpolicy.cs" />
+    <Compile Include="functions\agentactions.cs" />
+    <Compile Include="functions\appv5.cs" />
+    <Compile Include="functions\appv4.cs" />
+    <Compile Include="functions\Class_Template.cs" />
+    <Compile Include="functions\_PublicClass.cs" />
+    <Compile Include="functions\components.cs" />
+    <Compile Include="functions\dcm.cs" />
+    <Compile Include="functions\health.cs" />
+    <Compile Include="functions\locationservices.cs" />
+    <Compile Include="functions\monitoring.cs" />
+    <Compile Include="functions\inventory.cs" />
+    <Compile Include="functions\processes.cs" />
+    <Compile Include="functions\ExtProcess.cs" />
+    <Compile Include="functions\Win32_Process.cs" />
+    <Compile Include="functions\CIM_Process.cs" />
+    <Compile Include="functions\services.cs" />
+    <Compile Include="functions\Win32_Service.cs" />
+    <Compile Include="functions\Win32_BaseService.cs" />
+    <Compile Include="functions\CIM_Service.cs" />
+    <Compile Include="functions\CIM_LogicalElement.cs" />
+    <Compile Include="functions\CIM_ManagedSystemElement.cs" />
+    <Compile Include="functions\softwareupdates.cs" />
+    <Compile Include="functions\swcache.cs" />
+    <Compile Include="functions\agentproperties.cs" />
+    <Compile Include="functions\softwaredistribution.cs" />
+    <Compile Include="AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

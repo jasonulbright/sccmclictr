@@ -78,18 +78,14 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Customization, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\Users\RogerZander\OneDrive\Dokumente\Visual Studio 2010\Project_ClientCenter\SCCMCliCtr_WPF\Customization\bin\Release\Customization.dll</HintPath>
-    </Reference>
+    <!-- Customization: replaced Roger's OneDrive path with ProjectReference (added below) -->
     <Reference Include="NavigationPane, Version=1.0.5988.20744, Culture=neutral, PublicKeyToken=b239f36db07135c1, processorArchitecture=MSIL">
       <HintPath>..\packages\NavigationPane.2.1.0.0\lib\net40\NavigationPane.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="PresentationFramework.Aero" />
-    <Reference Include="sccmclictr.automation, Version=1.0.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\sccmclictrlib.1.0.1\lib\net48\sccmclictr.automation.dll</HintPath>
-    </Reference>
+    <!-- sccmclictr.automation: replaced NuGet package with local decompiled source -->
+    <!-- ProjectReference added at bottom of file -->
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Deployment" />
@@ -383,12 +379,7 @@
     <Content Include="Plugin_Regedit.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Plugin_RuckZuck.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Plugin_SelfUpdate.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    <!-- Plugin_RuckZuck and Plugin_SelfUpdate removed: depend on external ruckzuck repo -->
     <Content Include="Plugin_StatusMessageViewer.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -553,16 +544,7 @@
       <IncludeHash>True</IncludeHash>
       <FileType>File</FileType>
     </PublishFile>
-    <PublishFile Include="Plugin_SelfUpdate.dll">
-      <Visible>False</Visible>
-      <Group>
-      </Group>
-      <TargetPath>
-      </TargetPath>
-      <PublishState>Exclude</PublishState>
-      <IncludeHash>True</IncludeHash>
-      <FileType>File</FileType>
-    </PublishFile>
+    <!-- Plugin_SelfUpdate removed from publish -->
     <PublishFile Include="System.Management.Automation">
       <Visible>False</Visible>
       <Group>
@@ -621,6 +603,16 @@
   <PropertyGroup>
     <ManifestTimestampUrl>http://timestamp.verisign.com/scripts/timstamp.dll</ManifestTimestampUrl>
   </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\sccmclictr.automation\sccmclictr.automation.csproj">
+      <Project>{519B416F-38A2-4814-B4C7-173111C353A4}</Project>
+      <Name>sccmclictr.automation</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Customization\Customization.csproj">
+      <Project>{2956A544-F6D5-4799-899F-583EE5F2DF58}</Project>
+      <Name>Customization</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>if "$(ConfigurationName)"=="Debug" GOTO  end
