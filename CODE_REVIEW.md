@@ -30,9 +30,11 @@ Original project effectively abandoned. Maintainer (rzander) stated in Jan 2026:
 3. **ConnectIPC() no longer accepts plaintext password** — signature changed to `ConnectIPC(string, SecureString)` and `ConnectIPC(PSCredential)`. Caller updated to pass `SecurePassword` instead of `Password`.
 4. **Invoke-Expression removed** — 4 call sites in `inventory.cs` and `agentactions.cs` replaced with direct `& msiexec.exe` invocation. Eliminates code injection surface.
 
+### Fixed in v1.1.0 (cont.)
+5. **Saved-password storage removed** — password is no longer persisted to settings between sessions. `/Password:` command-line argument removed (was visible in process listings). Previously saved passwords are cleared on first connect. Use integrated auth (launch elevated via PAM/runas) or type credentials each session.
+
 ### Open
 1. **238 bare `catch { }` blocks** — silent exception swallowing across 55 files. Most are defensive property probes against remote clients (expected to fail when WMI class/registry key doesn't exist on that client version). Needs categorized review: leave defensive probes silent, surface actual operation failures.
-2. **Saved password encryption weak** — the WPF app encrypts saved passwords with SHA1 using the assembly name as the key (`common.Encrypt`/`common.Decrypt` in MainPage.xaml.cs). This is in the UI layer, not the automation library.
 
 ## Outdated Dependencies
 - `WPFToolkit` v3.5 — unmaintained since 2012, blocks .NET 10 migration

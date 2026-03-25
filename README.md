@@ -104,7 +104,7 @@ These are inherited from the original project. Some have been fixed; others are 
 | SecureString to plaintext conversion | **Fixed** | `SCCMAgent` no longer stores `string Password`; credentials stored as `PSCredential` only. IPC P/Invoke uses `SecureStringToGlobalAllocUnicode` with immediate zero-free. |
 | Unescaped strings in Invoke-Expression | **Fixed** | 4 call sites replaced with direct `& msiexec.exe` invocation |
 | 238 bare `catch { }` blocks | Open | Silent exception swallowing across 55 files. Most are intentional defensive probes against remote clients with varying configurations. Needs categorized review. |
-| Weak saved-password encryption (SHA1 + assembly name as key) | Open | UI layer (`common.cs`) uses assembly name as encryption key for saved credentials |
+| Saved-password storage removed | **Fixed** | Password is no longer persisted between sessions. `/Password:` command-line argument removed. Previously saved passwords are cleared on first connect. |
 | Outdated dependencies (WPFToolkit 2012, NavigationPane 2016) | Open | Both unmaintained; will block .NET 10 migration |
 
 **This tool is designed for use by trusted administrators on internal networks.** It is not suitable for untrusted or internet-facing environments without addressing the open security items above.
