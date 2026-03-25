@@ -290,7 +290,7 @@ public class swcache : baseInit
     /// <summary>Deletes the cached items from  the database (WMI).</summary>
     public void DeleteFromDatabase()
     {
-      this.oNewBase.GetStringFromPS($"[wmi]'{this.__NAMESPACE}:{this.__RELPATH}' | remove-wmiobject");
+      this.oNewBase.GetStringFromPS($"Get-CimInstance -Namespace \"{this.__NAMESPACE}\" -Query \"SELECT * FROM {this.__RELPATH.Split('.')[0]} WHERE {this.__RELPATH.Substring(this.__RELPATH.IndexOf('.') + 1)}\" | Remove-CimInstance");
     }
 
     /// <summary>
