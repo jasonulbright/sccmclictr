@@ -566,7 +566,7 @@ public class baseInit : IDisposable
   }
 
   /// <summary>
-  /// Gets a list of PSObjects from cache(if Reload==False) or from a given WMI namespace the PowerShell CmdLet Get-WmiObject
+  /// Gets a list of PSObjects from cache(if Reload==False) or from a given WMI namespace the PowerShell CmdLet Get-CimInstance
   /// </summary>
   /// <param name="WMINamespace">The WMI namespace.</param>
   /// <param name="WQLQuery">The WQL query.</param>
@@ -592,7 +592,7 @@ public class baseInit : IDisposable
   }
 
   /// <summary>
-  /// Gets a list of PSObjects from cache(if Reload==False) or from a given WMI namespace using the PowerShell CmdLet Get-WmiObject
+  /// Gets a list of PSObjects from cache(if Reload==False) or from a given WMI namespace using the PowerShell CmdLet Get-CimInstance
   /// </summary>
   /// <param name="WMINamespace">The WMI namespace.</param>
   /// <param name="WQLQuery">The WQL query.</param>
@@ -607,7 +607,7 @@ public class baseInit : IDisposable
     TimeSpan tCacheTime)
   {
     List<PSObject> objects = new List<PSObject>();
-    string str = $"get-wmiobject -query \"{WQLQuery}\" -namespace \"{WMINamespace}\"";
+    string str = $"Get-CimInstance -query \"{WQLQuery}\" -namespace \"{WMINamespace}\"";
     if (!this.bShowPSCodeOnly)
     {
       string hash = this.CreateHash(WMINamespace + WQLQuery);

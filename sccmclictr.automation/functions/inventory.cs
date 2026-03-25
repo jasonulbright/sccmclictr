@@ -153,7 +153,7 @@ public class inventory : baseInit
     {
       TimeSpan cacheTime = this.cacheTime;
       this.cacheTime = new TimeSpan(0, 15, 0);
-      string stringFromPs = this.GetStringFromPS("(Get-WmiObject Win32_Processor | where {$_.DeviceID -eq 'CPU0'}).AddressWidth");
+      string stringFromPs = this.GetStringFromPS("(Get-CimInstance Win32_Processor | where {$_.DeviceID -eq 'CPU0'}).AddressWidth");
       this.cacheTime = cacheTime;
       return string.Compare("64", stringFromPs, true) == 0 ? "x64" : "x86";
     }
@@ -166,7 +166,7 @@ public class inventory : baseInit
     {
       TimeSpan cacheTime = this.cacheTime;
       this.cacheTime = new TimeSpan(0, 15, 0);
-      string stringFromPs = this.GetStringFromPS("(Get-WmiObject Win32_OperatingSystem).Version");
+      string stringFromPs = this.GetStringFromPS("(Get-CimInstance Win32_OperatingSystem).Version");
       this.cacheTime = cacheTime;
       return stringFromPs;
     }
