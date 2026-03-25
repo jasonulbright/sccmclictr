@@ -25,11 +25,14 @@ Original project effectively abandoned. Maintainer (rzander) stated in Jan 2026:
 ### Fixed in v1.1.0
 1. **SSL cert validation globally disabled**: `ServerCertificateValidationCallback = delegate { return true; }` — replaced with TLS 1.2/1.3 enforcement
 
+### Fixed in v1.1.1
+2. **Credential handling hardened** — removed persistent `string Password` property from `SCCMAgent`. Credentials now stored only as `PSCredential`. IPC connection uses `Marshal.SecureStringToGlobalAllocUnicode` with immediate `ZeroFreeGlobalAllocUnicode` cleanup, minimizing plaintext exposure to the P/Invoke call boundary.
+3. **ConnectIPC() no longer accepts plaintext password** — signature changed to `ConnectIPC(string, SecureString)` and `ConnectIPC(PSCredential)`. Caller updated to pass `SecurePassword` instead of `Password`.
+4. **Invoke-Expression removed** — 4 call sites in `inventory.cs` and `agentactions.cs` replaced with direct `& msiexec.exe` invocation. Eliminates code injection surface.
+
 ### Open
 1. **238 bare `catch { }` blocks** — silent exception swallowing across 55 files. Most are defensive property probes against remote clients (expected to fail when WMI class/registry key doesn't exist on that client version). Needs categorized review: leave defensive probes silent, surface actual operation failures.
-2. **Weak credential handling** — assembly name as encryption key, SecureString-to-plaintext conversion
-3. **ConnectIPC()** passes plaintext password on command line
-4. **Unescaped Invoke-Expression** calls in `inventory.cs` and `agentactions.cs`
+2. **Saved password encryption weak** — the WPF app encrypts saved passwords with SHA1 using the assembly name as the key (`common.Encrypt`/`common.Decrypt` in MainPage.xaml.cs). This is in the UI layer, not the automation library.
 
 ## Outdated Dependencies
 - `WPFToolkit` v3.5 — unmaintained since 2012, blocks .NET 10 migration
