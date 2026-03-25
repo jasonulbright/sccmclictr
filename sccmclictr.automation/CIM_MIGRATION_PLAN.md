@@ -96,28 +96,53 @@ These are deeply embedded in `baseInit.cs` helper methods and throughout functio
 
 ## Migration Phases
 
-### Phase 1: Replace `Get-WmiObject`/`gwmi` with `Get-CimInstance` in PS command strings (**LOW RISK**)
-- Simple string replacement in C# string literals
-- `Get-WmiObject` -> `Get-CimInstance`
-- `gwmi` -> `Get-CimInstance`
-- `Get-WMIObject` -> `Get-CimInstance`
-- Also replace `Remove-WmiObject` -> `Remove-CimInstance`
-- Also replace `[System.Management.ManagementObject[]]` -> `[CimInstance[]]` in PS command strings
-- Update `Resources.resx` (HealthCheck and CacheCleanup scripts)
-- Update `Settings.cs` (PSGetDCOMPerm)
-- Note: `Resources.cs` is auto-generated from `Resources.resx`, so only update `.resx`; rebuild regenerates `.cs`
+### Phase 1: Replace `Get-WmiObject`/`gwmi` with `Get-CimInstance` (**COMPLETE**)
+- Commit: `51de4c3`
+- 8 files updated, ~20 replacements
+- `Get-WmiObject`/`gwmi`/`Get-WMIObject` -> `Get-CimInstance`
+- `Remove-WmiObject` -> `Remove-CimInstance`
+- `[System.Management.ManagementObject[]]` -> `[CimInstance[]]` in PS command strings
+- `ConvertToDateTime()` calls simplified (CIM returns native DateTime)
+- Updated `Resources.resx` (HealthCheck and CacheCleanup scripts)
+- Updated `Settings.cs` (PSGetDCOMPerm)
+- Deferred: `processes.cs` (uses `.GetOwner()` WMI method), `Set-WmiInstance` calls
+- **Validated**: Pester Phase 1 tests pass (18/18, 2 skipped — SCCM namespace)
 
-### Phase 2: Replace `[wmi]`/`[wmiclass]` PS accelerators with CIM cmdlets (**MEDIUM RISK**)
-These accelerators use `System.Management` under the hood. CIM equivalents:
+### Phase 2: Replace `[wmi]`/`[wmiclass]` PS accelerators with CIM cmdlets (**MEDIUM RISK — IN PROGRESS**)
+These accelerators use `System.Management` under the hood. CIM equivalents validated by Pester tests (18/18 pass):
 
-| Old Pattern | New Pattern |
-|-------------|-------------|
-| `([wmi]"NS:Class=@").Property` | `(Get-CimInstance -Namespace "NS" -ClassName "Class").Property` |
-| `([wmiclass]"NS:Class").Method(params)` | `Invoke-CimMethod -Namespace "NS" -ClassName "Class" -MethodName "Method" -Arguments @{...}` |
-| `$a=([wmi]"NS:Class=@");$a.Prop=Val;$a.Put()` | `Set-CimInstance` or `Invoke-CimMethod` |
-| `[wmi]"path" \| remove-wmiobject` | `Get-CimInstance ... \| Remove-CimInstance` |
+| Old Pattern | New Pattern | Pester Validated |
+|-------------|-------------|------------------|
+| `([wmi]"NS:Class=@").Property` | `(Get-CimInstance -Namespace "NS" -ClassName "Class").Property` | Yes — identical results |
+| `([wmiclass]"NS:Class").Method(params)` | `Invoke-CimMethod -Namespace "NS" -ClassName "Class" -MethodName "Method" -Arguments @{...}` | Yes — cmdlet structure |
+| `$a=([wmi]"NS:Class=@");$a.Prop=Val;$a.Put()` | `Get-CimInstance ... \| Set-CimInstance -Property @{Prop=Val}` | Yes — cmdlet structure |
+| `[wmi]"path" \| remove-wmiobject` | `Get-CimInstance ... \| Remove-CimInstance` | Yes — pipeline input |
+| `([wmi]"NS:Class.Key='Val'").Method()` | `Get-CimInstance -Namespace "NS" -ClassName "Class" -Filter "Key='Val'" \| Invoke-CimMethod -MethodName "Method"` | Yes — cmdlet structure |
 
-This affects ALL methods in `baseInit.cs` except `GetObjects()`, `GetCimObjects()`, `GetStringFromPS()`, and `GetObjectsFromPS()`.
+**Key date handling difference (confirmed by Pester):**
+- `[wmi]` returns DMTF strings for date properties (e.g., `"20231215120000.000000+000"`)
+- `Get-CimInstance` returns native `DateTime` objects
+- Both represent the same point in time (validated within 1-second tolerance)
+- C# code uses `ManagementDateTimeConverter.ToDateTime()` on results — Phase 3 will handle this
+
+**Scope — 7 methods in baseInit.cs:**
+1. `GetStringFromClassMethod()` — `([wmiclass]"PATH").Method.Property` -> `(Invoke-CimMethod ...).Property`
+2. `GetStringFromMethod()` — `([wmi]"PATH").Method(Property)` -> `Invoke-CimMethod` on instance
+3. `CallClassMethod()` — `([wmiclass]'PATH').Method(Params)` -> `Invoke-CimMethod`
+4. `CallInstanceMethod()` — `([wmi]'PATH').Method(Params)` -> `Get-CimInstance` + `Invoke-CimMethod`
+5. `GetProperty()` — `([wmi]"PATH").Property` -> `(Get-CimInstance ...).Property`
+6. `GetProperties()` — `([wmi]'PATH').Property` -> `(Get-CimInstance ...).Property`
+7. `SetProperty()` — `$a=([wmi]"PATH");$a.Prop=Val;$a.Put()` -> `Get-CimInstance | Set-CimInstance`
+
+**Scope — 6 direct usages in function files:**
+1. `agentactions.cs:51` — `[wmi]"..." | remove-wmiobject` -> `Get-CimInstance ... | Remove-CimInstance`
+2. `agentactions.cs:956` — `([wmiclass]'...').ApplyPolicyEx(...)` -> `Invoke-CimMethod`
+3. `locationservices.cs:87` — `[wmi]'...' | remove-wmiobject` -> `Get-CimInstance ... | Remove-CimInstance`
+4. `softwareupdates.cs:125,133,235,1268` — `([wmiclass]'...').InstallUpdates(...)` -> `Invoke-CimMethod`
+5. `swcache.cs:293` — `[wmi]'...' | remove-wmiobject` -> `Get-CimInstance ... | Remove-CimInstance`
+
+**WMI path format — requires parsing:**
+All `[wmi]`/`[wmiclass]` paths use the format `NAMESPACE:ClassName.Key='Value'` or `NAMESPACE:ClassName=@` (singleton). The baseInit methods receive these as the `WMIPath` parameter and must be decomposed into separate `-Namespace` and `-ClassName` (and optionally `-Filter`) arguments for CIM cmdlets.
 
 ### Phase 3: Replace `ManagementDateTimeConverter.ToDateTime()` in C# code (**LOW RISK**)
 Write a small static helper method that parses DMTF datetime strings without depending on `System.Management`:

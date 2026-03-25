@@ -84,7 +84,7 @@ public class locationservices : baseInit
       bool flag = false;
       try
       {
-        this.oNewBase.GetStringFromPS($"[wmi]'{this.__NAMESPACE}:{this.__RELPATH}' | remove-wmiobject");
+        this.oNewBase.GetStringFromPS($"Get-CimInstance -Namespace \"{this.__NAMESPACE}\" -Query \"SELECT * FROM {this.__RELPATH.Split('.')[0]} WHERE {this.__RELPATH.Substring(this.__RELPATH.IndexOf('.') + 1)}\" | Remove-CimInstance");
         flag = true;
       }
       catch
