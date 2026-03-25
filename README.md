@@ -141,7 +141,7 @@ For reference when building SCCM client tooling:
 - [x] Fix broken project references
 - [x] Harden credential handling (remove plaintext password storage, SecureString marshaling for IPC)
 - [x] Remove `Invoke-Expression` command injection surface (4 call sites)
-- [ ] Rename decompiler-generated variables (76 across 4 files)
+- [x] Rename decompiler-generated variables (41 across 2 files)
 - [ ] Categorize bare `catch { }` blocks (238 across 55 files)
 
 ### Phase 2: .NET 10 Migration

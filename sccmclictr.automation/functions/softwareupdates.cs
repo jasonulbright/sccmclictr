@@ -261,8 +261,8 @@ public class softwareupdates : baseInit
       this.Language = WMIObject.Properties[nameof (Language)].Value as string;
       this.ProductID = WMIObject.Properties[nameof (ProductID)].Value as string;
       this.RevisionNumber = WMIObject.Properties[nameof (RevisionNumber)].Value as uint?;
-      string dmtfDate = WMIObject.Properties[nameof (ScanTime)].Value as string;
-      this.ScanTime = !string.IsNullOrEmpty(dmtfDate) ? new DateTime?(ManagementDateTimeConverter.ToDateTime(dmtfDate)) : new DateTime?();
+      string scanTimeDmtf = WMIObject.Properties[nameof (ScanTime)].Value as string;
+      this.ScanTime = !string.IsNullOrEmpty(scanTimeDmtf) ? new DateTime?(ManagementDateTimeConverter.ToDateTime(scanTimeDmtf)) : new DateTime?();
       this.Sources = (softwareupdates.CCM_SourceStatus[]) null;
       this.SourceType = WMIObject.Properties[nameof (SourceType)].Value as uint?;
       this.SourceUniqueId = WMIObject.Properties[nameof (SourceUniqueId)].Value as string;
@@ -549,8 +549,8 @@ public class softwareupdates : baseInit
       this.ComponentName = WMIObject.Properties[nameof (ComponentName)].Value as string;
       this.MaxPauseDuration = WMIObject.Properties[nameof (MaxPauseDuration)].Value as uint?;
       this.PauseCookie = WMIObject.Properties[nameof (PauseCookie)].Value as uint?;
-      string dmtfDate = WMIObject.Properties[nameof (PauseStartTime)].Value as string;
-      this.PauseStartTime = !string.IsNullOrEmpty(dmtfDate) ? new DateTime?(ManagementDateTimeConverter.ToDateTime(dmtfDate)) : new DateTime?();
+      string pauseStartTimeDmtf = WMIObject.Properties[nameof (PauseStartTime)].Value as string;
+      this.PauseStartTime = !string.IsNullOrEmpty(pauseStartTimeDmtf) ? new DateTime?(ManagementDateTimeConverter.ToDateTime(pauseStartTimeDmtf)) : new DateTime?();
       this.Reserved = WMIObject.Properties[nameof (Reserved)].Value as string;
     }
 
@@ -1207,14 +1207,14 @@ public class softwareupdates : baseInit
       this.ExclusiveUpdate = WMIObject.Properties[nameof (ExclusiveUpdate)].Value as bool?;
       this.OverrideServiceWindows = WMIObject.Properties[nameof (OverrideServiceWindows)].Value as bool?;
       this.RebootOutsideServiceWindows = WMIObject.Properties[nameof (RebootOutsideServiceWindows)].Value as bool?;
-      string dmtfDate = WMIObject.Properties[nameof (RestartDeadline)].Value as string;
-      if (string.IsNullOrEmpty(dmtfDate))
+      string restartDeadlineDmtf = WMIObject.Properties[nameof (RestartDeadline)].Value as string;
+      if (string.IsNullOrEmpty(restartDeadlineDmtf))
       {
         this.RestartDeadline = new DateTime?();
       }
       else
       {
-        this.RestartDeadline = new DateTime?(ManagementDateTimeConverter.ToDateTime(dmtfDate));
+        this.RestartDeadline = new DateTime?(ManagementDateTimeConverter.ToDateTime(restartDeadlineDmtf));
         this.RestartDeadline = new DateTime?(this.RestartDeadline.Value.ToUniversalTime());
       }
       this.UpdateID = WMIObject.Properties[nameof (UpdateID)].Value as string;
