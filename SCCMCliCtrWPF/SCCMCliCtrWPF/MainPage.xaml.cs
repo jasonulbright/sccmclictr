@@ -264,7 +264,8 @@ namespace ClientCenter
             }
             catch { }
 
-            pb_Password.Password = common.Decrypt(Properties.Settings.Default.Password, Application.ResourceAssembly.ManifestModule.Name);
+            // Password is no longer saved between sessions. Use integrated auth
+            // (launch elevated) or type credentials each session.
             Common.Hostname = tb_TargetComputer.Text.Trim();
 
             try
@@ -276,9 +277,9 @@ namespace ClientCenter
                     if (Args.Contains("/?"))
                     {
                         System.Console.WriteLine("Usage:");
-                        System.Console.WriteLine("\tSCCMCliCtrWPF.exe <Hostname> [/Username:xxxx] [/Password:xxxxxx] ");
+                        System.Console.WriteLine("\tSCCMCliCtrWPF.exe <Hostname> [/Username:xxxx]");
                         System.Console.WriteLine("\tSCCMCliCtrWPF.exe [/RegisterConsole] [/UnRegisterConsole]");
-                        MessageBox.Show("SCCMCliCtrWPF.exe <Hostname> [/Username:xxxx] [/Password:xxxxxx]" + Environment.NewLine +
+                        MessageBox.Show("SCCMCliCtrWPF.exe <Hostname> [/Username:xxxx]" + Environment.NewLine +
                             "SCCMCliCtrWPF.exe [/RegisterConsole | /UnRegisterConsole]", "SCCMCliCtr Usage", MessageBoxButton.OK, MessageBoxImage.Information);
                         Close();
                         return;
@@ -307,20 +308,14 @@ namespace ClientCenter
                     }
 
                     string sUser = Args.FirstOrDefault(t => t.StartsWith("/Username:", StringComparison.CurrentCultureIgnoreCase));
-                    string sPW = Args.FirstOrDefault(t => t.StartsWith("/Password:", StringComparison.CurrentCultureIgnoreCase));
 
-                    if (sUser != null && sPW != null)
+                    if (sUser != null)
                     {
                         sUser = sUser.Substring(10);
-                        sPW = sPW.Substring(10);
-                        if (!string.IsNullOrEmpty(sUser) && !string.IsNullOrEmpty(sPW))
+                        if (!string.IsNullOrEmpty(sUser))
                         {
                             tb_Username.Text = sUser;
-                            Properties.Settings.Default.Username = tb_Username.Text;    //Binding is not yet syncing these, so do it manually.
-                            pb_Password.Password = sPW; //Not ideal but works
-                            //pb_Password.SecurePassword is read-only so another variable with one-way binding is required.
-                            sUser = "";
-                            sPW = "";
+                            Properties.Settings.Default.Username = tb_Username.Text;
                         }
                     }
 
@@ -545,11 +540,9 @@ namespace ClientCenter
                             Properties.Settings.Default.recentlyUsedComputers.RemoveAt(10);
                         }
 
-                        //save password
-                        if (!string.IsNullOrEmpty(tb_Username.Text))
-                        {
-                            Properties.Settings.Default.Password = common.Encrypt(new System.Net.NetworkCredential(string.Empty, pb_Password.SecurePassword).Password, Application.ResourceAssembly.ManifestModule.Name);
-                        }
+                        // Clear any previously saved password from older versions
+                        if (!string.IsNullOrEmpty(Properties.Settings.Default.Password))
+                            Properties.Settings.Default.Password = "";
 
                         Properties.Settings.Default.Save();
                     }
