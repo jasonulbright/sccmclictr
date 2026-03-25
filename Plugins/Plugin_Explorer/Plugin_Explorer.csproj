@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -49,10 +49,10 @@
   <ItemGroup>
     <Reference Include="Customization, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Customization\bin\Release\Customization.dll</HintPath>
+      <HintPath>..\..\Customization\bin\Debug\Customization.dll</HintPath>
     </Reference>
-    <Reference Include="sccmclictr.automation, Version=1.0.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\sccmclictrlib.1.0.1\lib\net48\sccmclictr.automation.dll</HintPath>
+    <Reference Include="sccmclictr.automation">
+      <HintPath>..\..\sccmclictr.automation\bin\Debug\sccmclictr.automation.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />

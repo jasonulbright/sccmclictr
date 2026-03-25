@@ -39,10 +39,9 @@ namespace ClientCenter
 
             ribbon1.ContextMenu = null;
 
-            //Disbale SSL/TLS Errors
-            System.Net.ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
-            //Disable CRL Check
-            System.Net.ServicePointManager.CheckCertificateRevocationList = false;
+            // SSL/TLS: validate certificates properly. Override per-connection if self-signed certs are needed.
+            // Previous code globally disabled validation — removed as security risk (MITM).
+            System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Tls12 | System.Net.SecurityProtocolType.Tls13;
 
             AgentSettingsPane.IsSelected = true;
 
