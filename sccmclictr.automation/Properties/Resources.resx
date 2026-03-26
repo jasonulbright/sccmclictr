@@ -126,9 +126,9 @@ $PatchRebootPending = $false;
 $RebootRequired = $false;
 $RunningUpdates = $false;
 $UserLoggedOn = $false;
-$CCMUpdate = get-wmiobject -query "SELECT * FROM CCM_SoftwareUpdate" -namespace "ROOT\ccm\ClientSDK";
-$CCMAppl = get-wmiobject -query "SELECT * FROM CCM_Application" -namespace "ROOT\ccm\ClientSDK";
-$CCMProg = get-wmiobject -query "SELECT * FROM CCM_Program" -namespace "ROOT\ccm\ClientSDK";
+$CCMUpdate = Get-CimInstance -query "SELECT * FROM CCM_SoftwareUpdate" -namespace "ROOT\ccm\ClientSDK";
+$CCMAppl = Get-CimInstance -query "SELECT * FROM CCM_Application" -namespace "ROOT\ccm\ClientSDK";
+$CCMProg = Get-CimInstance -query "SELECT * FROM CCM_Program" -namespace "ROOT\ccm\ClientSDK";
 $CM12RebootPending = ([wmiclass]'ROOT\ccm\ClientSDK:CCM_ClientUtilities').DetermineIfRebootPending().RebootPending;
 $CM12HardRebootPending = ([wmiclass]'ROOT\ccm\ClientSDK:CCM_ClientUtilities').DetermineIfRebootPending().IsHardRebootPending;
 $ComponentRebootPending = if(test-path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing\RebootPending"){ $true } else { $false }
@@ -140,7 +140,7 @@ if(@($CCMUpdate | where { $_.EvaluationState -eq 8 -or $_.EvaluationState -eq 9 
 if(@($CCMUpdate | where { $_.EvaluationState -eq 2 -or $_.EvaluationState -eq 3 -or $_.EvaluationState -eq 4 -or $_.EvaluationState -eq 5 -or $_.EvaluationState -eq 6 -or $_.EvaluationState -eq 7 -or $_.EvaluationState -eq 11 }).length -ne 0) { $RunningUpdates  = $true };
 if($FileRenamePending -or $CM12RebootPending -or $CM12HardRebootPending -or $PatchRebootPending -or $ComponentRebootPending) { $RebootRequired = $true };
 If((Get-Service smstsmgr -ea SilentlyContinue).Status -eq "Running") { $RunningUpdates = $true }
-$proc = @(gwmi win32_process -Filter "Name = 'explorer.exe'");
+$proc = @(Get-CimInstance win32_process -Filter "Name = 'explorer.exe'");
 if($proc.Length -gt 0) { $UserLoggedOn = $true };
 $RebootRequired.ToString() + ";" +$MissingUpdates.ToString() +";" + $RunningUpdates.ToString() + ";" + $UserLoggedOn.ToString();</value>
   </data>
@@ -321,13 +321,13 @@ $(UnProtect-PolicySecret ($PolicySecret))
 }</value>
   </data>
   <data name="CacheCleanup" xml:space="preserve">
-    <value>$CacheElements =  get-wmiobject -query "SELECT * FROM CacheInfoEx" -namespace "ROOT\ccm\SoftMgmtAgent"
+    <value>$CacheElements =  Get-CimInstance -query "SELECT * FROM CacheInfoEx" -namespace "ROOT\ccm\SoftMgmtAgent"
 $ElementGroup = $CacheElements | Group-Object ContentID
 [int]$Cleaned = 0;
 
 #Cleanup CacheItems where ContentFolder does not exist
 $CacheElements | where {!(Test-Path $_.Location)} | % { $_.Delete(); $Cleaned++ }
-$CacheElements = get-wmiobject -query "SELECT * FROM CacheInfoEx" -namespace "ROOT\ccm\SoftMgmtAgent"
+$CacheElements = Get-CimInstance -query "SELECT * FROM CacheInfoEx" -namespace "ROOT\ccm\SoftMgmtAgent"
 
 foreach ($ElementID in $ElementGroup) 
 {

@@ -464,7 +464,7 @@ public class agentproperties : baseInit
   {
     get
     {
-      return int.Parse(this.GetStringFromPS("$wmi = Get-WmiObject -Class Win32_OperatingSystem;$a = New-TimeSpan $wmi.ConvertToDateTime($wmi.LastBootUpTime) $(Get-Date);$a.Days"));
+      return int.Parse(this.GetStringFromPS("$wmi = Get-CimInstance -ClassName Win32_OperatingSystem;$a = New-TimeSpan $wmi.LastBootUpTime $(Get-Date);$a.Days"));
     }
   }
 
@@ -473,7 +473,7 @@ public class agentproperties : baseInit
   {
     get
     {
-      return DateTime.ParseExact(this.GetStringFromPS("$wmi = Get-WmiObject -Class Win32_OperatingSystem;$a = $wmi.ConvertToDateTime($wmi.LastBootUpTime);$a.ToString(\"yyyy-MM-dd HH:mm\")"), "yyyy-MM-dd HH:mm", (IFormatProvider) null);
+      return DateTime.ParseExact(this.GetStringFromPS("$wmi = Get-CimInstance -ClassName Win32_OperatingSystem;$a = $wmi.LastBootUpTime;$a.ToString(\"yyyy-MM-dd HH:mm\")"), "yyyy-MM-dd HH:mm", (IFormatProvider) null);
     }
   }
 
@@ -482,7 +482,7 @@ public class agentproperties : baseInit
   {
     get
     {
-      return TimeSpan.FromSeconds(double.Parse(this.GetStringFromPS("$wmi = Get-WmiObject -Class Win32_OperatingSystem;$a = New-TimeSpan $wmi.ConvertToDateTime($wmi.LastBootUpTime) $(Get-Date);$a.TotalSeconds").ToString()));
+      return TimeSpan.FromSeconds(double.Parse(this.GetStringFromPS("$wmi = Get-CimInstance -ClassName Win32_OperatingSystem;$a = New-TimeSpan $wmi.LastBootUpTime $(Get-Date);$a.TotalSeconds").ToString()));
     }
   }
 
@@ -799,7 +799,7 @@ public class agentproperties : baseInit
     {
       try
       {
-        return this.GetStringFromPS("(Get-WmiObject -Class CCM_InstalledProduct -Namespace \"root\\ccm\").ProductCode");
+        return this.GetStringFromPS("(Get-CimInstance -ClassName CCM_InstalledProduct -Namespace \"root\\ccm\").ProductCode");
       }
       catch
       {
@@ -817,7 +817,7 @@ public class agentproperties : baseInit
   {
     try
     {
-      return this.GetStringFromPS("gwmi -query \"SELECT * FROM __Namespace WHERE Name='CCM'\" -Namespace \"root\" | Remove-WmiObject");
+      return this.GetStringFromPS("Get-CimInstance -query \"SELECT * FROM __Namespace WHERE Name='CCM'\" -Namespace \"root\" | Remove-CimInstance");
     }
     catch
     {
@@ -834,7 +834,7 @@ public class agentproperties : baseInit
     {
       try
       {
-        string PSCode = "$username = (get-wmiobject -query \"SELECT Username FROM Win32_ComputerSystem\" -namespace \"root\\cimv2\").Username;$user = New-Object System.Security.Principal.NTAccount($username.split('\\')[0],$username.split('\\')[1]);$sid = $user.Translate([System.Security.Principal.SecurityIdentifier]);$sid.Value";
+        string PSCode = "$username = (Get-CimInstance -query \"SELECT Username FROM Win32_ComputerSystem\" -namespace \"root\\cimv2\").Username;$user = New-Object System.Security.Principal.NTAccount($username.split('\\')[0],$username.split('\\')[1]);$sid = $user.Translate([System.Security.Principal.SecurityIdentifier]);$sid.Value";
         loggedOnUserSiDs.Add(this.GetStringFromPS(PSCode));
       }
       catch
@@ -843,7 +843,7 @@ public class agentproperties : baseInit
     }
     else
     {
-      foreach (PSObject psObject in this.GetObjectsFromPS("get-wmiobject -query \"SELECT UserSID FROM CCM_UserLogonEvents WHERE LogoffTime = NULL\" -namespace \"ROOT\\ccm\""))
+      foreach (PSObject psObject in this.GetObjectsFromPS("Get-CimInstance -query \"SELECT UserSID FROM CCM_UserLogonEvents WHERE LogoffTime = NULL\" -namespace \"ROOT\\ccm\""))
       {
         try
         {

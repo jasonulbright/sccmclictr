@@ -8,7 +8,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Management;
 using System.Management.Automation;
 using System.Management.Automation.Runspaces;
 
@@ -106,7 +105,7 @@ public class appv4 : baseInit
       this.CachedOsdPath = WMIObject.Properties[nameof (CachedOsdPath)].Value as string;
       this.GlobalRunningCount = WMIObject.Properties[nameof (GlobalRunningCount)].Value as uint?;
       string dmtfDate = WMIObject.Properties[nameof (LastLaunchOnSystem)].Value as string;
-      this.LastLaunchOnSystem = !string.IsNullOrEmpty(dmtfDate) ? new DateTime?(ManagementDateTimeConverter.ToDateTime(dmtfDate)) : new DateTime?();
+      this.LastLaunchOnSystem = !string.IsNullOrEmpty(dmtfDate) ? new DateTime?(common.DmtfToDateTime(dmtfDate)) : new DateTime?();
       this.Loading = WMIObject.Properties[nameof (Loading)].Value as bool?;
       this.Name = WMIObject.Properties[nameof (Name)].Value as string;
       this.OriginalOsdPath = WMIObject.Properties[nameof (OriginalOsdPath)].Value as string;
