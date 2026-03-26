@@ -76,7 +76,7 @@ The tool includes 14 plugin extensions:
 - **Hardened credentials** -- no plaintext password storage, SecureString throughout
 - **Removed code injection** -- replaced `Invoke-Expression` with direct invocation
 - **Removed saved passwords** -- `/Password:` command-line argument removed
-- **CIM migration underway** -- replacing deprecated `Get-WmiObject` with `Get-CimInstance` ([details](CODE_REVIEW.md))
+- **CIM migration complete** -- all `Get-WmiObject` / `[wmi]` / `[wmiclass]` replaced with CIM cmdlets. `System.Management` dependency removed. 43 Pester tests. ([details](CODE_REVIEW.md))
 
 ## Security
 
@@ -86,6 +86,7 @@ The tool includes 14 plugin extensions:
 | Plaintext password storage | **Fixed** |
 | Invoke-Expression code injection | **Fixed** |
 | Saved-password persistence | **Fixed** |
+| WMI deprecation (`System.Management`) | **Fixed** — CIM migration complete |
 | 308 bare `catch { }` blocks | [Audited](CATCH_BLOCK_AUDIT.md) |
 | Outdated vendored dependencies | Open |
 
