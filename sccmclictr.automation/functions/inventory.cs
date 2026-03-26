@@ -8,7 +8,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Management;
 using System.Management.Automation;
 using System.Management.Automation.Runspaces;
 
@@ -153,7 +152,7 @@ public class inventory : baseInit
     {
       TimeSpan cacheTime = this.cacheTime;
       this.cacheTime = new TimeSpan(0, 15, 0);
-      string stringFromPs = this.GetStringFromPS("(Get-WmiObject Win32_Processor | where {$_.DeviceID -eq 'CPU0'}).AddressWidth");
+      string stringFromPs = this.GetStringFromPS("(Get-CimInstance Win32_Processor | where {$_.DeviceID -eq 'CPU0'}).AddressWidth");
       this.cacheTime = cacheTime;
       return string.Compare("64", stringFromPs, true) == 0 ? "x64" : "x86";
     }
@@ -166,7 +165,7 @@ public class inventory : baseInit
     {
       TimeSpan cacheTime = this.cacheTime;
       this.cacheTime = new TimeSpan(0, 15, 0);
-      string stringFromPs = this.GetStringFromPS("(Get-WmiObject Win32_OperatingSystem).Version");
+      string stringFromPs = this.GetStringFromPS("(Get-CimInstance Win32_OperatingSystem).Version");
       this.cacheTime = cacheTime;
       return stringFromPs;
     }
@@ -342,14 +341,14 @@ public class inventory : baseInit
       this.WMIObject = WMIObject;
       this.InventoryActionID = WMIObject.Properties[nameof (InventoryActionID)].Value as string;
       string dmtfDate1 = WMIObject.Properties[nameof (LastCycleStartedDate)].Value as string;
-      this.LastCycleStartedDate = !string.IsNullOrEmpty(dmtfDate1) ? new DateTime?(ManagementDateTimeConverter.ToDateTime(dmtfDate1)) : new DateTime?();
+      this.LastCycleStartedDate = !string.IsNullOrEmpty(dmtfDate1) ? new DateTime?(common.DmtfToDateTime(dmtfDate1)) : new DateTime?();
       this.LastMajorReportVersion = WMIObject.Properties[nameof (LastMajorReportVersion)].Value as uint?;
       this.LastMinorReportVersion = WMIObject.Properties[nameof (LastMinorReportVersion)].Value as uint?;
       string dmtfDate2 = WMIObject.Properties[nameof (LastReportDate)].Value as string;
       if (string.IsNullOrEmpty(dmtfDate2))
         this.LastReportDate = new DateTime?();
       else
-        this.LastReportDate = new DateTime?(ManagementDateTimeConverter.ToDateTime(dmtfDate2));
+        this.LastReportDate = new DateTime?(common.DmtfToDateTime(dmtfDate2));
     }
 
     internal string __CLASS { get; set; }
@@ -389,7 +388,7 @@ public class inventory : baseInit
       this.__INSTANCE = true;
       this.WMIObject = WMIObject;
       string dmtfDate = WMIObject.Properties[nameof (Date)].Value as string;
-      this.Date = !string.IsNullOrEmpty(dmtfDate) ? new DateTime?(ManagementDateTimeConverter.ToDateTime(dmtfDate)) : new DateTime?();
+      this.Date = !string.IsNullOrEmpty(dmtfDate) ? new DateTime?(common.DmtfToDateTime(dmtfDate)) : new DateTime?();
       this.hr0_1 = WMIObject.Properties[nameof (hr0_1)].Value as uint?;
       this.hr10_11 = WMIObject.Properties[nameof (hr10_11)].Value as uint?;
       this.hr11_12 = WMIObject.Properties[nameof (hr11_12)].Value as uint?;
@@ -505,7 +504,7 @@ public class inventory : baseInit
       if (string.IsNullOrEmpty(dmtfDate))
         this.LKGTime = new DateTime?();
       else
-        this.LKGTime = new DateTime?(ManagementDateTimeConverter.ToDateTime(dmtfDate));
+        this.LKGTime = new DateTime?(common.DmtfToDateTime(dmtfDate));
     }
 
     internal string __CLASS { get; set; }
@@ -545,7 +544,7 @@ public class inventory : baseInit
       this.ComputerShutdownState = WMIObject.Properties[nameof (ComputerShutdownState)].Value as uint?;
       this.ComputerSleepState = WMIObject.Properties[nameof (ComputerSleepState)].Value as uint?;
       string dmtfDate = WMIObject.Properties[nameof (LastRecordedDate)].Value as string;
-      this.LastRecordedDate = !string.IsNullOrEmpty(dmtfDate) ? new DateTime?(ManagementDateTimeConverter.ToDateTime(dmtfDate)) : new DateTime?();
+      this.LastRecordedDate = !string.IsNullOrEmpty(dmtfDate) ? new DateTime?(common.DmtfToDateTime(dmtfDate)) : new DateTime?();
       this.MonitorOnState = WMIObject.Properties[nameof (MonitorOnState)].Value as uint?;
     }
 
@@ -598,7 +597,7 @@ public class inventory : baseInit
       if (string.IsNullOrEmpty(dmtfDate))
         this.time = new DateTime?();
       else
-        this.time = new DateTime?(ManagementDateTimeConverter.ToDateTime(dmtfDate));
+        this.time = new DateTime?(common.DmtfToDateTime(dmtfDate));
     }
 
     internal string __CLASS { get; set; }
@@ -643,7 +642,7 @@ public class inventory : baseInit
       this.RequesterType = WMIObject.Properties[nameof (RequesterType)].Value as string;
       this.RequestType = WMIObject.Properties[nameof (RequestType)].Value as string;
       string dmtfDate = WMIObject.Properties[nameof (Time)].Value as string;
-      this.Time = !string.IsNullOrEmpty(dmtfDate) ? new DateTime?(ManagementDateTimeConverter.ToDateTime(dmtfDate)) : new DateTime?();
+      this.Time = !string.IsNullOrEmpty(dmtfDate) ? new DateTime?(common.DmtfToDateTime(dmtfDate)) : new DateTime?();
       this.UnknownRequester = WMIObject.Properties[nameof (UnknownRequester)].Value as bool?;
     }
 
@@ -699,7 +698,7 @@ public class inventory : baseInit
       if (string.IsNullOrEmpty(dmtfDate))
         this.MonthStart = new DateTime?();
       else
-        this.MonthStart = new DateTime?(ManagementDateTimeConverter.ToDateTime(dmtfDate));
+        this.MonthStart = new DateTime?(common.DmtfToDateTime(dmtfDate));
     }
 
     internal string __CLASS { get; set; }

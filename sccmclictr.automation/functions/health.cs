@@ -141,7 +141,7 @@ public class health : baseInit
   /// <summary>Delete root\ccm namespace in WMI</summary>
   public void DeleteCCMNamespace()
   {
-    this.GetStringFromPS("gwmi -query \"SELECT * FROM __Namespace WHERE Name='CCM'\" -Namespace \"root\" | Remove-WmiObject");
+    this.GetStringFromPS("Get-CimInstance -query \"SELECT * FROM __Namespace WHERE Name='CCM'\" -Namespace \"root\" | Remove-CimInstance");
   }
 
   /// <summary>Delete all machine certificates from the SMS Folder</summary>
