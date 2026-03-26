@@ -7,7 +7,6 @@
 
 using System;
 using System.Diagnostics;
-using System.Management;
 using System.Management.Automation;
 using System.Management.Automation.Runspaces;
 
@@ -38,7 +37,7 @@ public class CIM_ManagedSystemElement
     this.Caption = WMIObject.Properties[nameof (Caption)].Value as string;
     this.Description = WMIObject.Properties[nameof (Description)].Value as string;
     string dmtfDate = WMIObject.Properties[nameof (InstallDate)].Value as string;
-    this.InstallDate = !string.IsNullOrEmpty(dmtfDate) ? new DateTime?(ManagementDateTimeConverter.ToDateTime(dmtfDate)) : new DateTime?();
+    this.InstallDate = !string.IsNullOrEmpty(dmtfDate) ? new DateTime?(common.DmtfToDateTime(dmtfDate)) : new DateTime?();
     this.Name = WMIObject.Properties[nameof (Name)].Value as string;
     this.Status = WMIObject.Properties[nameof (Status)].Value as string;
   }

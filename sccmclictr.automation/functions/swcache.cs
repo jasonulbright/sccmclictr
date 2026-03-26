@@ -9,7 +9,6 @@ using sccmclictr.automation.Properties;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Management;
 using System.Management.Automation;
 using System.Management.Automation.Runspaces;
 
@@ -188,7 +187,7 @@ public class swcache : baseInit
         this.ExcludeFileList = "";
       }
       string dmtfDate = WMIObject.Properties[nameof (LastReferenced)].Value as string;
-      this.LastReferenced = !string.IsNullOrEmpty(dmtfDate) ? new DateTime?(ManagementDateTimeConverter.ToDateTime(dmtfDate)) : new DateTime?();
+      this.LastReferenced = !string.IsNullOrEmpty(dmtfDate) ? new DateTime?(common.DmtfToDateTime(dmtfDate)) : new DateTime?();
       this.Location = WMIObject.Properties[nameof (Location)].Value as string;
       try
       {
