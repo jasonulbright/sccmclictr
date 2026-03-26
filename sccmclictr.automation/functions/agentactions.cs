@@ -953,7 +953,7 @@ public class agentactions : baseInit
   {
     try
     {
-      return !string.IsNullOrEmpty(this.baseClient.GetStringFromPS($"([wmiclass]'ROOT\\ccm\\ClientSdk:CCM_SoftwareCatalogUtilities').ApplyPolicyEx('{Body}','{BodySignature}','{BodySource}').Id"));
+      return !string.IsNullOrEmpty(this.baseClient.GetStringFromPS($"(Invoke-CimMethod -Namespace 'ROOT\\ccm\\ClientSdk' -ClassName CCM_SoftwareCatalogUtilities -MethodName ApplyPolicyEx -Arguments @{{Body='{Body}';BodySignature='{BodySignature}';BodySource='{BodySource}'}}).Id"));
     }
     catch
     {

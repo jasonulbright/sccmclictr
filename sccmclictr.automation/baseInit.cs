@@ -322,10 +322,27 @@ public class baseInit : IDisposable
     string MethodParams,
     bool Reload)
   {
-    if (!MethodParams.StartsWith("("))
-      MethodParams = $"({MethodParams})";
+    // Strip outer parens from params if present, for argument parsing
+    string rawParams = MethodParams.Trim();
+    if (rawParams.StartsWith("(") && rawParams.EndsWith(")"))
+      rawParams = rawParams.Substring(1, rawParams.Length - 2);
+
+    var (ns, cls) = ParseWmiPathForMethod(WMIPath);
     PSObject psObject1 = (PSObject) null;
-    string str = $"([wmiclass]'{WMIPath}').{WMIMethod}{MethodParams}";
+    string str;
+    if (string.IsNullOrWhiteSpace(rawParams))
+    {
+      // No-arg method call
+      str = $"Invoke-CimMethod -Namespace \"{ns}\" -ClassName \"{cls}\" -MethodName \"{WMIMethod}\"";
+    }
+    else
+    {
+      // Parameterized call: discover param names from CIM class, map positional args
+      str = $"$_pv = @({rawParams}); " +
+            $"$_pn = (Get-CimClass -Namespace '{ns}' -ClassName '{cls}').CimClassMethods['{WMIMethod}'].Parameters.Name; " +
+            $"$_a = @{{}}; for ($i=0; $i -lt $_pv.Count; $i++) {{ $_a[$_pn[$i]] = $_pv[$i] }}; " +
+            $"Invoke-CimMethod -Namespace \"{ns}\" -ClassName \"{cls}\" -MethodName \"{WMIMethod}\" -Arguments $_a";
+    }
     if (!this.bShowPSCodeOnly)
     {
       string hash = this.CreateHash(WMIPath + WMIMethod + MethodParams);
@@ -379,7 +396,22 @@ public class baseInit : IDisposable
     bool Reload)
   {
     PSObject psObject1 = (PSObject) null;
-    string str = $"([wmi]'{WMIPath}').{WMIMethod}({MethodParams})";
+    // Instance method: get CIM instance first, then invoke method on it
+    string cimGet = WmiPathToCimQuery(WMIPath);
+    var (ns, cls) = ParseWmiPathForMethod(WMIPath);
+    string rawParams = MethodParams?.Trim() ?? "";
+    string str;
+    if (string.IsNullOrWhiteSpace(rawParams))
+    {
+      str = $"{cimGet} | Invoke-CimMethod -MethodName \"{WMIMethod}\"";
+    }
+    else
+    {
+      str = $"$_pv = @({rawParams}); " +
+            $"$_pn = (Get-CimClass -Namespace '{ns}' -ClassName '{cls}').CimClassMethods['{WMIMethod}'].Parameters.Name; " +
+            $"$_a = @{{}}; for ($i=0; $i -lt $_pv.Count; $i++) {{ $_a[$_pn[$i]] = $_pv[$i] }}; " +
+            $"{cimGet} | Invoke-CimMethod -MethodName \"{WMIMethod}\" -Arguments $_a";
+    }
     if (!this.bShowPSCodeOnly)
     {
       string hash = this.CreateHash(WMIPath + WMIMethod + MethodParams);
