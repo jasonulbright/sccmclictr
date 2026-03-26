@@ -11,7 +11,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Management;
 using System.Management.Automation;
 using System.Management.Automation.Runspaces;
 using System.Net;
@@ -413,7 +412,7 @@ public class softwaredistribution : baseInit
       }
       else
       {
-        this.Deadline = new DateTime?(ManagementDateTimeConverter.ToDateTime(deadlineDmtf));
+        this.Deadline = new DateTime?(common.DmtfToDateTime(deadlineDmtf));
         utcConverted = this.Deadline;
         this.Deadline = new DateTime?(utcConverted.Value.ToUniversalTime());
       }
@@ -431,7 +430,7 @@ public class softwaredistribution : baseInit
         this.NextUserScheduledTime = utcConverted;
       }
       else
-        this.NextUserScheduledTime = new DateTime?(ManagementDateTimeConverter.ToDateTime(nextUserTimeDmtf));
+        this.NextUserScheduledTime = new DateTime?(common.DmtfToDateTime(nextUserTimeDmtf));
       this.PercentComplete = WMIObject.Properties[nameof (PercentComplete)].Value as uint?;
       this.Publisher = WMIObject.Properties[nameof (Publisher)].Value as string;
       this.Type = WMIObject.Properties[nameof (Type)].Value as uint?;
@@ -521,7 +520,7 @@ public class softwaredistribution : baseInit
       this.Id = WMIObject.Properties[nameof (Id)].Value as string;
       this.InstallState = WMIObject.Properties[nameof (InstallState)].Value as string;
       string lastEvalDmtf = WMIObject.Properties[nameof (LastEvalTime)].Value as string;
-      this.LastEvalTime = !string.IsNullOrEmpty(lastEvalDmtf) ? new DateTime?(ManagementDateTimeConverter.ToDateTime(lastEvalDmtf)) : new DateTime?();
+      this.LastEvalTime = !string.IsNullOrEmpty(lastEvalDmtf) ? new DateTime?(common.DmtfToDateTime(lastEvalDmtf)) : new DateTime?();
       this.PostInstallAction = WMIObject.Properties[nameof (PostInstallAction)].Value as string;
       this.ResolvedState = WMIObject.Properties[nameof (ResolvedState)].Value as string;
       this.RetriesRemaining = WMIObject.Properties[nameof (RetriesRemaining)].Value as uint?;
@@ -819,7 +818,7 @@ public class softwaredistribution : baseInit
       {
         try
         {
-          this.LastEvalTime = new DateTime?(ManagementDateTimeConverter.ToDateTime(lastEvalDmtf));
+          this.LastEvalTime = new DateTime?(common.DmtfToDateTime(lastEvalDmtf));
           this.LastEvalTime = new DateTime?(this.LastEvalTime.Value.ToUniversalTime());
         }
         catch
@@ -835,7 +834,7 @@ public class softwaredistribution : baseInit
       {
         try
         {
-          this.LastInstallTime = new DateTime?(ManagementDateTimeConverter.ToDateTime(lastInstallDmtf));
+          this.LastInstallTime = new DateTime?(common.DmtfToDateTime(lastInstallDmtf));
           this.LastInstallTime = new DateTime?(this.LastInstallTime.Value.ToUniversalTime());
         }
         catch
@@ -854,7 +853,7 @@ public class softwaredistribution : baseInit
       {
         try
         {
-          this.ReleaseDate = new DateTime?(ManagementDateTimeConverter.ToDateTime(releaseDateDmtf));
+          this.ReleaseDate = new DateTime?(common.DmtfToDateTime(releaseDateDmtf));
           this.ReleaseDate = new DateTime?(this.ReleaseDate.Value.ToUniversalTime());
         }
         catch
@@ -873,7 +872,7 @@ public class softwaredistribution : baseInit
       {
         try
         {
-          this.StartTime = new DateTime?(ManagementDateTimeConverter.ToDateTime(startTimeDmtf));
+          this.StartTime = new DateTime?(common.DmtfToDateTime(startTimeDmtf));
           this.StartTime = new DateTime?(this.StartTime.Value.ToUniversalTime());
         }
         catch
@@ -901,14 +900,14 @@ public class softwaredistribution : baseInit
       this.__INSTANCE = true;
       this.WMIObject = WMIObject;
       string nextRevalDmtf = WMIObject.Properties[nameof (NextGlobalRevalTime)].Value as string;
-      this.NextGlobalRevalTime = !string.IsNullOrEmpty(nextRevalDmtf) ? new DateTime?(ManagementDateTimeConverter.ToDateTime(nextRevalDmtf)) : new DateTime?();
+      this.NextGlobalRevalTime = !string.IsNullOrEmpty(nextRevalDmtf) ? new DateTime?(common.DmtfToDateTime(nextRevalDmtf)) : new DateTime?();
       string nextRetryDmtf = WMIObject.Properties[nameof (NextRetryTime)].Value as string;
-      this.NextRetryTime = !string.IsNullOrEmpty(nextRetryDmtf) ? new DateTime?(ManagementDateTimeConverter.ToDateTime(nextRetryDmtf)) : new DateTime?();
+      this.NextRetryTime = !string.IsNullOrEmpty(nextRetryDmtf) ? new DateTime?(common.DmtfToDateTime(nextRetryDmtf)) : new DateTime?();
       string nextServiceWindowDmtf = WMIObject.Properties[nameof (NextServiceWindowTime)].Value as string;
       if (string.IsNullOrEmpty(nextServiceWindowDmtf))
         this.NextServiceWindowTime = new DateTime?();
       else
-        this.NextServiceWindowTime = new DateTime?(ManagementDateTimeConverter.ToDateTime(nextServiceWindowDmtf));
+        this.NextServiceWindowTime = new DateTime?(common.DmtfToDateTime(nextServiceWindowDmtf));
     }
 
     internal string __CLASS { get; set; }
@@ -984,21 +983,21 @@ public class softwaredistribution : baseInit
       this.__INSTANCE = true;
       this.WMIObject = WMIObject;
       string activeTimeDmtf = WMIObject.Properties[nameof (ADV_ActiveTime)].Value as string;
-      this.ADV_ActiveTime = !string.IsNullOrEmpty(activeTimeDmtf) ? new DateTime?(ManagementDateTimeConverter.ToDateTime(activeTimeDmtf)) : new DateTime?();
+      this.ADV_ActiveTime = !string.IsNullOrEmpty(activeTimeDmtf) ? new DateTime?(common.DmtfToDateTime(activeTimeDmtf)) : new DateTime?();
       this.ADV_ActiveTimeIsGMT = WMIObject.Properties[nameof (ADV_ActiveTimeIsGMT)].Value as bool?;
       this.ADV_ADF_Published = WMIObject.Properties[nameof (ADV_ADF_Published)].Value as bool?;
       this.ADV_ADF_RunNotification = WMIObject.Properties[nameof (ADV_ADF_RunNotification)].Value as bool?;
       this.ADV_AdvertisementID = WMIObject.Properties[nameof (ADV_AdvertisementID)].Value as string;
       string expirationTimeDmtf = WMIObject.Properties[nameof (ADV_ExpirationTime)].Value as string;
-      this.ADV_ExpirationTime = !string.IsNullOrEmpty(expirationTimeDmtf) ? new DateTime?(ManagementDateTimeConverter.ToDateTime(expirationTimeDmtf)) : new DateTime?();
+      this.ADV_ExpirationTime = !string.IsNullOrEmpty(expirationTimeDmtf) ? new DateTime?(common.DmtfToDateTime(expirationTimeDmtf)) : new DateTime?();
       this.ADV_ExpirationTimeIsGMT = WMIObject.Properties[nameof (ADV_ExpirationTimeIsGMT)].Value as bool?;
       this.ADV_FirstRunBehavior = WMIObject.Properties[nameof (ADV_FirstRunBehavior)].Value as string;
       this.ADV_MandatoryAssignments = WMIObject.Properties[nameof (ADV_MandatoryAssignments)].Value as bool?;
       this.ADV_ProgramWindowIsGMT = WMIObject.Properties[nameof (ADV_ProgramWindowIsGMT)].Value as bool?;
       string windowStartDmtf = WMIObject.Properties[nameof (ADV_ProgramWindowStartTime)].Value as string;
-      this.ADV_ProgramWindowStartTime = !string.IsNullOrEmpty(windowStartDmtf) ? new DateTime?(ManagementDateTimeConverter.ToDateTime(windowStartDmtf)) : new DateTime?();
+      this.ADV_ProgramWindowStartTime = !string.IsNullOrEmpty(windowStartDmtf) ? new DateTime?(common.DmtfToDateTime(windowStartDmtf)) : new DateTime?();
       string windowStopDmtf = WMIObject.Properties[nameof (ADV_ProgramWindowStopTime)].Value as string;
-      this.ADV_ProgramWindowStopTime = !string.IsNullOrEmpty(windowStopDmtf) ? new DateTime?(ManagementDateTimeConverter.ToDateTime(windowStopDmtf)) : new DateTime?();
+      this.ADV_ProgramWindowStopTime = !string.IsNullOrEmpty(windowStopDmtf) ? new DateTime?(common.DmtfToDateTime(windowStopDmtf)) : new DateTime?();
       this.ADV_RCF_InstallFromCDOptions = WMIObject.Properties[nameof (ADV_RCF_InstallFromCDOptions)].Value as string;
       this.ADV_RCF_InstallFromLocalDPOptions = WMIObject.Properties[nameof (ADV_RCF_InstallFromLocalDPOptions)].Value as string;
       this.ADV_RCF_InstallFromRemoteDPOptions = WMIObject.Properties[nameof (ADV_RCF_InstallFromRemoteDPOptions)].Value as string;
@@ -1289,7 +1288,7 @@ public class softwaredistribution : baseInit
       this.Reserved = WMIObject.Properties[nameof (Reserved)].Value as string;
       this.TS_BootImageID = WMIObject.Properties[nameof (TS_BootImageID)].Value as string;
       string tsDeadlineDmtf = WMIObject.Properties[nameof (TS_Deadline)].Value as string;
-      this.TS_Deadline = !string.IsNullOrEmpty(tsDeadlineDmtf) ? new DateTime?(ManagementDateTimeConverter.ToDateTime(tsDeadlineDmtf)) : new DateTime?();
+      this.TS_Deadline = !string.IsNullOrEmpty(tsDeadlineDmtf) ? new DateTime?(common.DmtfToDateTime(tsDeadlineDmtf)) : new DateTime?();
       this.TS_MandatoryCountdown = WMIObject.Properties[nameof (TS_MandatoryCountdown)].Value as uint?;
       this.TS_PopupReminderInterval = WMIObject.Properties[nameof (TS_PopupReminderInterval)].Value as uint?;
       this.TS_References = WMIObject.Properties[nameof (TS_References)].Value as string[];
@@ -1338,7 +1337,7 @@ public class softwaredistribution : baseInit
       this.__INSTANCE = true;
       this.WMIObject = WMIObject;
       string activationDmtf = WMIObject.Properties[nameof (ActivationTime)].Value as string;
-      this.ActivationTime = !string.IsNullOrEmpty(activationDmtf) ? new DateTime?(ManagementDateTimeConverter.ToDateTime(activationDmtf)) : new DateTime?();
+      this.ActivationTime = !string.IsNullOrEmpty(activationDmtf) ? new DateTime?(common.DmtfToDateTime(activationDmtf)) : new DateTime?();
       this.AdvertisedDirectly = WMIObject.Properties[nameof (AdvertisedDirectly)].Value as bool?;
       this.Categories = WMIObject.Properties[nameof (Categories)].Value as string[];
       this.CompletionAction = WMIObject.Properties[nameof (CompletionAction)].Value as uint?;
@@ -1348,13 +1347,13 @@ public class softwaredistribution : baseInit
       this.DiskSpaceRequired = WMIObject.Properties[nameof (DiskSpaceRequired)].Value as string;
       this.Duration = WMIObject.Properties[nameof (Duration)].Value as uint?;
       string expirationDmtf = WMIObject.Properties[nameof (ExpirationTime)].Value as string;
-      this.ExpirationTime = !string.IsNullOrEmpty(expirationDmtf) ? new DateTime?(ManagementDateTimeConverter.ToDateTime(expirationDmtf)) : new DateTime?();
+      this.ExpirationTime = !string.IsNullOrEmpty(expirationDmtf) ? new DateTime?(common.DmtfToDateTime(expirationDmtf)) : new DateTime?();
       this.ForceDependencyToRun = WMIObject.Properties[nameof (ForceDependencyToRun)].Value as bool?;
       this.HighImpact = WMIObject.Properties[nameof (HighImpact)].Value as bool?;
       this.LastExitCode = WMIObject.Properties[nameof (LastExitCode)].Value as uint?;
       this.LastRunStatus = WMIObject.Properties[nameof (LastRunStatus)].Value as string;
       string lastRunDmtf = WMIObject.Properties[nameof (LastRunTime)].Value as string;
-      this.LastRunTime = !string.IsNullOrEmpty(lastRunDmtf) ? new DateTime?(ManagementDateTimeConverter.ToDateTime(lastRunDmtf)) : new DateTime?();
+      this.LastRunTime = !string.IsNullOrEmpty(lastRunDmtf) ? new DateTime?(common.DmtfToDateTime(lastRunDmtf)) : new DateTime?();
       this.Level = WMIObject.Properties[nameof (Level)].Value as uint?;
       this.NotifyUser = WMIObject.Properties[nameof (NotifyUser)].Value as bool?;
       this.PackageID = WMIObject.Properties[nameof (PackageID)].Value as string;
@@ -1469,12 +1468,12 @@ public class softwaredistribution : baseInit
       this.WMIObject = WMIObject;
       this.ActiveMessage = WMIObject.Properties[nameof (ActiveMessage)].Value as string;
       string activeTimeDmtf = WMIObject.Properties[nameof (ActiveTime)].Value as string;
-      this.ActiveTime = !string.IsNullOrEmpty(activeTimeDmtf) ? new DateTime?(ManagementDateTimeConverter.ToDateTime(activeTimeDmtf)) : new DateTime?();
+      this.ActiveTime = !string.IsNullOrEmpty(activeTimeDmtf) ? new DateTime?(common.DmtfToDateTime(activeTimeDmtf)) : new DateTime?();
       this.ActiveTimeIsGMT = WMIObject.Properties[nameof (ActiveTimeIsGMT)].Value as bool?;
       this.DeliverMode = WMIObject.Properties[nameof (DeliverMode)].Value as string;
       this.ExpireMessage = WMIObject.Properties[nameof (ExpireMessage)].Value as string;
       string expireTimeDmtf = WMIObject.Properties[nameof (ExpireTime)].Value as string;
-      this.ExpireTime = !string.IsNullOrEmpty(expireTimeDmtf) ? new DateTime?(ManagementDateTimeConverter.ToDateTime(expireTimeDmtf)) : new DateTime?();
+      this.ExpireTime = !string.IsNullOrEmpty(expireTimeDmtf) ? new DateTime?(common.DmtfToDateTime(expireTimeDmtf)) : new DateTime?();
       this.ExpireTimeIsGMT = WMIObject.Properties[nameof (ExpireTimeIsGMT)].Value as bool?;
       this.MessageName = WMIObject.Properties[nameof (MessageName)].Value as string;
       this.MessageTimeout = WMIObject.Properties[nameof (MessageTimeout)].Value as string;
@@ -1539,15 +1538,15 @@ public class softwaredistribution : baseInit
       this.__INSTANCE = true;
       this.WMIObject = WMIObject;
       string activationSentDmtf = WMIObject.Properties[nameof (ActivationMessageSent)].Value as string;
-      this.ActivationMessageSent = !string.IsNullOrEmpty(activationSentDmtf) ? new DateTime?(ManagementDateTimeConverter.ToDateTime(activationSentDmtf)) : new DateTime?();
+      this.ActivationMessageSent = !string.IsNullOrEmpty(activationSentDmtf) ? new DateTime?(common.DmtfToDateTime(activationSentDmtf)) : new DateTime?();
       this.ActivationMessageSentIsGMT = WMIObject.Properties[nameof (ActivationMessageSentIsGMT)].Value as bool?;
       string expirationSentDmtf = WMIObject.Properties[nameof (ExpirationMessageSent)].Value as string;
-      this.ExpirationMessageSent = !string.IsNullOrEmpty(expirationSentDmtf) ? new DateTime?(ManagementDateTimeConverter.ToDateTime(expirationSentDmtf)) : new DateTime?();
+      this.ExpirationMessageSent = !string.IsNullOrEmpty(expirationSentDmtf) ? new DateTime?(common.DmtfToDateTime(expirationSentDmtf)) : new DateTime?();
       this.ExpirationMessageSentIsGMT = WMIObject.Properties[nameof (ExpirationMessageSentIsGMT)].Value as bool?;
       string firstEvalDmtf = WMIObject.Properties[nameof (FirstEvalTime)].Value as string;
-      this.FirstEvalTime = !string.IsNullOrEmpty(firstEvalDmtf) ? new DateTime?(ManagementDateTimeConverter.ToDateTime(firstEvalDmtf)) : new DateTime?();
+      this.FirstEvalTime = !string.IsNullOrEmpty(firstEvalDmtf) ? new DateTime?(common.DmtfToDateTime(firstEvalDmtf)) : new DateTime?();
       string lastTriggerDmtf = WMIObject.Properties[nameof (LastTriggerTime)].Value as string;
-      this.LastTriggerTime = !string.IsNullOrEmpty(lastTriggerDmtf) ? new DateTime?(ManagementDateTimeConverter.ToDateTime(lastTriggerDmtf)) : new DateTime?();
+      this.LastTriggerTime = !string.IsNullOrEmpty(lastTriggerDmtf) ? new DateTime?(common.DmtfToDateTime(lastTriggerDmtf)) : new DateTime?();
       this.ScheduleID = WMIObject.Properties[nameof (ScheduleID)].Value as string;
       this.TriggerState = WMIObject.Properties[nameof (TriggerState)].Value as string;
       this.UserSID = WMIObject.Properties[nameof (UserSID)].Value as string;
@@ -1613,9 +1612,9 @@ public class softwaredistribution : baseInit
       this.OverrideServiceWindows = WMIObject.Properties[nameof (OverrideServiceWindows)].Value as bool?;
       this.RebootOutsideServiceWindows = WMIObject.Properties[nameof (RebootOutsideServiceWindows)].Value as bool?;
       string restartDeadlineDmtf = WMIObject.Properties[nameof (RestartDeadline)].Value as string;
-      this.RestartDeadline = !string.IsNullOrEmpty(restartDeadlineDmtf) ? new DateTime?(ManagementDateTimeConverter.ToDateTime(restartDeadlineDmtf)) : new DateTime?();
+      this.RestartDeadline = !string.IsNullOrEmpty(restartDeadlineDmtf) ? new DateTime?(common.DmtfToDateTime(restartDeadlineDmtf)) : new DateTime?();
       string startTimeDmtf = WMIObject.Properties[nameof (StartTime)].Value as string;
-      this.StartTime = !string.IsNullOrEmpty(startTimeDmtf) ? new DateTime?(ManagementDateTimeConverter.ToDateTime(startTimeDmtf)) : new DateTime?();
+      this.StartTime = !string.IsNullOrEmpty(startTimeDmtf) ? new DateTime?(common.DmtfToDateTime(startTimeDmtf)) : new DateTime?();
       this.UpdateID = WMIObject.Properties[nameof (UpdateID)].Value as string;
       this.URL = WMIObject.Properties[nameof (URL)].Value as string;
       this.UserUIExperience = WMIObject.Properties[nameof (UserUIExperience)].Value as bool?;
@@ -2732,9 +2731,9 @@ public class softwaredistribution : baseInit
       this.DisableMomAlerts = WMIObject.Properties[nameof (DisableMomAlerts)].Value as bool?;
       this.DPLocality = WMIObject.Properties[nameof (DPLocality)].Value as uint?;
       string enforcementDmtf = WMIObject.Properties[nameof (EnforcementDeadline)].Value as string;
-      this.EnforcementDeadline = !string.IsNullOrEmpty(enforcementDmtf) ? new DateTime?(ManagementDateTimeConverter.ToDateTime(enforcementDmtf)) : new DateTime?();
+      this.EnforcementDeadline = !string.IsNullOrEmpty(enforcementDmtf) ? new DateTime?(common.DmtfToDateTime(enforcementDmtf)) : new DateTime?();
       string expirationDmtf = WMIObject.Properties[nameof (ExpirationTime)].Value as string;
-      this.ExpirationTime = !string.IsNullOrEmpty(expirationDmtf) ? new DateTime?(ManagementDateTimeConverter.ToDateTime(expirationDmtf)) : new DateTime?();
+      this.ExpirationTime = !string.IsNullOrEmpty(expirationDmtf) ? new DateTime?(common.DmtfToDateTime(expirationDmtf)) : new DateTime?();
       this.LogComplianceToWinEvent = WMIObject.Properties[nameof (LogComplianceToWinEvent)].Value as bool?;
       this.NonComplianceCriticality = WMIObject.Properties[nameof (NonComplianceCriticality)].Value as uint?;
       this.NotifyUser = WMIObject.Properties[nameof (NotifyUser)].Value as bool?;
@@ -2749,11 +2748,11 @@ public class softwaredistribution : baseInit
       this.SettingTypes = WMIObject.Properties[nameof (SettingTypes)].Value as string;
       this.SoftDeadlineEnabled = WMIObject.Properties[nameof (SoftDeadlineEnabled)].Value as bool?;
       string startTimeDmtf = WMIObject.Properties[nameof (StartTime)].Value as string;
-      this.StartTime = !string.IsNullOrEmpty(startTimeDmtf) ? new DateTime?(ManagementDateTimeConverter.ToDateTime(startTimeDmtf)) : new DateTime?();
+      this.StartTime = !string.IsNullOrEmpty(startTimeDmtf) ? new DateTime?(common.DmtfToDateTime(startTimeDmtf)) : new DateTime?();
       this.StateMessagePriority = WMIObject.Properties[nameof (StateMessagePriority)].Value as uint?;
       this.SuppressReboot = WMIObject.Properties[nameof (SuppressReboot)].Value as uint?;
       string updateDeadlineDmtf = WMIObject.Properties[nameof (UpdateDeadline)].Value as string;
-      this.UpdateDeadline = !string.IsNullOrEmpty(updateDeadlineDmtf) ? new DateTime?(ManagementDateTimeConverter.ToDateTime(updateDeadlineDmtf)) : new DateTime?();
+      this.UpdateDeadline = !string.IsNullOrEmpty(updateDeadlineDmtf) ? new DateTime?(common.DmtfToDateTime(updateDeadlineDmtf)) : new DateTime?();
       this.UseGMTTimes = WMIObject.Properties[nameof (UseGMTTimes)].Value as bool?;
       this.UseSiteEvaluation = WMIObject.Properties[nameof (UseSiteEvaluation)].Value as bool?;
       this.WoLEnabled = WMIObject.Properties[nameof (WoLEnabled)].Value as bool?;

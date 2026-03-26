@@ -7,7 +7,6 @@
 
 using System;
 using System.Diagnostics;
-using System.Management;
 using System.Management.Automation;
 using System.Management.Automation.Runspaces;
 
@@ -35,7 +34,7 @@ public class CIM_Process : CIM_LogicalElement
     this.WMIObject = WMIObject;
     this.CreationClassName = WMIObject.Properties[nameof (CreationClassName)].Value as string;
     string dmtfDate1 = WMIObject.Properties[nameof (CreationDate)].Value as string;
-    this.CreationDate = !string.IsNullOrEmpty(dmtfDate1) ? new DateTime?(ManagementDateTimeConverter.ToDateTime(dmtfDate1)) : new DateTime?();
+    this.CreationDate = !string.IsNullOrEmpty(dmtfDate1) ? new DateTime?(common.DmtfToDateTime(dmtfDate1)) : new DateTime?();
     this.CSCreationClassName = WMIObject.Properties[nameof (CSCreationClassName)].Value as string;
     this.CSName = WMIObject.Properties[nameof (CSName)].Value as string;
     this.ExecutionState = WMIObject.Properties[nameof (ExecutionState)].Value as ushort?;
@@ -45,7 +44,7 @@ public class CIM_Process : CIM_LogicalElement
     this.OSName = WMIObject.Properties[nameof (OSName)].Value as string;
     this.Priority = WMIObject.Properties[nameof (Priority)].Value as uint?;
     string dmtfDate2 = WMIObject.Properties[nameof (TerminationDate)].Value as string;
-    this.TerminationDate = !string.IsNullOrEmpty(dmtfDate2) ? new DateTime?(ManagementDateTimeConverter.ToDateTime(dmtfDate2)) : new DateTime?();
+    this.TerminationDate = !string.IsNullOrEmpty(dmtfDate2) ? new DateTime?(common.DmtfToDateTime(dmtfDate2)) : new DateTime?();
     this.UserModeTime = WMIObject.Properties[nameof (UserModeTime)].Value as ulong?;
     this.WorkingSetSize = WMIObject.Properties[nameof (WorkingSetSize)].Value as ulong?;
   }

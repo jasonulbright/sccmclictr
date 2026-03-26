@@ -8,7 +8,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Management;
 using System.Management.Automation;
 using System.Management.Automation.Runspaces;
 using System.Xml;
@@ -89,7 +88,7 @@ public class dcm : baseInit
       {
         try
         {
-          this.LastEvalTime = new DateTime?(ManagementDateTimeConverter.ToDateTime(dmtfDate));
+          this.LastEvalTime = new DateTime?(common.DmtfToDateTime(dmtfDate));
         }
         catch
         {

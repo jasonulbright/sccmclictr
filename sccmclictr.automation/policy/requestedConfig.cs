@@ -69,7 +69,7 @@ public class requestedConfig : baseInit
   /// <param name="ServiceWindowID">A service window identifier.</param>
   public void DeleteServiceWindow(string ServiceWindowID)
   {
-    this.baseClient.GetStringFromPS($"Get-WMIObject -Namespace 'ROOT\\ccm\\Policy\\Machine\\RequestedConfig' -Query 'SELECT * FROM CCM_ServiceWindow WHERE ServiceWindowID = \"{ServiceWindowID}\"' | Remove-WmiObject");
+    this.baseClient.GetStringFromPS($"Get-CimInstance -Namespace 'ROOT\\ccm\\Policy\\Machine\\RequestedConfig' -Query 'SELECT * FROM CCM_ServiceWindow WHERE ServiceWindowID = \"{ServiceWindowID}\"' | Remove-CimInstance");
   }
 
   /// <summary>Gets a list of component client configuration.</summary>
