@@ -8,8 +8,8 @@
 using System;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Globalization;
 using System.IO;
-using System.Management;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -102,11 +102,60 @@ public static class common
   {
     try
     {
-      return string.IsNullOrEmpty(ManagementDateTime) ? new DateTime?() : new DateTime?(ManagementDateTimeConverter.ToDateTime(ManagementDateTime));
+      return string.IsNullOrEmpty(ManagementDateTime) ? new DateTime?() : new DateTime?(DmtfToDateTime(ManagementDateTime));
     }
     catch
     {
     }
     return new DateTime?();
+  }
+
+  /// <summary>
+  /// Converts a DMTF datetime string to a DateTime object.
+  /// Replaces System.Management.ManagementDateTimeConverter.ToDateTime().
+  /// DMTF format: yyyyMMddHHmmss.ffffff+UUU (e.g., "20231215120000.000000+000")
+  /// </summary>
+  public static DateTime DmtfToDateTime(string dmtfDate)
+  {
+    if (string.IsNullOrEmpty(dmtfDate))
+      throw new ArgumentNullException(nameof(dmtfDate));
+
+    // Handle wildcard characters (****) that WMI uses for unknown fields
+    string cleaned = dmtfDate.Replace('*', '0');
+
+    // Parse the date portion: yyyyMMddHHmmss
+    int year   = int.Parse(cleaned.Substring(0, 4));
+    int month  = int.Parse(cleaned.Substring(4, 2));
+    int day    = int.Parse(cleaned.Substring(6, 2));
+    int hour   = int.Parse(cleaned.Substring(8, 2));
+    int minute = int.Parse(cleaned.Substring(10, 2));
+    int second = int.Parse(cleaned.Substring(12, 2));
+
+    // Parse microseconds (after the dot)
+    long ticks = 0;
+    int dotIndex = cleaned.IndexOf('.');
+    if (dotIndex >= 0 && dotIndex + 1 < cleaned.Length)
+    {
+      // Extract up to 6 digits of fractional seconds
+      string fracPart = "";
+      for (int i = dotIndex + 1; i < cleaned.Length && char.IsDigit(cleaned[i]); i++)
+        fracPart += cleaned[i];
+      if (fracPart.Length > 0)
+        ticks = long.Parse(fracPart.PadRight(7, '0').Substring(0, 7)); // Convert to 100-ns ticks
+    }
+
+    DateTime dt = new DateTime(year, month, day, hour, minute, second).AddTicks(ticks);
+
+    // Parse UTC offset: +UUU or -UUU (minutes from UTC)
+    int signIndex = cleaned.IndexOfAny(new[] { '+', '-' }, dotIndex >= 0 ? dotIndex : 14);
+    if (signIndex >= 0)
+    {
+      string offsetStr = cleaned.Substring(signIndex);
+      int offsetMinutes = int.Parse(offsetStr);
+      dt = dt.AddMinutes(-offsetMinutes); // Convert to UTC
+      dt = dt.ToLocalTime();
+    }
+
+    return dt;
   }
 }
