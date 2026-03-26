@@ -122,7 +122,7 @@ public class softwareupdates : baseInit
   /// </summary>
   public void InstallAllRequiredUpdates()
   {
-    this.baseClient.GetObjectsFromPS(string.Format("([wmiclass]'ROOT\\ccm\\ClientSDK:CCM_SoftwareUpdatesManager').InstallUpdates()"), true);
+    this.baseClient.GetObjectsFromPS("Invoke-CimMethod -Namespace 'ROOT\\ccm\\ClientSDK' -ClassName CCM_SoftwareUpdatesManager -MethodName InstallUpdates", true);
   }
 
   /// <summary>
@@ -130,7 +130,7 @@ public class softwareupdates : baseInit
   /// </summary>
   public void InstallAllApprovedUpdates()
   {
-    this.baseClient.GetObjectsFromPS(string.Format("([wmiclass]'ROOT\\ccm\\ClientSDK:CCM_SoftwareUpdatesManager').InstallUpdates([CimInstance[]] (Get-CimInstance -query 'SELECT * FROM CCM_SoftwareUpdate' -namespace 'ROOT\\ccm\\ClientSDK'))"), true);
+    this.baseClient.GetObjectsFromPS("Invoke-CimMethod -Namespace 'ROOT\\ccm\\ClientSDK' -ClassName CCM_SoftwareUpdatesManager -MethodName InstallUpdates -Arguments @{CCMUpdates=[CimInstance[]](Get-CimInstance -Query 'SELECT * FROM CCM_SoftwareUpdate' -Namespace 'ROOT\\ccm\\ClientSDK')}", true);
   }
 
   /// <summary>Check if there are updates with pending reboot</summary>
@@ -232,7 +232,7 @@ public class softwareupdates : baseInit
   public void InstallUpdates(List<softwareupdates.CCM_SoftwareUpdate> Updates)
   {
     List<string> updateIds = new List<string>();
-    this.baseClient.GetObjectsFromPS($"[CimInstance[]] $a = Get-CimInstance -query \"SELECT * FROM CCM_SoftwareUpdate WHERE UpdateID like '{string.Join("' OR UpdateID='", (IEnumerable<string>) Updates.Select<softwareupdates.CCM_SoftwareUpdate, string>((Func<softwareupdates.CCM_SoftwareUpdate, string>) (t => t.UpdateID)).ToList<string>())}'\" -namespace \"ROOT\\ccm\\ClientSDK\";([wmiclass]'ROOT\\ccm\\ClientSDK:CCM_SoftwareUpdatesManager').InstallUpdates($a)", true);
+    this.baseClient.GetObjectsFromPS($"[CimInstance[]] $a = Get-CimInstance -Query \"SELECT * FROM CCM_SoftwareUpdate WHERE UpdateID like '{string.Join("' OR UpdateID='", (IEnumerable<string>) Updates.Select<softwareupdates.CCM_SoftwareUpdate, string>((Func<softwareupdates.CCM_SoftwareUpdate, string>) (t => t.UpdateID)).ToList<string>())}'\" -Namespace \"ROOT\\ccm\\ClientSDK\"; Invoke-CimMethod -Namespace 'ROOT\\ccm\\ClientSDK' -ClassName CCM_SoftwareUpdatesManager -MethodName InstallUpdates -Arguments @{{CCMUpdates=$a}}", true);
   }
 
   /// <summary>Source:root\ccm\SoftwareUpdates\UpdatesStore</summary>
@@ -1265,7 +1265,7 @@ public class softwareupdates : baseInit
     /// <summary>Installs this instance.</summary>
     public void Install()
     {
-      this.oNewBase.GetObjectsFromPS($"$a = Get-CimInstance -query \"SELECT * FROM CCM_SoftwareUpdate WHERE UpdateID='{this.UpdateID}'\" -namespace \"ROOT\\ccm\\ClientSDK\";([wmiclass]'ROOT\\ccm\\ClientSDK:CCM_SoftwareUpdatesManager').InstallUpdates($a)", true);
+      this.oNewBase.GetObjectsFromPS($"$a = Get-CimInstance -Query \"SELECT * FROM CCM_SoftwareUpdate WHERE UpdateID='{this.UpdateID}'\" -Namespace \"ROOT\\ccm\\ClientSDK\"; Invoke-CimMethod -Namespace 'ROOT\\ccm\\ClientSDK' -ClassName CCM_SoftwareUpdatesManager -MethodName InstallUpdates -Arguments @{{CCMUpdates=[CimInstance[]]$a}}", true);
     }
   }
 }
