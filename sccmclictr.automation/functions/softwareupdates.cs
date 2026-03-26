@@ -9,7 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Management;
 using System.Management.Automation;
 using System.Management.Automation.Runspaces;
 
@@ -262,7 +261,7 @@ public class softwareupdates : baseInit
       this.ProductID = WMIObject.Properties[nameof (ProductID)].Value as string;
       this.RevisionNumber = WMIObject.Properties[nameof (RevisionNumber)].Value as uint?;
       string scanTimeDmtf = WMIObject.Properties[nameof (ScanTime)].Value as string;
-      this.ScanTime = !string.IsNullOrEmpty(scanTimeDmtf) ? new DateTime?(ManagementDateTimeConverter.ToDateTime(scanTimeDmtf)) : new DateTime?();
+      this.ScanTime = !string.IsNullOrEmpty(scanTimeDmtf) ? new DateTime?(common.DmtfToDateTime(scanTimeDmtf)) : new DateTime?();
       this.Sources = (softwareupdates.CCM_SourceStatus[]) null;
       this.SourceType = WMIObject.Properties[nameof (SourceType)].Value as uint?;
       this.SourceUniqueId = WMIObject.Properties[nameof (SourceUniqueId)].Value as string;
@@ -550,7 +549,7 @@ public class softwareupdates : baseInit
       this.MaxPauseDuration = WMIObject.Properties[nameof (MaxPauseDuration)].Value as uint?;
       this.PauseCookie = WMIObject.Properties[nameof (PauseCookie)].Value as uint?;
       string pauseStartTimeDmtf = WMIObject.Properties[nameof (PauseStartTime)].Value as string;
-      this.PauseStartTime = !string.IsNullOrEmpty(pauseStartTimeDmtf) ? new DateTime?(ManagementDateTimeConverter.ToDateTime(pauseStartTimeDmtf)) : new DateTime?();
+      this.PauseStartTime = !string.IsNullOrEmpty(pauseStartTimeDmtf) ? new DateTime?(common.DmtfToDateTime(pauseStartTimeDmtf)) : new DateTime?();
       this.Reserved = WMIObject.Properties[nameof (Reserved)].Value as string;
     }
 
@@ -720,7 +719,7 @@ public class softwareupdates : baseInit
       this.__INSTANCE = true;
       this.WMIObject = WMIObject;
       string deadlineDmtf = WMIObject.Properties[nameof (Deadline)].Value as string;
-      this.Deadline = !string.IsNullOrEmpty(deadlineDmtf) ? new DateTime?(ManagementDateTimeConverter.ToDateTime(deadlineDmtf)) : new DateTime?();
+      this.Deadline = !string.IsNullOrEmpty(deadlineDmtf) ? new DateTime?(common.DmtfToDateTime(deadlineDmtf)) : new DateTime?();
       this.DisableMomAlerts = WMIObject.Properties[nameof (DisableMomAlerts)].Value as bool?;
       this.DownloadSize = WMIObject.Properties[nameof (DownloadSize)].Value as uint?;
       this.DPLocality = WMIObject.Properties[nameof (DPLocality)].Value as uint?;
@@ -731,13 +730,13 @@ public class softwareupdates : baseInit
       this.PercentComplete = WMIObject.Properties[nameof (PercentComplete)].Value as uint?;
       this.RaiseMomAlertsOnFailure = WMIObject.Properties[nameof (RaiseMomAlertsOnFailure)].Value as bool?;
       string rebootDeadlineDmtf = WMIObject.Properties[nameof (RebootDeadline)].Value as string;
-      this.RebootDeadline = !string.IsNullOrEmpty(rebootDeadlineDmtf) ? new DateTime?(ManagementDateTimeConverter.ToDateTime(rebootDeadlineDmtf)) : new DateTime?();
+      this.RebootDeadline = !string.IsNullOrEmpty(rebootDeadlineDmtf) ? new DateTime?(common.DmtfToDateTime(rebootDeadlineDmtf)) : new DateTime?();
       this.RebootOutsideOfServiceWindows = WMIObject.Properties[nameof (RebootOutsideOfServiceWindows)].Value as bool?;
       this.RefAssignments = WMIObject.Properties[nameof (RefAssignments)].Value as string;
       this.Reserved = WMIObject.Properties[nameof (Reserved)].Value as string;
       this.ScheduledUpdateOptions = WMIObject.Properties[nameof (ScheduledUpdateOptions)].Value as uint?;
       string startTimeDmtf = WMIObject.Properties[nameof (StartTime)].Value as string;
-      this.StartTime = !string.IsNullOrEmpty(startTimeDmtf) ? new DateTime?(ManagementDateTimeConverter.ToDateTime(startTimeDmtf)) : new DateTime?();
+      this.StartTime = !string.IsNullOrEmpty(startTimeDmtf) ? new DateTime?(common.DmtfToDateTime(startTimeDmtf)) : new DateTime?();
       this.UpdateAction = WMIObject.Properties[nameof (UpdateAction)].Value as uint?;
       this.UpdateApplicability = WMIObject.Properties[nameof (UpdateApplicability)].Value as uint?;
       this.UpdateId = WMIObject.Properties[nameof (UpdateId)].Value as string;
@@ -1214,7 +1213,7 @@ public class softwareupdates : baseInit
       }
       else
       {
-        this.RestartDeadline = new DateTime?(ManagementDateTimeConverter.ToDateTime(restartDeadlineDmtf));
+        this.RestartDeadline = new DateTime?(common.DmtfToDateTime(restartDeadlineDmtf));
         this.RestartDeadline = new DateTime?(this.RestartDeadline.Value.ToUniversalTime());
       }
       this.UpdateID = WMIObject.Properties[nameof (UpdateID)].Value as string;

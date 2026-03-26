@@ -23,11 +23,11 @@ internal sealed class Settings : ApplicationSettingsBase
 
   [ApplicationScopedSetting]
   [DebuggerNonUserCode]
-  [DefaultSettingValue("$Reg = [WMIClass]\"root\\default:StdRegProv\"\r\n$DCOM = $Reg.GetBinaryValue(2147483650,\"{0}\",\"{1}\").uValue\r\n$security = Get-CimInstance -Namespace root/cimv2 -ClassName __SystemSecurity\r\n$converter = new-object system.management.ManagementClass Win32_SecurityDescriptorHelper\r\n$converter.BinarySDToSDDL($DCOM).SDDL\r\n")]
+  [DefaultSettingValue("$DCOM = (Invoke-CimMethod -Namespace 'root\\default' -ClassName StdRegProv -MethodName GetBinaryValue -Arguments @{hDefKey=[uint32]2147483650;sSubKeyName='{0}';sValueName='{1}'}).uValue\r\n$security = Get-CimInstance -Namespace root/cimv2 -ClassName __SystemSecurity\r\n$converter = Get-CimClass -Namespace root/cimv2 -ClassName Win32_SecurityDescriptorHelper\r\n(Invoke-CimMethod -InputObject $converter -MethodName BinarySDToSDDL -Arguments @{BinarySD=[byte[]]$DCOM}).SDDL\r\n")]
   public string PSGetDCOMPerm => (string) this[nameof (PSGetDCOMPerm)];
 
   [ApplicationScopedSetting]
   [DebuggerNonUserCode]
-  [DefaultSettingValue("$Reg = [WMIClass]\"root\\default:StdRegProv\"\r\n$newDCOMSDDL = \"{2}\"\r\n$DCOMbinarySD = $converter.SDDLToBinarySD($newDCOMSDDL)\r\n$Reg.SetBinaryValue(2147483650,\"{0}\",\"{1}\", $DCOMbinarySD.binarySD)\r\n")]
+  [DefaultSettingValue("$newDCOMSDDL = \"{2}\"\r\n$DCOMbinarySD = (Invoke-CimMethod -Namespace 'root/cimv2' -ClassName Win32_SecurityDescriptorHelper -MethodName SDDLToBinarySD -Arguments @{SDDL=$newDCOMSDDL}).BinarySD\r\nInvoke-CimMethod -Namespace 'root\\default' -ClassName StdRegProv -MethodName SetBinaryValue -Arguments @{hDefKey=[uint32]2147483650;sSubKeyName='{0}';sValueName='{1}';uValue=[byte[]]$DCOMbinarySD}\r\n")]
   public string PSSetDCOMPerm => (string) this[nameof (PSSetDCOMPerm)];
 }
