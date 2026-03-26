@@ -4,7 +4,7 @@
 - **Upstream**: https://github.com/rzander/sccmclictr
 - **Fork**: https://github.com/jasonulbright/sccmclictr
 - **Fork base**: Latest upstream commit (includes all 27 commits through v1.0.7.2)
-- **Current version**: v1.1.1
+- **Current version**: v1.2.0
 
 Original project effectively abandoned. Maintainer (rzander) stated in Jan 2026: "I currently don't have access to any test environments" and "there are no plans to refactor ClientCenter... In worst case it will die with Get-WMIObject." Removed from Microsoft Store and winget. Hangs on Windows 25H2.
 
@@ -89,22 +89,24 @@ The fork base includes all upstream commits through v1.0.7.2:
 | `root\sms` | Site provider discovery (admin server) |
 | `root\wmi` | WMI operational namespace |
 
-## CIM Migration (in progress -- `cim-migration` branch)
+## CIM Migration -- COMPLETE (v1.2.0)
 
-Replacing deprecated `Get-WmiObject` / `[wmi]` / `[wmiclass]` with CIM cmdlets. Runs on .NET Framework 4.8, no .NET 10 required. Validated with Pester tests at each phase (30/30 passing).
+All deprecated `System.Management` / WMI usage removed. `System.Management` assembly reference removed from csproj. Only `System.Management.Automation` (PowerShell runspace) remains.
 
-**Key finding**: All WMI access is PS-mediated. Only C#-side `System.Management` usage is `ManagementDateTimeConverter.ToDateTime()` (~40 call sites).
+**Key finding**: All WMI access was PS-mediated (PowerShell commands through remote runspace). Zero direct C# WMI calls to remote machines.
 
 | Phase | Status | Scope |
 |-------|--------|-------|
 | 1: `Get-WmiObject`/`gwmi` string replacement | **Complete** | 8 files, ~20 replacements |
 | 2a: Property reads/writes | **Complete** | `baseInit.cs` + 3 function files |
 | 2b: No-arg method calls | **Complete** | `baseInit.cs` |
-| 2c: Parameterized method calls | Pending | 6 remaining `[wmi]`/`[wmiclass]` references |
-| 3: Replace `ManagementDateTimeConverter` | Pending | ~40 C# call sites |
-| 4: Remove `System.Management` reference | Pending | Cleanup |
+| 2c: Parameterized method calls | **Complete** | Dynamic param discovery via `Get-CimClass` |
+| 3: Replace `ManagementDateTimeConverter` | **Complete** | Custom `DmtfToDateTime` parser, 51 call sites |
+| 4: Remove `System.Management` reference | **Complete** | Removed from csproj, all `using` statements removed |
 
-Test lab operational: CM 2509, site code MCM, `192.168.50.20`. See `CIM_MIGRATION_PLAN.md` on the `cim-migration` branch.
+43 Pester tests (30 unit + 13 integration against live CM 2509). See `CIM_MIGRATION_PLAN.md`.
+
+**Phase 5 (future)**: Replace PS-string architecture with native C# `CimSession` API. Currently all WMI/CIM operations are PowerShell command strings sent through a remote runspace. Direct C# `CimSession` calls would be faster and type-safe. Natural fit for .NET 10 migration.
 
 ## Project Structure
 
@@ -136,8 +138,8 @@ sccmclictr\
 - [x] Clean decompiler variables (41 across 2 files)
 - [x] Audit catch blocks (308 across 57 files)
 
-### Phase 2: CIM Migration -- IN PROGRESS
-Replace `Get-WmiObject` / `[wmi]` / `[wmiclass]` with CIM cmdlets. Pester-validated at each phase. See CIM Migration section above.
+### Phase 2: CIM Migration -- COMPLETE (v1.2.0)
+`System.Management` dependency removed. See CIM Migration section above.
 
 ### Phase 3: Catch Block Implementation
 Apply fixes from `CATCH_BLOCK_AUDIT.md`: 40 silent-ok (leave), 91 debug (`Debug.WriteLine`), 114 surface (`Listener?.WriteError`), 61 unverified (manual review).
