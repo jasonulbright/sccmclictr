@@ -80,7 +80,7 @@
   <ItemGroup>
     <!-- Customization: replaced Roger's OneDrive path with ProjectReference (added below) -->
     <Reference Include="NavigationPane, Version=1.0.5988.20744, Culture=neutral, PublicKeyToken=b239f36db07135c1, processorArchitecture=MSIL">
-      <HintPath>..\packages\NavigationPane.2.1.0.0\lib\net40\NavigationPane.dll</HintPath>
+      <HintPath>..\..\lib\NavigationPane\NavigationPane.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="PresentationFramework.Aero" />
@@ -97,11 +97,11 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="System.Windows.Controls.Input.Toolkit, Version=3.5.40128.1, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\WPFToolkit.3.5.50211.1\lib\System.Windows.Controls.Input.Toolkit.dll</HintPath>
+      <HintPath>..\..\lib\WPFToolkit\System.Windows.Controls.Input.Toolkit.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Windows.Controls.Layout.Toolkit, Version=3.5.40128.1, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\WPFToolkit.3.5.50211.1\lib\System.Windows.Controls.Layout.Toolkit.dll</HintPath>
+      <HintPath>..\..\lib\WPFToolkit\System.Windows.Controls.Layout.Toolkit.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Windows.Controls.Ribbon" />
@@ -119,7 +119,7 @@
     <Reference Include="WindowsBase" />
     <Reference Include="WindowsFormsIntegration" />
     <Reference Include="WPFToolkit, Version=3.5.40128.1, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\WPFToolkit.3.5.50211.1\lib\WPFToolkit.dll</HintPath>
+      <HintPath>..\..\lib\WPFToolkit\WPFToolkit.dll</HintPath>
       <Private>True</Private>
     </Reference>
   </ItemGroup>

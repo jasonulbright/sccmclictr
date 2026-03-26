@@ -34,13 +34,18 @@ Original project effectively abandoned. Maintainer (rzander) stated in Jan 2026:
 5. **Saved-password storage removed** — password is no longer persisted to settings between sessions. `/Password:` command-line argument removed (was visible in process listings). Previously saved passwords are cleared on first connect. Use integrated auth (launch elevated via PAM/runas) or type credentials each session.
 
 ### Open
-1. **238 bare `catch { }` blocks** — silent exception swallowing across 55 files. Most are defensive property probes against remote clients (expected to fail when WMI class/registry key doesn't exist on that client version). Needs categorized review: leave defensive probes silent, surface actual operation failures.
+1. **308 bare `catch { }` blocks** — audited and categorized across 57 files (see `CATCH_BLOCK_AUDIT.md`). 40 SILENT-OK, 91 DEBUG, 114 SURFACE, 61 UNVERIFIED. Implementation pending.
 
-## Outdated Dependencies
-- `WPFToolkit` v3.5 — unmaintained since 2012, blocks .NET 10 migration
-- `NavigationPane` v2.1 — unmaintained, blocks .NET 10 migration
-- `System.Management.Automation` v3.0 — PS 3.0 era, hardcoded DLL path
-- Code signing references Sectigo cert with hardcoded path (non-functional)
+## Dependencies (all vendored — zero NuGet)
+All external dependencies are vendored in `lib/`. No `nuget restore` required. No external package manager dependencies.
+
+| Dependency | Version | Location | Status |
+|-----------|---------|----------|--------|
+| NavigationPane | 2.1.0 | `lib/NavigationPane/` | Vendored DLL. Dead project (.NET 3.5 era). Replace in .NET 10 migration. |
+| WPFToolkit | 3.5.50211.1 | `lib/WPFToolkit/` | Vendored DLL (3 files). Dead since 2012. Most controls built into modern WPF. |
+| MSTest | 1.2.0 | `lib/MSTest/` | Vendored DLL + build props/targets. Test infrastructure only. |
+| System.Management.Automation | 3.0.0 | GAC / hardcoded path | PS 3.0 era. Ships with Windows. |
+| Code signing cert | Sectigo | Hardcoded path | Non-functional reference from original author. |
 
 ## Upstream Fixes (already included)
 The fork base includes all 27 upstream commits through v1.0.7.2. These are already in our codebase:
@@ -62,14 +67,15 @@ The fork base includes all 27 upstream commits through v1.0.7.2. These are alrea
 5. **Connectivity brittle** — Surface, VPN, proxy, alt creds all break
 6. **Resource leak** — CPU climbs over time (#80)
 
-## WS-MAN Migration Assessment
-- **Request**: Issue #216 — port from direct WMI (Get-WmiObject) to WS-MAN with PSSessionConfiguration tunneling
-- **Previous blocker**: sccmclictrlib was a closed-source NuGet with no access to the WMI call sites
-- **Current status**: Blocker removed. The automation library is now full source. All WMI calls are visible and modifiable in `sccmclictr.automation/functions/`.
-- **Scope**: The library uses `System.Management.ManagementScope` / `ManagementObjectSearcher` throughout (classic WMI, not CIM). A port would replace these with `CimSession` / `CimInstance` (MI-based, WS-MAN native) or route queries through PowerShell remoting sessions.
-- **Effort estimate**: 4-6 weeks. The 25 function files in `functions/` plus 3 in `policy/` contain all WMI call sites. `baseInit.cs` and `WSMan.cs` handle connection/runspace management.
-- **Risk**: High. Every WMI query pattern changes. The 238 defensive catch blocks complicate testing — silent failures make it hard to distinguish "works" from "silently broken."
-- **Recommendation**: Worth pursuing now that source access removes the primary blocker. Start with a single function file (e.g., `agentproperties.cs`) as a proof-of-concept before committing to full port.
+## CIM Migration (in progress — `cim-migration` branch)
+- **Request**: Upstream issues #58, #208, #216 — replace deprecated `Get-WmiObject` / `[wmi]` / `[wmiclass]` with CIM cmdlets
+- **Key finding**: All WMI access is PS-mediated (PowerShell commands through remote runspace). Zero direct C# WMI calls to remote machines. Only C#-side `System.Management` usage is `ManagementDateTimeConverter.ToDateTime()` (~40 sites).
+- **Phases 1, 2a, 2b complete**: `Get-WmiObject`→`Get-CimInstance`, property reads/writes→CIM, no-arg methods→`Invoke-CimMethod`. Validated with Pester tests (30/30 pass).
+- **Phase 2c pending**: 6 remaining `[wmi]`/`[wmiclass]` references with parameterized method calls. Requires WMI method parameter name mapping for `Invoke-CimMethod -Arguments`.
+- **Phase 3 pending**: Replace `ManagementDateTimeConverter.ToDateTime()` with custom DMTF parser.
+- **Phase 4 pending**: Remove `System.Management` assembly reference entirely.
+- **Test lab**: Home lab operational (CM 2509, site code MCM, `192.168.50.20`). Integration tests can now validate against live SCCM client.
+- See `CIM_MIGRATION_PLAN.md` on the `cim-migration` branch for full details.
 
 ## WMI Namespaces Used
 - `root\cimv2` — Standard Windows classes (services, processes, OS info)
