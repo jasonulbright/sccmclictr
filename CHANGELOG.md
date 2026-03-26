@@ -1,5 +1,18 @@
 # Changelog
 
+## v1.1.1 -- Vendor Dependencies & Catch Block Audit (2026-03-25)
+
+### Dependencies
+- **All NuGet dependencies vendored to `lib/`** — NavigationPane, WPFToolkit (3 DLLs), and MSTest (adapter + framework) are now referenced via direct HintPath. `packages.config` files removed. No `nuget restore` required. The project is fully self-contained with zero external package manager dependencies.
+
+### Documentation
+- **`CATCH_BLOCK_AUDIT.md`** — comprehensive audit of all 308 bare `catch { }` blocks across 57 files. Categorized as SILENT-OK (40), DEBUG (91), SURFACE (114), UNVERIFIED (61). Implementation pending.
+- **Roadmap updated** — Phase 1 (stabilization) complete. CIM migration (Phase 2) in progress on `cim-migration` branch with sub-phase tracking. Catch block implementation (Phase 3) and .NET 10 migration (Phase 4) documented.
+- **CODE_REVIEW.md updated** — dependency table, CIM migration status, corrected catch block counts.
+- **Build instructions simplified** — single `msbuild` command, no NuGet step.
+
+---
+
 ## v1.1.0 -- Community Fork: Source Integration & Security Fixes (2026-03-25)
 
 ### Breaking Changes

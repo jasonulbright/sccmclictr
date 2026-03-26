@@ -37,21 +37,16 @@ A WPF desktop tool for IT professionals to troubleshoot ConfigMgr/MECM agent iss
 - .NET Framework 4.8 targeting pack
 
 ### Build Steps
+No NuGet restore required -- all dependencies are vendored in `lib/`.
 ```
-# 1. Restore NuGet packages (WPFToolkit, NavigationPane, MSTest)
-nuget restore SCCMCliCtrWPF\SCCMCliCtrWPF.sln
+# 1. Build the main solution (includes automation library, app, and tests)
+msbuild SCCMCliCtrWPF\SCCMCliCtrWPF.sln -p:Configuration=Debug
 
-# 2. Build the automation library (produces the DLL plugins reference)
-msbuild sccmclictr.automation\sccmclictr.automation.csproj -p:Configuration=Debug
-
-# 3. Build plugin solutions (14 separate .sln files in Plugins\)
+# 2. Build plugin solutions (14 separate .sln files in Plugins\)
 for /d %p in (Plugins\Plugin_*) do msbuild "%p\*.sln" -p:Configuration=Debug -verbosity:quiet
 
-# 4. Copy plugin DLLs into the main project folder
-copy Plugins\*\bin\Debug\Plugin_*.dll SCCMCliCtrWPF\SCCMCliCtrWPF\
-
-# 5. Build the main solution
-msbuild SCCMCliCtrWPF\SCCMCliCtrWPF.sln -p:Configuration=Debug
+# 3. Copy plugin DLLs into the main project output folder
+copy Plugins\*\bin\Debug\Plugin_*.dll SCCMCliCtrWPF\SCCMCliCtrWPF\bin\Debug\
 ```
 
 Output: `SCCMCliCtrWPF\SCCMCliCtrWPF\bin\Debug\SCCMCliCtrWPF.exe`
@@ -103,7 +98,7 @@ These are inherited from the original project. Some have been fixed; others are 
 | SSL cert validation globally disabled | **Fixed** | Replaced with TLS 1.2/1.3 enforcement |
 | SecureString to plaintext conversion | **Fixed** | `SCCMAgent` no longer stores `string Password`; credentials stored as `PSCredential` only. IPC P/Invoke uses `SecureStringToGlobalAllocUnicode` with immediate zero-free. |
 | Unescaped strings in Invoke-Expression | **Fixed** | 4 call sites replaced with direct `& msiexec.exe` invocation |
-| 238 bare `catch { }` blocks | Open | Silent exception swallowing across 55 files. Most are intentional defensive probes against remote clients with varying configurations. Needs categorized review. |
+| 308 bare `catch { }` blocks | Audited | Categorized across 57 files (see `CATCH_BLOCK_AUDIT.md`). 40 silent-ok, 91 debug, 114 surface, 61 unverified. Implementation pending. |
 | Saved-password storage removed | **Fixed** | Password is no longer persisted between sessions. `/Password:` command-line argument removed. Previously saved passwords are cleared on first connect. |
 | Outdated dependencies (WPFToolkit 2012, NavigationPane 2016) | Open | Both unmaintained; will block .NET 10 migration |
 
