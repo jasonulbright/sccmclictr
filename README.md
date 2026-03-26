@@ -134,34 +134,51 @@ For reference when building SCCM client tooling:
 
 ## Roadmap
 
-### Phase 1: Stabilization (current)
+### Phase 1: Stabilization (complete)
 - [x] Integrate decompiled automation library as source
 - [x] Remove dead plugins (RuckZuck, SelfUpdate)
 - [x] Fix SSL certificate validation
 - [x] Fix broken project references
 - [x] Harden credential handling (remove plaintext password storage, SecureString marshaling for IPC)
 - [x] Remove `Invoke-Expression` command injection surface (4 call sites)
+- [x] Remove saved-password storage and `/Password:` command-line argument
 - [x] Rename decompiler-generated variables (41 across 2 files)
-- [ ] Categorize bare `catch { }` blocks (238 across 55 files)
+- [x] Audit bare `catch { }` blocks (308 across 57 files — see `CATCH_BLOCK_AUDIT.md`)
 
-### Phase 2: .NET 10 Migration
-Target: .NET 10 LTS (supported through November 2028).
+### Phase 2: CIM Migration (in progress, `cim-migration` branch)
+Replace deprecated `Get-WmiObject` / `[wmi]` / `[wmiclass]` with CIM cmdlets (`Get-CimInstance`, `Invoke-CimMethod`, `Set-CimInstance`). Runs on .NET Framework 4.8 — no .NET 10 required.
 
-| Component | Migration Path |
-|-----------|---------------|
-| WPF | Supported on .NET 10 (`<UseWPF>true</UseWPF>`) |
-| System.Management (WMI) | NuGet package `System.Management` v10.x |
-| System.Management.Automation (PS) | NuGet `Microsoft.PowerShell.SDK` 7.6+ (hosts PS 7.x, remote WSMan to PS 5.1 still works) |
-| COM Interop (CPAPPLET) | Fully supported on .NET 10 |
-| P/Invoke (mpr.dll) | Works unchanged |
-| System.Runtime.Caching | NuGet package v10.x |
-| TripleDES/SHA1 | Built-in; use `TripleDES.Create()` / `SHA1.Create()` factory methods |
-| NavigationPane 2.1.0 | **Must be replaced** (dead project, .NET 3.5 era) |
-| WPFToolkit 3.5 | **Must be replaced** (most controls now built into WPF) |
-| ClickOnce | Not supported on .NET 10; replace with MSIX or self-contained publish |
-| Plugin architecture | All plugins must be recompiled for .NET 10 (cannot load .NET Framework DLLs) |
+| Sub-phase | Status | Scope |
+|-----------|--------|-------|
+| Phase 1: `Get-WmiObject`/`gwmi` string replacement | **Complete** | 8 files, ~20 replacements |
+| Phase 2a: Property reads/writes (`GetProperty`, `SetProperty`) | **Complete** | `baseInit.cs` + 3 function files |
+| Phase 2b: No-arg method calls (`GetStringFromClassMethod`) | **Complete** | `baseInit.cs` |
+| Phase 2c: Parameterized method calls (`CallClassMethod`) | Pending | 6 remaining `[wmi]`/`[wmiclass]` references |
+| Phase 3: Replace `ManagementDateTimeConverter` (C# side) | Pending | ~40 call sites |
+| Phase 4: Remove `System.Management` reference | Pending | Cleanup |
 
-**Key constraint**: .NET 10 hosts PowerShell 7.x, not Windows PowerShell 5.1. Remote WSMan operations to PS 5.1 endpoints still work (protocol-level), but locally-executed scripts run under PS 7.x.
+Validated with Pester tests at each phase (30/30 passing). See `CIM_MIGRATION_PLAN.md` on the `cim-migration` branch for details.
+
+### Phase 3: Catch Block Implementation
+Apply the categorized fixes from `CATCH_BLOCK_AUDIT.md`:
+
+| Category | Count | Action |
+|----------|-------|--------|
+| SILENT-OK | 40 | Leave as-is — defensive probes, dispose, cleanup |
+| DEBUG | 91 | Add `Debug.WriteLine` (visible with debugger only) |
+| SURFACE | 114 | Add `Listener?.WriteError` / trace (visible in UI) |
+| UNVERIFIED | 61 | Manual review needed |
+
+### Phase 4: .NET 10 Migration
+Target: .NET 10 LTS (EOL November 2028). Blocked by NavigationPane and WPFToolkit replacement.
+
+| Blocker | Issue |
+|---------|-------|
+| NavigationPane 2.1 | Dead .NET 3.5 project, no .NET 10 equivalent — must be replaced |
+| WPFToolkit 3.5 | Most controls now built into WPF — remove package, use built-in |
+| ClickOnce | Not supported on .NET 10 — replace with MSIX or self-contained publish |
+| Plugin architecture | All 14 plugins must be recompiled for .NET 10 |
+| PowerShell hosting | Shifts from 5.1 to 7.x (remote WSMan to 5.1 endpoints still works) |
 
 ## License
 
