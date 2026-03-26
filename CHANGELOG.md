@@ -1,5 +1,20 @@
 # Changelog
 
+## v1.2.0 -- CIM Migration: System.Management Removed (2026-03-26)
+
+### CIM Migration (complete)
+All deprecated `System.Management` / WMI usage removed from the automation library. The `System.Management` assembly reference is no longer needed.
+
+- **Get-WmiObject/gwmi** replaced with `Get-CimInstance` across 8 files (~20 call sites)
+- **[wmi]/[wmiclass]** PS accelerators replaced with `Get-CimInstance`, `Invoke-CimMethod`, `Set-CimInstance` in all `baseInit.cs` helper methods and 6 direct call sites in function files
+- **ManagementDateTimeConverter.ToDateTime()** replaced with custom `common.DmtfToDateTime()` parser across 51 call sites in 9 files
+- **System.Management** assembly reference removed from `sccmclictr.automation.csproj`
+- **Dynamic parameter discovery**: `CallClassMethod`/`CallInstanceMethod` use `Get-CimClass` at runtime to map positional arguments to `Invoke-CimMethod -Arguments` hashtable
+- **43 Pester tests**: 30 unit tests + 13 integration tests against live CM 2509 (site code MCM). All pass.
+- See `CIM_MIGRATION_PLAN.md` for full technical details.
+
+---
+
 ## v1.1.1 -- Vendor Dependencies & Catch Block Audit (2026-03-25)
 
 ### Dependencies
