@@ -1,0 +1,7 @@
+{
+  "ProjectType": "mecm-tool",
+  "Status": "maintenance",
+  "Category": "MECM",
+  "ValidationSchedule": "none",
+  "Notes": "Community fork of rzander/sccmclictr. CIM migration complete (v1.2.0). 308 catch blocks to surface. Future: native C# CimSession API (.NET 10)."
+}
