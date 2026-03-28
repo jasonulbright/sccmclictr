@@ -3,5 +3,5 @@
   "Status": "maintenance",
   "Category": "MECM",
   "ValidationSchedule": "none",
-  "Notes": "Community fork of rzander/sccmclictr. CIM migration complete (v1.2.0). 308 catch blocks to surface. Future: native C# CimSession API (.NET 10)."
+  "Notes": "Community fork of rzander/sccmclictr. CIM migration complete (v1.2.0). 308 catch blocks to surface (CATCH_BLOCK_AUDIT.md: 40 SILENT-OK, 91 DEBUG, 114 SURFACE, 61 UNVERIFIED). sccmclictrlib decompiled and integrated as ProjectReference -- builds clean. Future: native C# CimSession API on .NET 10. .NET 10 migration planned (NavigationPane + WPFToolkit replacements needed). Cherry-pick 3 HIGH fixes from 1.0.7.2 (keyboard debounce, PSScripts freeze, IPC credential fix). Open community issue #82: user-targeted deployments invisible. Pending: C# + Fluent UI conversion."
 }
