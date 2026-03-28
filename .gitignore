@@ -329,3 +329,4 @@ Customization/*.cs
 MSI_Setup/
 /SCCMCliCtrWPF/SCCMCliCtrWPF/Newtonsoft.Json.dll
 /SCCMCliCtrWPF/SCCMCliCtrWPF/Serilog.dll
+project-manifest.json
