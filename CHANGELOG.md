@@ -1,5 +1,22 @@
 # Changelog
 
+## v1.3.0 -- Community Fork Branding & Feature Unlock (2026-03-29)
+
+### Changed
+- **Title** updated to "Client Center for ConfigMgr (Community Fork)"
+- **About page** -- added Jason Ulbright to contributors list, updated copyright to include 2026
+- **GitHub link** points to community fork (jasonulbright/sccmclictr)
+- **Assembly version** bumped to 1.1.0, description typo fixed ("Configurtaion" → "Configuration")
+
+### Removed
+- **Donate nag** -- PayPal button, "Get rid of this Message" blurb, and PRO Version upsell removed from About page
+- **License gating** -- `CheckLicense()` now returns true. All plugin buttons (MSRA, MSTSC, StatView, RDP, Explorer, Remote Tools, etc.) are enabled without a license key
+
+### Added
+- Screenshot in README
+
+---
+
 ## v1.2.0 -- CIM Migration: System.Management Removed (2026-03-26)
 
 ### CIM Migration (complete)
