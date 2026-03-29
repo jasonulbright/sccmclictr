@@ -8,11 +8,11 @@ using System.Windows;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("SCCMCliCtr")]
-[assembly: AssemblyDescription("Client Center for Configurtaion Manager")]
+[assembly: AssemblyDescription("Client Center for Configuration Manager")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Zander - Tools")]
+[assembly: AssemblyCompany("Community Fork")]
 [assembly: AssemblyProduct("SCCMCliCtr")]
-[assembly: AssemblyCopyright("Copyright ©  2022 by Roger Zander")]
+[assembly: AssemblyCopyright("Copyright © 2023 Roger Zander, 2026 Jason Ulbright")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -51,5 +51,5 @@ using System.Windows;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.0.7.*")]
-[assembly: AssemblyFileVersion("1.0.7.1")]
+[assembly: AssemblyVersion("1.1.0.*")]
+[assembly: AssemblyFileVersion("1.1.0.0")]

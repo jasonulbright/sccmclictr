@@ -1,6 +1,8 @@
 # Client Center for Configuration Manager (Community Fork)
 
-A WPF desktop tool for IT professionals to troubleshoot ConfigMgr/MECM agent issues on remote workstations. Connect via WinRM to view client settings, running services, software deployments, update status, agent configuration, and execute administrative actions -- all from a single pane.
+A WPF desktop tool for IT professionals to troubleshoot ConfigMgr/MECM agent issues on remote workstations.
+
+![Client Center for ConfigMgr](screenshot.png) Connect via WinRM to view client settings, running services, software deployments, update status, agent configuration, and execute administrative actions -- all from a single pane.
 
 **This is a maintained community fork** of [rzander/sccmclictr](https://github.com/rzander/sccmclictr), which was effectively abandoned in 2023. The original tool was removed from the Microsoft Store and winget, hangs on Windows 25H2, and the maintainer confirmed he has no test environment and no plans to update.
 
