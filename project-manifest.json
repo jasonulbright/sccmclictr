@@ -1,8 +1,8 @@
 {
-  "ProjectType": "mecm-tool",
-  "Description": "Community fork of Client Center for ConfigMgr remote troubleshooting",
-  "Status": "maintenance",
-  "Category": "MECM",
-  "ValidationSchedule": "none",
-  "Notes": "TASK: Replace Intel AMT button with one-click client health report (HTML, open in Edge)\nTASK: Surface 308 catch blocks (40 silent-ok, 91 debug, 114 surface, 61 unverified)\nTASK: Native C# CimSession API migration (.NET 10)\nTASK: C# + Fluent UI conversion"
+    "Description":  "Community fork of Client Center for ConfigMgr remote troubleshooting",
+    "ProjectType":  "mecm-tool",
+    "ValidationSchedule":  "none",
+    "Category":  "MECM",
+    "Status":  "maintenance",
+    "Notes":  "INFO: v1.2.0 shipped, WMI reference for LWC\nTASK: v2.0 C# + Fluent UI conversion + CimSession migration\nTASK: Replace Intel AMT button with client health report\nTASK: Surface 308 catch blocks"
 }
