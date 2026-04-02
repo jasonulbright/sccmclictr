@@ -4,5 +4,5 @@
     "ValidationSchedule":  "none",
     "Category":  "MECM",
     "Status":  "maintenance",
-    "Notes":  "INFO: v1.2.0 shipped, WMI reference for LWC\nTASK: v2.0 C# + Fluent UI conversion + CimSession migration\nTASK: Replace Intel AMT button with client health report\nTASK: Surface 308 catch blocks"
+    "Notes":  "INFO: v1.2.0 shipped, WMI reference for LWC\nTASK: v2.0 C# + Fluent UI + CimSession migration"
 }
