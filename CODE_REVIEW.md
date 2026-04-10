@@ -4,7 +4,7 @@
 - **Upstream**: https://github.com/rzander/sccmclictr
 - **Fork**: https://github.com/jasonulbright/sccmclictr
 - **Fork base**: Latest upstream commit (includes all 27 commits through v1.0.7.2)
-- **Current version**: v1.2.0
+- **Current version**: v1.3.0
 
 Original project effectively abandoned. Maintainer (rzander) stated in Jan 2026: "I currently don't have access to any test environments" and "there are no plans to refactor ClientCenter... In worst case it will die with Get-WMIObject." Removed from Microsoft Store and winget. Hangs on Windows 25H2.
 
@@ -30,7 +30,7 @@ Original project effectively abandoned. Maintainer (rzander) stated in Jan 2026:
 | # | Issue | Status | Details |
 |---|-------|--------|---------|
 | 1 | 308 bare `catch { }` blocks | Audited | Categorized across 57 files. 40 SILENT-OK, 91 DEBUG, 114 SURFACE, 61 UNVERIFIED. See `CATCH_BLOCK_AUDIT.md`. |
-| 2 | Outdated vendored dependencies | Open | NavigationPane (2016) and WPFToolkit (2012) are dead projects. Vendored in `lib/`. Replacement planned for .NET 10 migration. |
+| 2 | Outdated vendored dependencies | Accepted | NavigationPane (2016) and WPFToolkit (2012) are dead projects. Vendored in `lib/`. Functionally stable on .NET Framework 4.8, no known CVEs. Replacement would require UI rework — not justified for a maintenance fork. |
 
 ## Dependencies (all vendored -- zero NuGet)
 
@@ -38,8 +38,8 @@ All external dependencies are vendored in `lib/`. No `nuget restore` required.
 
 | Dependency | Version | Location | Notes |
 |-----------|---------|----------|-------|
-| NavigationPane | 2.1.0 | `lib/NavigationPane/` | Dead project (.NET 3.5 era). Replace in .NET 10 migration. |
-| WPFToolkit | 3.5.50211.1 | `lib/WPFToolkit/` | 3 DLLs. Dead since 2012. Most controls built into modern WPF. |
+| NavigationPane | 2.1.0 | `lib/NavigationPane/` | Dead project (.NET 3.5 era). Functionally stable on 4.8, no CVEs. |
+| WPFToolkit | 3.5.50211.1 | `lib/WPFToolkit/` | 3 DLLs. Dead since 2012. Functionally stable on 4.8, no CVEs. |
 | MSTest | 1.2.0 | `lib/MSTest/` | DLLs + build props/targets. Test infrastructure only. |
 | System.Management.Automation | 3.0.0 | GAC | PS 3.0 era. Ships with Windows. |
 
@@ -70,7 +70,7 @@ The fork base includes all upstream commits through v1.0.7.2:
 | Theme | Issues | Fork Status |
 |-------|--------|-------------|
 | SSL/HTTPS | #199, #200, #203, #212 | Partially addressed (TLS fix) |
-| WMI deprecation | #58, #208 | CIM migration in progress |
+| WMI deprecation | #58, #208 | **Fixed** — CIM migration complete (v1.2.0) |
 | User-targeted deployments invisible | #82 (26 comments) | Open -- queries only IsMachineTarget |
 | Application Groups unsupported | #144, #207, #183 | Open |
 | Connectivity (Surface, VPN, proxy) | Various | Open |
@@ -141,18 +141,8 @@ sccmclictr\
 ### Phase 2: CIM Migration -- COMPLETE (v1.2.0)
 `System.Management` dependency removed. See CIM Migration section above.
 
-### Phase 3: Catch Block Implementation
-Apply fixes from `CATCH_BLOCK_AUDIT.md`: 40 silent-ok (leave), 91 debug (`Debug.WriteLine`), 114 surface (`Listener?.WriteError`), 61 unverified (manual review).
+### Phase 3: Catch Block Implementation (optional)
+Apply fixes from `CATCH_BLOCK_AUDIT.md`: 40 silent-ok (leave), 91 debug (`Debug.WriteLine`), 114 surface (`Listener?.WriteError`), 61 unverified (manual review). Low priority — cosmetic improvement, not a functional issue.
 
-### Phase 4: .NET 10 Migration
-Target: .NET 10 LTS (EOL November 2028).
-
-| Blocker | Resolution |
-|---------|------------|
-| NavigationPane 2.1 | Replace (dead .NET 3.5 project) |
-| WPFToolkit 3.5 | Replace with built-in WPF controls |
-| ClickOnce | Replace with MSIX or self-contained publish |
-| 14 plugins | Recompile for .NET 10 |
-| PowerShell hosting | 5.1 to 7.x (remote WSMan to 5.1 still works) |
-
-Supported as-is: WPF, System.Management (via Windows Compatibility Pack), COM interop, P/Invoke.
+### Phase 4: .NET 10 Migration (aspirational — not planned)
+Would require UI rework (NavigationPane, WPFToolkit replacements), ClickOnce to MSIX, 14 plugin recompiles, and PS 5.1 to 7.x hosting migration. .NET Framework 4.8 is supported through 2032+ and ships with Windows. This fork's value is "it works when the original doesn't" — a full rewrite is not justified unless there's a compelling functional reason.
