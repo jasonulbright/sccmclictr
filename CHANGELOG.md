@@ -1,5 +1,17 @@
 # Changelog
 
+## v1.3.1 -- Final Cleanup & Fork Signoff (2026-04-10)
+
+### Changed
+- **Vendored dependencies** status changed from "Open" to "Accepted" — NavigationPane 2.1 and WPFToolkit 3.5 are functionally stable on .NET Framework 4.8 with no known CVEs. Replacement would require UI rework not justified for a maintenance fork.
+- **CODE_REVIEW.md** updated: version to v1.3.0, CIM migration marked fixed in upstream issues table, .NET 10 migration reclassified as aspirational (not planned), dependency notes clarified.
+- **Roadmap** Phase 4 (.NET 10) reclassified as aspirational. .NET Framework 4.8 is supported through 2032+ and ships with Windows.
+
+### Removed
+- **`cim-migration` branch** deleted (local + remote). Work was merged in v1.2.0; branch was stale.
+
+---
+
 ## v1.3.0 -- Community Fork Branding & Feature Unlock (2026-03-29)
 
 ### Changed
