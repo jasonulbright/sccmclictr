@@ -90,7 +90,7 @@ The tool includes 14 plugin extensions:
 | Saved-password persistence | **Fixed** |
 | WMI deprecation (`System.Management`) | **Fixed** — CIM migration complete |
 | 308 bare `catch { }` blocks | [Audited](CATCH_BLOCK_AUDIT.md) |
-| Outdated vendored dependencies | Open |
+| Outdated vendored dependencies | Accepted — stable on .NET 4.8, no CVEs |
 
 This tool is designed for trusted administrators on internal networks. See [CODE_REVIEW.md](CODE_REVIEW.md) for detailed security analysis.
 
