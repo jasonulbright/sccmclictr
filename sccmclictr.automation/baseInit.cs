@@ -47,6 +47,7 @@ public class baseInit : IDisposable
         {
           this.tsPSCode.Close();
         }
+        // silent: dispose path; tsPSCode.Close() inside Dispose
         catch
         {
         }
@@ -60,10 +61,12 @@ public class baseInit : IDisposable
           this.Cache.Remove(keyValuePair.Key, (string) null);
         this.Cache.Dispose();
       }
+      // silent: dispose path; Cache.Dispose() inside Dispose
       catch
       {
       }
     }
+    // silent: dispose path; outer catch wrapping entire Dispose body
     catch
     {
     }

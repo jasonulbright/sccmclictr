@@ -92,6 +92,7 @@ namespace AgentActionTools
                         }
                     }
                 }
+                // silent: property probe; SCCM console UI path from registry, returns "" on failure
                 catch { }
                 return "";
             }
@@ -126,6 +127,7 @@ namespace AgentActionTools
                         return sServer;
                     }
                 }
+                // silent: property probe; SCCM server name from registry, returns "" on failure
                 catch { }
                 return "";
             }

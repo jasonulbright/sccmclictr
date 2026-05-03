@@ -251,6 +251,7 @@ public class monitoring : baseInit
         this.pipeline.StateChanged -= new EventHandler<PipelineStateEventArgs>(this.pipeline_StateChanged);
         this._remoteRunspace.Close();
       }
+      // silent: pipeline/runspace close in monitoring teardown
       catch
       {
       }

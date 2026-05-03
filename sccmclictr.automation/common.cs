@@ -104,6 +104,7 @@ public static class common
     {
       return string.IsNullOrEmpty(ManagementDateTime) ? new DateTime?() : new DateTime?(DmtfToDateTime(ManagementDateTime));
     }
+    // silent: DMTF DateTime parse; returns null DateTime on failure
     catch
     {
     }

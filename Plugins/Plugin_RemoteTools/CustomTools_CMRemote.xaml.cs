@@ -83,6 +83,7 @@ namespace AgentActionTools
                         }
                     }
                 }
+                // silent: property probe; SCCM console UI path from registry, returns "" on failure
                 catch { }
                 return "";
             }

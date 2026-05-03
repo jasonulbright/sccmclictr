@@ -90,6 +90,7 @@ public class dcm : baseInit
         {
           this.LastEvalTime = new DateTime?(common.DmtfToDateTime(dmtfDate));
         }
+        // silent: DMTF DateTime parse; LastEvalTime stays null on failure
         catch
         {
         }
