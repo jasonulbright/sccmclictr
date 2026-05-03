@@ -85,4 +85,8 @@
     <EmbeddedResource Include="Properties\Resources.resx" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Target Name="BareCatchGuard" BeforeTargets="CoreCompile">
+    <Message Text="Running bare-catch regression guard..." Importance="normal" />
+    <Exec Command="powershell -NoProfile -ExecutionPolicy Bypass -File &quot;$(MSBuildThisFileDirectory)..\tools\check-bare-catches.ps1&quot;" />
+  </Target>
 </Project>
