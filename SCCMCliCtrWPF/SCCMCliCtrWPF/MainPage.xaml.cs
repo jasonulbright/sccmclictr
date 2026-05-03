@@ -432,12 +432,14 @@ namespace ClientCenter
                 if (oAgent != null)
                     oAgent.Client.Monitoring.AsynchronousScript.Close();
             }
+            // silent: Current_Exit; close async monitoring script during app shutdown
             catch { }
             try
             {
                 if (oAgent != null && oAgent.isConnected)
                     oAgent.disconnect();
             }
+            // silent: Current_Exit; disconnect agent during app shutdown
             catch { }
         }
 
@@ -1427,6 +1429,7 @@ namespace ClientCenter
                         {
                             File.Delete(sUIPath + @"\XmlStorage\Extensions\Actions\" + sGUID + "\\sccmclictr.xml");
                         }
+                        // silent: cleanup; File.Delete for console extension XML, ignore if missing/locked
                         catch { }
                     }
                 }

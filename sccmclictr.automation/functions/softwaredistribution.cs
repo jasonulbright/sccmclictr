@@ -821,6 +821,7 @@ public class softwaredistribution : baseInit
           this.LastEvalTime = new DateTime?(common.DmtfToDateTime(lastEvalDmtf));
           this.LastEvalTime = new DateTime?(this.LastEvalTime.Value.ToUniversalTime());
         }
+        // silent: DMTF DateTime parse; LastEvalTime stays null on failure
         catch
         {
         }
@@ -837,6 +838,7 @@ public class softwaredistribution : baseInit
           this.LastInstallTime = new DateTime?(common.DmtfToDateTime(lastInstallDmtf));
           this.LastInstallTime = new DateTime?(this.LastInstallTime.Value.ToUniversalTime());
         }
+        // silent: DMTF DateTime parse; LastInstallTime stays null on failure
         catch
         {
         }
@@ -856,6 +858,7 @@ public class softwaredistribution : baseInit
           this.ReleaseDate = new DateTime?(common.DmtfToDateTime(releaseDateDmtf));
           this.ReleaseDate = new DateTime?(this.ReleaseDate.Value.ToUniversalTime());
         }
+        // silent: DMTF DateTime parse; ReleaseDate stays null on failure
         catch
         {
         }
@@ -875,6 +878,7 @@ public class softwaredistribution : baseInit
           this.StartTime = new DateTime?(common.DmtfToDateTime(startTimeDmtf));
           this.StartTime = new DateTime?(this.StartTime.Value.ToUniversalTime());
         }
+        // silent: DMTF DateTime parse; StartTime stays null on failure
         catch
         {
         }

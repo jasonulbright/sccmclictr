@@ -1,8 +1,8 @@
 # Bare Catch Block Audit
 
-Status: Categorized, not yet implemented. Implementation deferred to v2.0 modernization (see [MODERNIZATION_PLAN.md](MODERNIZATION_PLAN.md) phases C0–C6).
+Status: Categorized, not yet implemented. Implementation deferred to v2.0 modernization (see [MODERNIZATION_PLAN.md](MODERNIZATION_PLAN.md) phases C0ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“C6).
 
-**Last refreshed**: 2026-05-03 (C0 of v2.0 plan). Line numbers verified against current code; 4 files line-shifted -1 due to CIM Phase 2c+3+4 cleanup commits (no count change). 51 of 56 files unchanged.
+**Last refreshed**: 2026-05-03 (C1 of v2.0 plan). Line numbers updated for the 14 files where SILENT-OK comments were added; 308 blocks reconcile to 308.
 
 ## Summary
 
@@ -42,18 +42,18 @@ Note: The automation library catch blocks are primarily in decompiled code. Most
 ### baseInit.cs (3 blocks)
 | Line | Category | Context |
 |------|----------|---------|
-| 50 | SILENT-OK | Dispose -- `tsPSCode.Close()` inside Dispose method |
-| 63 | SILENT-OK | Dispose -- `Cache.Dispose()` inside Dispose method |
-| 67 | SILENT-OK | Dispose -- outer catch wrapping entire Dispose body |
+| 51 | SILENT-OK | Dispose -- `tsPSCode.Close()` inside Dispose method |
+| 65 | SILENT-OK | Dispose -- `Cache.Dispose()` inside Dispose method |
+| 70 | SILENT-OK | Dispose -- outer catch wrapping entire Dispose body |
 
 ### SCCMAgent.cs (5 blocks)
 | Line | Category | Context |
 |------|----------|---------|
-| 46 | SILENT-OK | Dispose -- `disconnect()` inside Dispose method |
-| 72 | SILENT-OK | Property probe -- `TargetHostname` getter, returns "" on failure |
-| 95 | SILENT-OK | Property probe -- `isConnected` getter, returns false on failure |
-| 402 | SILENT-OK | IPC connect attempt -- sets `ipcconnected = false` on failure |
-| 418 | SILENT-OK | IPC connect attempt -- sets `ipcconnected = false`, returns false |
+| 47 | SILENT-OK | Dispose -- `disconnect()` inside Dispose method |
+| 74 | SILENT-OK | Property probe -- `TargetHostname` getter, returns "" on failure |
+| 98 | SILENT-OK | Property probe -- `isConnected` getter, returns false on failure |
+| 406 | SILENT-OK | IPC connect attempt -- sets `ipcconnected = false` on failure |
+| 423 | SILENT-OK | IPC connect attempt -- sets `ipcconnected = false`, returns false |
 
 ### WSMan.cs (3 blocks)
 | Line | Category | Context |
@@ -65,7 +65,7 @@ Note: The automation library catch blocks are primarily in decompiled code. Most
 ### common.cs (1 block)
 | Line | Category | Context |
 |------|----------|---------|
-| 107 | SILENT-OK | DateTime parse -- `ManagementDateTimeConverter.ToDateTime`, returns null DateTime |
+| 108 | SILENT-OK | DateTime parse -- `ManagementDateTimeConverter.ToDateTime`, returns null DateTime |
 
 ### agentactions.cs (62 blocks)
 | Line | Category | Context |
@@ -136,24 +136,24 @@ Note: The automation library catch blocks are primarily in decompiled code. Most
 ### agentproperties.cs (18 blocks)
 | Line | Category | Context |
 |------|----------|---------|
-| 429 | SILENT-OK | Property probe -- `ClientVersion` getter, returns cached/empty |
-| 502 | SILENT-OK | Property probe -- `AssignedSite` getter, returns empty |
-| 527 | SILENT-OK | Property probe -- `ManagementPoint` getter, returns empty |
-| 543 | SILENT-OK | Property probe -- `InternetManagementPoint` getter, returns "" |
-| 576 | SILENT-OK | Property probe -- `ManagementPointProxy` getter, returns empty |
-| 603 | SILENT-OK | Property probe -- `LocalSCCMAgentPath` getter, returns "" |
-| 626 | DEBUG | Property probe -- `SCCMAgentLogFiles` list, returns empty list |
-| 644 | SILENT-OK | Property probe -- `SMSSLP` getter, returns "" |
-| 673 | SILENT-OK | Property probe -- `DnsSuffix` getter, returns "" |
-| 708 | SILENT-OK | Property probe -- `HttpPort` getter, returns null int |
-| 743 | SILENT-OK | Property probe -- `HttpsPort` getter, returns null int |
-| 772 | SILENT-OK | Property probe -- `PendingFileRenameOperations`, returns false |
-| 788 | SILENT-OK | Property probe -- `RebootPending` (CBS), returns false |
-| 804 | DEBUG | Property probe -- `ProductCode`, returns "" |
-| 822 | SURFACE | `RemoveWMINamespaceCCM` -- destructive WMI cleanup |
-| 840 | DEBUG | `LoggedOnUserSiDs` -- get user SID, continues on failure |
-| 852 | DEBUG | Inner loop -- `UserSID` property access, continues |
-| 879 | DEBUG | `DeviceId` -- property parsing, returns default struct |
+| 430 | SILENT-OK | Property probe -- `ClientVersion` getter, returns cached/empty |
+| 504 | SILENT-OK | Property probe -- `AssignedSite` getter, returns empty |
+| 530 | SILENT-OK | Property probe -- `ManagementPoint` getter, returns empty |
+| 547 | SILENT-OK | Property probe -- `InternetManagementPoint` getter, returns "" |
+| 581 | SILENT-OK | Property probe -- `ManagementPointProxy` getter, returns empty |
+| 609 | SILENT-OK | Property probe -- `LocalSCCMAgentPath` getter, returns "" |
+| 632 | DEBUG | Property probe -- `SCCMAgentLogFiles` list, returns empty list |
+| 651 | SILENT-OK | Property probe -- `SMSSLP` getter, returns "" |
+| 681 | SILENT-OK | Property probe -- `DnsSuffix` getter, returns "" |
+| 717 | SILENT-OK | Property probe -- `HttpPort` getter, returns null int |
+| 753 | SILENT-OK | Property probe -- `HttpsPort` getter, returns null int |
+| 783 | SILENT-OK | Property probe -- `PendingFileRenameOperations`, returns false |
+| 800 | SILENT-OK | Property probe -- `RebootPending` (CBS), returns false |
+| 816 | DEBUG | Property probe -- `ProductCode`, returns "" |
+| 834 | SURFACE | `RemoveWMINamespaceCCM` -- destructive WMI cleanup |
+| 852 | DEBUG | `LoggedOnUserSiDs` -- get user SID, continues on failure |
+| 864 | DEBUG | Inner loop -- `UserSID` property access, continues |
+| 891 | DEBUG | `DeviceId` -- property parsing, returns default struct |
 
 ### components.cs (1 block)
 | Line | Category | Context |
@@ -163,10 +163,10 @@ Note: The automation library catch blocks are primarily in decompiled code. Most
 ### dcm.cs (4 blocks)
 | Line | Category | Context |
 |------|----------|---------|
-| 93 | SILENT-OK | DateTime parse -- `LastEvalTime` DMTF conversion |
-| 149 | SURFACE | `TriggerEvaluation` -- DCM baseline eval, returns 1 on failure |
-| 174 | DEBUG | XML attribute parse -- `IsDetected`, defaults to true |
-| 202 | DEBUG | Config item list parsing, returns partial list |
+| 94 | SILENT-OK | DateTime parse -- `LastEvalTime` DMTF conversion |
+| 150 | SURFACE | `TriggerEvaluation` -- DCM baseline eval, returns 1 on failure |
+| 175 | DEBUG | XML attribute parse -- `IsDetected`, defaults to true |
+| 203 | DEBUG | Config item list parsing, returns partial list |
 
 ### health.cs (5 blocks)
 | Line | Category | Context |
@@ -196,7 +196,7 @@ Note: The automation library catch blocks are primarily in decompiled code. Most
 | 135 | DEBUG | Type conversion fallback in async PS output handling |
 | 146 | DEBUG | Hashtable property enumeration fallback |
 | 153 | DEBUG | Outer fallback for async output conversion |
-| 254 | SILENT-OK | Cleanup -- pipeline/runspace close in monitoring teardown |
+| 255 | SILENT-OK | Cleanup -- pipeline/runspace close in monitoring teardown |
 
 ### processes.cs (1 block)
 | Line | Category | Context |
@@ -214,20 +214,20 @@ Note: The automation library catch blocks are primarily in decompiled code. Most
 | 721 | DEBUG | Enforcement deadline override -- SetProperty in loop, continues |
 | 744 | DEBUG | Enforcement deadline restore -- SetProperty, continues |
 | 797 | DEBUG | `AppDTs` array construction -- property parsing |
-| 824 | SILENT-OK | DateTime parse -- `LastEvalTime` DMTF conversion |
-| 840 | SILENT-OK | DateTime parse -- `LastInstallTime` DMTF conversion |
-| 859 | SILENT-OK | DateTime parse -- `ReleaseDate` DMTF conversion |
-| 878 | SILENT-OK | DateTime parse -- `StartTime` DMTF conversion |
-| 1210 | DEBUG | `CCM_Scheduler_ScheduledMessage` construction in loop |
-| 1237 | SURFACE | `SetProperty` ADV_RepeatRunBehavior -- schedule override |
-| 1244 | SURFACE | `SetProperty` ADV_MandatoryAssignments -- schedule override |
-| 1817 | SURFACE | `Remove-Item` registry path -- execution history delete |
-| 2041 | DEBUG | Update status switch case -- assignment with break |
-| 2158 | DEBUG | WMI property parsing for SW update status icon/status |
-| 2166 | DEBUG | `ErrorCode` uint parse |
-| 2173 | DEBUG | `PercentComplete` uint parse |
-| 2177 | DEBUG | Outer catch wrapping entire SW update constructor |
-| 2722 | DEBUG | `AssignedCIs` array conversion |
+| 825 | SILENT-OK | DateTime parse -- `LastEvalTime` DMTF conversion |
+| 842 | SILENT-OK | DateTime parse -- `LastInstallTime` DMTF conversion |
+| 862 | SILENT-OK | DateTime parse -- `ReleaseDate` DMTF conversion |
+| 882 | SILENT-OK | DateTime parse -- `StartTime` DMTF conversion |
+| 1214 | DEBUG | `CCM_Scheduler_ScheduledMessage` construction in loop |
+| 1241 | SURFACE | `SetProperty` ADV_RepeatRunBehavior -- schedule override |
+| 1248 | SURFACE | `SetProperty` ADV_MandatoryAssignments -- schedule override |
+| 1821 | SURFACE | `Remove-Item` registry path -- execution history delete |
+| 2045 | DEBUG | Update status switch case -- assignment with break |
+| 2162 | DEBUG | WMI property parsing for SW update status icon/status |
+| 2170 | DEBUG | `ErrorCode` uint parse |
+| 2177 | DEBUG | `PercentComplete` uint parse |
+| 2181 | DEBUG | Outer catch wrapping entire SW update constructor |
+| 2726 | DEBUG | `AssignedCIs` array conversion |
 
 ### swcache.cs (6 blocks)
 | Line | Category | Context |
@@ -274,23 +274,23 @@ Note: The automation library catch blocks are primarily in decompiled code. Most
 | 293 | SURFACE | Console extension registration (`/RegisterConsole` arg) |
 | 304 | SURFACE | Console extension unregistration (`/UnRegisterConsole` arg) |
 | 338 | UNVERIFIED | Connection parameter setup |
-| 435 | SILENT-OK | `Current_Exit` -- close monitoring script |
-| 441 | SILENT-OK | `Current_Exit` -- disconnect agent |
-| 465 | SURFACE | `bt_Connect_Click` -- stop monitoring and disconnect |
-| 549 | SURFACE | `bt_Connect_Click` -- save settings after connect |
-| 684 | UNVERIFIED | Tab switching / agent action invocation |
-| 688 | UNVERIFIED | Outer catch around tab switching |
-| 1081 | DEBUG | AutoComplete populate -- ItemsSource binding |
-| 1114 | SURFACE-ALREADY | `bt_Ping_Click` -- catch appends "Unable to ping" to rStatus |
-| 1130 | SURFACE-ALREADY | `bt_RegConsole_Click` -- catch calls `myTrace.WriteError(...)` |
-| 1142 | SURFACE | `bt_UnRegConsole_Click` -- catch calls `myTrace.WriteError(...)` (already has error msg but using bare catch) |
-| 1159 | SURFACE | `btResetPausedSWDist_Click` -- reset paused SW dist |
-| 1171 | SURFACE | `btResetProvisioningMode_Click` -- reset provisioning mode |
-| 1183 | SURFACE | `btResetSystemTaskExclude_Click` -- reset system task exclude |
-| 1195 | SURFACE | `btDeleteIsCacheCopyNeededCallBack_Click` -- delete callback |
-| 1206 | SURFACE | `btRefreshServerComplianceState_Click` -- already has `myTrace.WriteError` in catch body |
-| 1223 | SURFACE | `bt_CleanBoundaryGroupCache_Click` -- already has `myTrace.WriteError` in catch body |
-| 1430 | SILENT-OK | File.Delete for console extension XML -- cleanup |
+| 436 | SILENT-OK | `Current_Exit` -- close monitoring script |
+| 443 | SILENT-OK | `Current_Exit` -- disconnect agent |
+| 467 | SURFACE | `bt_Connect_Click` -- stop monitoring and disconnect |
+| 551 | SURFACE | `bt_Connect_Click` -- save settings after connect |
+| 686 | UNVERIFIED | Tab switching / agent action invocation |
+| 690 | UNVERIFIED | Outer catch around tab switching |
+| 1083 | DEBUG | AutoComplete populate -- ItemsSource binding |
+| 1116 | SURFACE-ALREADY | `bt_Ping_Click` -- catch appends "Unable to ping" to rStatus |
+| 1132 | SURFACE-ALREADY | `bt_RegConsole_Click` -- catch calls `myTrace.WriteError(...)` |
+| 1144 | SURFACE | `bt_UnRegConsole_Click` -- catch calls `myTrace.WriteError(...)` (already has error msg but using bare catch) |
+| 1161 | SURFACE | `btResetPausedSWDist_Click` -- reset paused SW dist |
+| 1173 | SURFACE | `btResetProvisioningMode_Click` -- reset provisioning mode |
+| 1185 | SURFACE | `btResetSystemTaskExclude_Click` -- reset system task exclude |
+| 1197 | SURFACE | `btDeleteIsCacheCopyNeededCallBack_Click` -- delete callback |
+| 1208 | SURFACE | `btRefreshServerComplianceState_Click` -- already has `myTrace.WriteError` in catch body |
+| 1225 | SURFACE | `bt_CleanBoundaryGroupCache_Click` -- already has `myTrace.WriteError` in catch body |
+| 1433 | SILENT-OK | File.Delete for console extension XML -- cleanup |
 
 ### Logs.cs (2 blocks)
 | Line | Category | Context |
@@ -511,7 +511,7 @@ Note: The automation library catch blocks are primarily in decompiled code. Most
 
 ### Plugin_CustomTools_AMTTools/AgentActionTool_AMTTools.xaml.cs (5 blocks)
 
-**[REMOVED IN V2.0 PER MODERNIZATION_PLAN.md D8 — DO NOT FIX]** Intel AMT is EOL; entire plugin dir deleted in Phase U6. These 5 blocks are tracked here for census accuracy only.
+**[REMOVED IN V2.0 PER MODERNIZATION_PLAN.md D8 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â DO NOT FIX]** Intel AMT is EOL; entire plugin dir deleted in Phase U6. These 5 blocks are tracked here for census accuracy only.
 
 | Line | Category | Context |
 |------|----------|---------|
@@ -551,37 +551,37 @@ Note: The automation library catch blocks are primarily in decompiled code. Most
 ### Plugin_RemoteTools/AgentActionTool_CMRemote.xaml.cs (1 block)
 | Line | Category | Context |
 |------|----------|---------|
-| 64 | SILENT-OK | Property probe -- SCCM console UI path from registry, returns "" |
+| 65 | SILENT-OK | Property probe -- SCCM console UI path from registry, returns "" |
 
 ### Plugin_RemoteTools/CustomTools_CMRemote.xaml.cs (1 block)
 | Line | Category | Context |
 |------|----------|---------|
-| 86 | SILENT-OK | Property probe -- SCCM console UI path from registry, returns "" |
+| 87 | SILENT-OK | Property probe -- SCCM console UI path from registry, returns "" |
 
 ### Plugin_ResourceExplorer/AgentActionTool_CMRemote.xaml.cs (3 blocks)
 | Line | Category | Context |
 |------|----------|---------|
-| 65 | SILENT-OK | Property probe -- SCCM console UI path from registry, returns "" |
-| 99 | SILENT-OK | Property probe -- SCCM server name from registry, returns "" |
-| 114 | DEBUG | WMI query -- `SiteCode` from ManagementObject, returns "" |
+| 66 | SILENT-OK | Property probe -- SCCM console UI path from registry, returns "" |
+| 101 | SILENT-OK | Property probe -- SCCM server name from registry, returns "" |
+| 116 | DEBUG | WMI query -- `SiteCode` from ManagementObject, returns "" |
 
 ### Plugin_ResourceExplorer/CustomTools_CMResource.xaml.cs (3 blocks)
 | Line | Category | Context |
 |------|----------|---------|
-| 94 | SILENT-OK | Property probe -- SCCM console UI path from registry, returns "" |
-| 128 | SILENT-OK | Property probe -- SCCM server name from registry, returns "" |
-| 143 | DEBUG | WMI query -- `SiteCode` from ManagementObject, returns "" |
+| 95 | SILENT-OK | Property probe -- SCCM console UI path from registry, returns "" |
+| 130 | SILENT-OK | Property probe -- SCCM server name from registry, returns "" |
+| 145 | DEBUG | WMI query -- `SiteCode` from ManagementObject, returns "" |
 
 ### Plugin_StatusMessageViewer/AgentActionTool_StatusMessage.xaml.cs (3 blocks)
 | Line | Category | Context |
 |------|----------|---------|
-| 65 | SILENT-OK | Property probe -- SCCM console UI path from registry, returns "" |
-| 99 | SILENT-OK | Property probe -- SCCM server name from registry, returns "" |
-| 114 | DEBUG | WMI query -- `SiteCode` from ManagementObject, returns "" |
+| 66 | SILENT-OK | Property probe -- SCCM console UI path from registry, returns "" |
+| 101 | SILENT-OK | Property probe -- SCCM server name from registry, returns "" |
+| 116 | DEBUG | WMI query -- `SiteCode` from ManagementObject, returns "" |
 
 ### Plugin_StatusMessageViewer/CustomTools_StatusMessage.xaml.cs (3 blocks)
 | Line | Category | Context |
 |------|----------|---------|
-| 95 | SILENT-OK | Property probe -- SCCM console UI path from registry, returns "" |
-| 129 | SILENT-OK | Property probe -- SCCM server name from registry, returns "" |
-| 144 | DEBUG | WMI query -- `SiteCode` from ManagementObject, returns "" |
+| 96 | SILENT-OK | Property probe -- SCCM console UI path from registry, returns "" |
+| 131 | SILENT-OK | Property probe -- SCCM server name from registry, returns "" |
+| 146 | DEBUG | WMI query -- `SiteCode` from ManagementObject, returns "" |

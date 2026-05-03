@@ -426,6 +426,7 @@ public class agentproperties : baseInit
         clientVersion = this.GetProperty("ROOT\\ccm:SMS_Client=@", nameof (ClientVersion));
         this.cacheTime = cacheTime;
       }
+      // silent: property probe; ClientVersion returns cached/empty on failure
       catch
       {
       }
@@ -499,6 +500,7 @@ public class agentproperties : baseInit
         assignedSite = this.GetStringFromClassMethod("ROOT\\ccm:SMS_Client", "GetAssignedSite()", "sSiteCode");
         this.cacheTime = cacheTime;
       }
+      // silent: property probe; AssignedSite returns "" on failure
       catch
       {
       }
@@ -524,6 +526,7 @@ public class agentproperties : baseInit
         managementPoint = this.GetProperty($"ROOT\\ccm:SMS_Authority.Name='SMS:{this.AssignedSite}'", "CurrentManagementPoint");
         this.cacheTime = cacheTime;
       }
+      // silent: property probe; ManagementPoint returns "" on failure
       catch
       {
       }
@@ -540,6 +543,7 @@ public class agentproperties : baseInit
       {
         return this.baseClient.Inventory.isx64OS & !this.baseClient.AgentProperties.isSCCM2012 ? this.GetStringFromPS("(Get-ItemProperty(\"HKLM:\\SOFTWARE\\Wow6432Node\\Microsoft\\SMS\\Client\\Internet Facing\")).$(\"Internet MP Hostname\")") : this.GetStringFromPS("(Get-ItemProperty(\"HKLM:\\SOFTWARE\\Microsoft\\SMS\\Client\\Internet Facing\")).$(\"Internet MP Hostname\")");
       }
+      // silent: property probe; ManagementPointInternet returns "" on failure
       catch
       {
       }
@@ -573,6 +577,7 @@ public class agentproperties : baseInit
         foreach (PSObject psObject in this.GetObjects("ROOT\\CCM", "SELECT * FROM SMS_MPProxyInformation Where State = 'Active'"))
           managementPointProxy = psObject.Properties["Name"].Value.ToString();
       }
+      // silent: property probe; ManagementPointProxy returns "" on failure
       catch
       {
       }
@@ -600,6 +605,7 @@ public class agentproperties : baseInit
       {
         return this.baseClient.Inventory.isx64OS & !this.baseClient.AgentProperties.isSCCM2012 ? this.GetStringFromPS("(Get-ItemProperty(\"HKLM:\\SOFTWARE\\Wow6432Node\\Microsoft\\SMS\\Client\\Configuration\\Client Properties\")).$(\"Local SMS Path\")") : this.GetStringFromPS("(Get-ItemProperty(\"HKLM:\\SOFTWARE\\Microsoft\\SMS\\Client\\Configuration\\Client Properties\")).$(\"Local SMS Path\")");
       }
+      // silent: property probe; LocalSCCMAgentPath returns "" on failure
       catch
       {
       }
@@ -641,6 +647,7 @@ public class agentproperties : baseInit
       {
         return this.baseClient.Inventory.isx64OS & !this.baseClient.AgentProperties.isSCCM2012 ? this.GetStringFromPS("(Get-ItemProperty(\"HKLM:\\SOFTWARE\\Wow6432Node\\Microsoft\\CCM\")).$(\"SMSSLP\")") : this.GetStringFromPS("(Get-ItemProperty(\"HKLM:\\SOFTWARE\\Microsoft\\CCM\")).$(\"SMSSLP\")");
       }
+      // silent: property probe; ServerLocatorPoint (SMSSLP) returns "" on failure
       catch
       {
       }
@@ -670,6 +677,7 @@ public class agentproperties : baseInit
       {
         return this.baseClient.Inventory.isx64OS & !this.baseClient.AgentProperties.isSCCM2012 ? this.GetStringFromPS("(Get-ItemProperty(\"HKLM:\\SOFTWARE\\Wow6432Node\\Microsoft\\CCM\\LocationServices\")).$(\"DnsSuffix\")") : this.GetStringFromPS("(Get-ItemProperty(\"HKLM:\\SOFTWARE\\Microsoft\\CCM\\LocationServices\")).$(\"DnsSuffix\")");
       }
+      // silent: property probe; DNSSuffix returns "" on failure
       catch
       {
       }
@@ -705,6 +713,7 @@ public class agentproperties : baseInit
         string stringFromPs1 = this.GetStringFromPS("(Get-ItemProperty(\"HKLM:\\SOFTWARE\\Microsoft\\CCM\")).$(\"HttpPort\")");
         return !string.IsNullOrEmpty(stringFromPs1) ? new int?(int.Parse(stringFromPs1)) : new int?();
       }
+      // silent: property probe; HTTPPort returns null int on failure
       catch
       {
       }
@@ -740,6 +749,7 @@ public class agentproperties : baseInit
         string stringFromPs1 = this.GetStringFromPS("(Get-ItemProperty(\"HKLM:\\SOFTWARE\\Microsoft\\CCM\")).$(\"HttpsPort\")");
         return !string.IsNullOrEmpty(stringFromPs1) ? new int?(int.Parse(stringFromPs1)) : new int?();
       }
+      // silent: property probe; HTTPSPort returns null int on failure
       catch
       {
       }
@@ -769,6 +779,7 @@ public class agentproperties : baseInit
       {
         return this.GetObjectsFromPS("(Get-ItemProperty(\"HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\")).$(\"PendingFileRenameOperations\")").Count > 0;
       }
+      // silent: property probe; FileRenameOperationsPending returns false on failure
       catch
       {
       }
@@ -785,6 +796,7 @@ public class agentproperties : baseInit
       {
         return this.GetObjectsFromPS("if(test-path \"HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Component Based Servicing\\RebootPending\"){ $true }").Count > 0;
       }
+      // silent: property probe; ComponentServicingRebootPending returns false on failure
       catch
       {
       }

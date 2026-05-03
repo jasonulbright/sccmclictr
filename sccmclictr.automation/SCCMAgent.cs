@@ -43,6 +43,7 @@ public class SCCMAgent : IDisposable
       if (this.isConnected)
         this.disconnect();
     }
+    // silent: dispose path; disconnect() inside Dispose
     catch
     {
     }
@@ -69,6 +70,7 @@ public class SCCMAgent : IDisposable
       {
         return this.ConnectionInfo.ComputerName;
       }
+      // silent: property probe; TargetHostname returns "" on failure
       catch
       {
         return "";
@@ -92,6 +94,7 @@ public class SCCMAgent : IDisposable
         if (this.remoteRunspace.RunspaceStateInfo.State == RunspaceState.Opened)
           return true;
       }
+      // silent: property probe; isConnected returns false on failure
       catch
       {
       }
@@ -399,6 +402,7 @@ public class SCCMAgent : IDisposable
           this.connectIPC(this.Hostname, this.Credential);
         this.ipcconnected = true;
       }
+      // silent: IPC connect attempt; sets ipcconnected=false on failure
       catch
       {
         this.ipcconnected = false;
@@ -415,6 +419,7 @@ public class SCCMAgent : IDisposable
         this.connectIPC(this.Hostname, this.Credential);
       this.ipcconnected = true;
     }
+    // silent: IPC connect attempt (PSCredential overload); sets ipcconnected=false, returns false on failure
     catch
     {
       this.ipcconnected = false;
