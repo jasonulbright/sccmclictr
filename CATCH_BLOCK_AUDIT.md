@@ -1,6 +1,8 @@
 # Bare Catch Block Audit
 
-Status: Categorized, not yet implemented.
+Status: Categorized, not yet implemented. Implementation deferred to v2.0 modernization (see [MODERNIZATION_PLAN.md](MODERNIZATION_PLAN.md) phases C0–C6).
+
+**Last refreshed**: 2026-05-03 (C0 of v2.0 plan). Line numbers verified against current code; 4 files line-shifted -1 due to CIM Phase 2c+3+4 cleanup commits (no count change). 51 of 56 files unchanged.
 
 ## Summary
 
@@ -161,10 +163,10 @@ Note: The automation library catch blocks are primarily in decompiled code. Most
 ### dcm.cs (4 blocks)
 | Line | Category | Context |
 |------|----------|---------|
-| 94 | SILENT-OK | DateTime parse -- `LastEvalTime` DMTF conversion |
-| 150 | SURFACE | `TriggerEvaluation` -- DCM baseline eval, returns 1 on failure |
-| 175 | DEBUG | XML attribute parse -- `IsDetected`, defaults to true |
-| 203 | DEBUG | Config item list parsing, returns partial list |
+| 93 | SILENT-OK | DateTime parse -- `LastEvalTime` DMTF conversion |
+| 149 | SURFACE | `TriggerEvaluation` -- DCM baseline eval, returns 1 on failure |
+| 174 | DEBUG | XML attribute parse -- `IsDetected`, defaults to true |
+| 202 | DEBUG | Config item list parsing, returns partial list |
 
 ### health.cs (5 blocks)
 | Line | Category | Context |
@@ -178,10 +180,10 @@ Note: The automation library catch blocks are primarily in decompiled code. Most
 ### inventory.cs (4 blocks)
 | Line | Category | Context |
 |------|----------|---------|
-| 55 | DEBUG | `InstalledSoftware` loop -- WMI object construction, continues |
-| 79 | DEBUG | `InventoryActionStatus` loop -- WMI object construction, continues |
-| 142 | DEBUG | `SMS_PowerSettings` loop -- WMI object construction, continues |
-| 214 | DEBUG | `InstallDate` property parse -- nullable DateTime handling |
+| 54 | DEBUG | `InstalledSoftware` loop -- WMI object construction, continues |
+| 78 | DEBUG | `InventoryActionStatus` loop -- WMI object construction, continues |
+| 141 | DEBUG | `SMS_PowerSettings` loop -- WMI object construction, continues |
+| 213 | DEBUG | `InstallDate` property parse -- nullable DateTime handling |
 
 ### locationservices.cs (1 block)
 | Line | Category | Context |
@@ -204,38 +206,38 @@ Note: The automation library catch blocks are primarily in decompiled code. Most
 ### softwaredistribution.cs (22 blocks)
 | Line | Category | Context |
 |------|----------|---------|
-| 80 | DEBUG | `CCM_Application` list loop -- WMI construction, continues |
-| 102 | DEBUG | `CCM_ApplicationActions` -- single object construction, returns null |
-| 201 | DEBUG | `SoftwareStatus` list loop -- WMI construction, continues |
-| 264 | DEBUG | XML field reflection -- `SetValue` in loop, continues |
-| 320 | DEBUG | `CCM_ApplicationCIAssignment` loop -- WMI construction, continues |
-| 722 | DEBUG | Enforcement deadline override -- SetProperty in loop, continues |
-| 745 | DEBUG | Enforcement deadline restore -- SetProperty, continues |
-| 798 | DEBUG | `AppDTs` array construction -- property parsing |
-| 825 | SILENT-OK | DateTime parse -- `LastEvalTime` DMTF conversion |
-| 841 | SILENT-OK | DateTime parse -- `LastInstallTime` DMTF conversion |
-| 860 | SILENT-OK | DateTime parse -- `ReleaseDate` DMTF conversion |
-| 879 | SILENT-OK | DateTime parse -- `StartTime` DMTF conversion |
-| 1211 | DEBUG | `CCM_Scheduler_ScheduledMessage` construction in loop |
-| 1238 | SURFACE | `SetProperty` ADV_RepeatRunBehavior -- schedule override |
-| 1245 | SURFACE | `SetProperty` ADV_MandatoryAssignments -- schedule override |
-| 1818 | SURFACE | `Remove-Item` registry path -- execution history delete |
-| 2042 | DEBUG | Update status switch case -- assignment with break |
-| 2159 | DEBUG | WMI property parsing for SW update status icon/status |
-| 2167 | DEBUG | `ErrorCode` uint parse |
-| 2174 | DEBUG | `PercentComplete` uint parse |
-| 2178 | DEBUG | Outer catch wrapping entire SW update constructor |
-| 2723 | DEBUG | `AssignedCIs` array conversion |
+| 79 | DEBUG | `CCM_Application` list loop -- WMI construction, continues |
+| 101 | DEBUG | `CCM_ApplicationActions` -- single object construction, returns null |
+| 200 | DEBUG | `SoftwareStatus` list loop -- WMI construction, continues |
+| 263 | DEBUG | XML field reflection -- `SetValue` in loop, continues |
+| 319 | DEBUG | `CCM_ApplicationCIAssignment` loop -- WMI construction, continues |
+| 721 | DEBUG | Enforcement deadline override -- SetProperty in loop, continues |
+| 744 | DEBUG | Enforcement deadline restore -- SetProperty, continues |
+| 797 | DEBUG | `AppDTs` array construction -- property parsing |
+| 824 | SILENT-OK | DateTime parse -- `LastEvalTime` DMTF conversion |
+| 840 | SILENT-OK | DateTime parse -- `LastInstallTime` DMTF conversion |
+| 859 | SILENT-OK | DateTime parse -- `ReleaseDate` DMTF conversion |
+| 878 | SILENT-OK | DateTime parse -- `StartTime` DMTF conversion |
+| 1210 | DEBUG | `CCM_Scheduler_ScheduledMessage` construction in loop |
+| 1237 | SURFACE | `SetProperty` ADV_RepeatRunBehavior -- schedule override |
+| 1244 | SURFACE | `SetProperty` ADV_MandatoryAssignments -- schedule override |
+| 1817 | SURFACE | `Remove-Item` registry path -- execution history delete |
+| 2041 | DEBUG | Update status switch case -- assignment with break |
+| 2158 | DEBUG | WMI property parsing for SW update status icon/status |
+| 2166 | DEBUG | `ErrorCode` uint parse |
+| 2173 | DEBUG | `PercentComplete` uint parse |
+| 2177 | DEBUG | Outer catch wrapping entire SW update constructor |
+| 2722 | DEBUG | `AssignedCIs` array conversion |
 
 ### swcache.cs (6 blocks)
 | Line | Category | Context |
 |------|----------|---------|
-| 166 | DEBUG | `ContentFlags` property probe -- sets null on failure |
-| 176 | DEBUG | `ContentSize` property probe -- sets null on failure |
-| 186 | DEBUG | `ExcludeFileList` property probe -- sets "" on failure |
-| 197 | DEBUG | `PeerCaching` property probe -- sets false on failure |
-| 205 | DEBUG | `PersistInCache` property probe -- sets null on failure |
-| 213 | DEBUG | `ReferenceCount` property probe -- sets null on failure |
+| 165 | DEBUG | `ContentFlags` property probe -- sets null on failure |
+| 175 | DEBUG | `ContentSize` property probe -- sets null on failure |
+| 185 | DEBUG | `ExcludeFileList` property probe -- sets "" on failure |
+| 196 | DEBUG | `PeerCaching` property probe -- sets false on failure |
+| 204 | DEBUG | `PersistInCache` property probe -- sets null on failure |
+| 212 | DEBUG | `ReferenceCount` property probe -- sets null on failure |
 
 ### Win32_Service.cs (3 blocks)
 | Line | Category | Context |
@@ -508,6 +510,9 @@ Note: The automation library catch blocks are primarily in decompiled code. Most
 | 275 | SURFACE | `miRepairApp_Click` -- repair app via PS |
 
 ### Plugin_CustomTools_AMTTools/AgentActionTool_AMTTools.xaml.cs (5 blocks)
+
+**[REMOVED IN V2.0 PER MODERNIZATION_PLAN.md D8 — DO NOT FIX]** Intel AMT is EOL; entire plugin dir deleted in Phase U6. These 5 blocks are tracked here for census accuracy only.
+
 | Line | Category | Context |
 |------|----------|---------|
 | 146 | DEBUG | vPro tool download -- `_RunPS` for sWget command |
