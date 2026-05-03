@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <RootNamespace>SccmCliCtr.V2Spike</RootNamespace>
+    <AssemblyName>SccmCliCtrV2Spike</AssemblyName>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <RestorePackagesPath>$(MSBuildThisFileDirectory)..\packages-noop\</RestorePackagesPath>
+    <RestoreSources>$(MSBuildThisFileDirectory)..\nuget-empty\</RestoreSources>
+    <DisableImplicitFrameworkReferences>false</DisableImplicitFrameworkReferences>
+    <AutomaticallyUseReferenceAssemblyPackages>false</AutomaticallyUseReferenceAssemblyPackages>
+    <ResolveAssemblyReferencesSilent>true</ResolveAssemblyReferencesSilent>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="Wpf.Ui">
+      <HintPath>..\lib\wpf-ui\net10.0-windows\Wpf.Ui.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+  </ItemGroup>
+
+</Project>
