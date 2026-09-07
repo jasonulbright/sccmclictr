@@ -27,7 +27,6 @@ public static class common
   {
     try
     {
-      TripleDESCryptoServiceProvider cryptoServiceProvider = new TripleDESCryptoServiceProvider();
       byte[] hash = new SHA1CryptoServiceProvider().ComputeHash(Encoding.ASCII.GetBytes(strKey));
       return Convert.ToBase64String(ProtectedData.Protect(Encoding.ASCII.GetBytes(strPlainText), hash, DataProtectionScope.CurrentUser));
     }
@@ -46,7 +45,6 @@ public static class common
   {
     try
     {
-      TripleDESCryptoServiceProvider cryptoServiceProvider = new TripleDESCryptoServiceProvider();
       byte[] hash = new SHA1CryptoServiceProvider().ComputeHash(Encoding.ASCII.GetBytes(strKey));
       return Encoding.ASCII.GetString(ProtectedData.Unprotect(Convert.FromBase64String(strBase64Text), hash, DataProtectionScope.CurrentUser));
     }

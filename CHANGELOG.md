@@ -1,6 +1,6 @@
 # Changelog
 
-## v1.4.0 -- Maintained Build & Distribution (2026-09-07)
+## v1.3.0.1 -- Maintained Build & Distribution (2026-09-07)
 
 ### Added
 - Reproducible `scripts/build.ps1` Release build for the WPF application and all 14 plugins.
@@ -24,9 +24,10 @@
 - Made one-way image bindings return `Binding.DoNothing` instead of throwing from `ConvertBack`.
 - Removed a committed plaintext lab password; live integration tests now require environment-provided credentials and skip when they are not configured.
 - Removed compiler-warning dead code and unused exception variables.
+- Removed two unused TripleDES provider allocations reported by CodeQL; the methods continue to use Windows DPAPI without changing their encrypted-data format.
 
 ### Changed
-- Main assembly version is now `1.4.0.0`.
+- Main assembly version is now `1.3.0.1`.
 - README now distinguishes the completed core CIM migration from optional legacy PowerShell scripts that intentionally remain compatible with Windows PowerShell 5.1.
 - Legacy AppV 4.6 and AMT plugins remain available but are accurately labeled as legacy integrations.
 

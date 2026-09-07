@@ -4,7 +4,7 @@
 - **Upstream**: https://github.com/rzander/sccmclictr
 - **Fork**: https://github.com/jasonulbright/sccmclictr
 - **Fork base**: Latest upstream commit (includes all 27 commits through v1.0.7.2)
-- **Current version**: v1.4.0
+- **Current version**: v1.3.0.1
 
 The original project is no longer actively developed. Its maintainer has noted that he no longer has a ConfigMgr test environment and does not plan a broad refactor away from the legacy WMI compatibility paths. This fork therefore focuses on conservative maintenance, supported Windows compatibility, and dependable distribution rather than feature expansion.
 
@@ -150,11 +150,11 @@ Apply fixes from `CATCH_BLOCK_AUDIT.md`: 40 silent-ok (leave), 91 debug (`Debug.
 ### Phase 4: .NET 10 Migration (non-shipping experiment)
 Would require UI rework (NavigationPane, WPFToolkit replacements), ClickOnce to MSIX, 14 plugin recompiles, and PS 5.1 to 7.x hosting migration. .NET Framework 4.8 is supported through 2032+ and ships with Windows. This fork's value is "it works when the original doesn't" — a full rewrite is not justified unless there's a compelling functional reason.
 
-## Build and Release Review (v1.4.0)
+## Build and Release Review (v1.3.0.1)
 
 The former AppVeyor file targeted Visual Studio 2017, built only the main solution, did not assemble current plugin outputs, and could not publish a complete release. Active project files also contained Roger's retired local SignTool path and certificate identity, while plugin Release builds referenced `bin\Debug` dependencies.
 
-Version 1.4.0 replaces that path with:
+Version 1.3.0.1 replaces that path with:
 
 - `scripts/build.ps1` for repeatable main-app and 14-plugin Release builds and staging.
 - Explicit runtime-file validation so missing or stale plugin DLLs cannot be silently packaged.

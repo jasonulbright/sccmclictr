@@ -140,7 +140,7 @@ Run the CIM migration and optional live-environment Pester checks with Pester 5.
 No NuGet restore is required; the stable third-party controls and MSTest assemblies are vendored under `lib\`. To compile the installer locally, install Inno Setup 6 or 7 and run:
 
 ```powershell
-.\scripts\new-release-assets.ps1 -StageDirectory .\artifacts\stage -Version 1.4.0
+.\scripts\new-release-assets.ps1 -StageDirectory .\artifacts\stage -Version 1.3.0.1
 ```
 
 Release signing and publication are documented in [docs/RELEASING.md](docs/RELEASING.md).
