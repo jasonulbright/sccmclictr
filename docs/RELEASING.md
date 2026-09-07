@@ -2,23 +2,23 @@
 
 The `Release` GitHub Actions workflow builds every .NET Framework 4.8 project, Authenticode-signs the first-party executables and DLLs, creates an Inno Setup installer and portable ZIP, generates SHA-256 checksums, adds GitHub build-provenance attestations, and publishes the assets to a GitHub release.
 
-Unsigned releases are deliberately blocked.
+Unsigned releases are deliberately blocked. Signing uses the same Azure Artifact Signing account and public certificate profile as Spectra-PDF; no exportable code-signing certificate is stored in GitHub.
 
 ## One-time signing setup
 
-Add these GitHub Actions repository secrets:
+Create a GitHub environment named `release`, then add a federated credential to the existing Azure signing app registration for this exact subject:
 
-- `SIGNING_CERTIFICATE_BASE64`: the Base64 representation of a trusted code-signing PFX certificate.
-- `SIGNING_CERTIFICATE_PASSWORD`: the PFX password.
-
-From PowerShell, an owner can populate them without writing the Base64 value to disk:
-
-```powershell
-[Convert]::ToBase64String([IO.File]::ReadAllBytes('C:\secure\code-signing.pfx')) | gh secret set SIGNING_CERTIFICATE_BASE64
-gh secret set SIGNING_CERTIFICATE_PASSWORD
+```text
+repo:jasonulbright/sccmclictr:environment:release
 ```
 
-The workflow uses SHA-256 Authenticode signatures and an RFC 3161 timestamp. The PFX is decoded only into the ephemeral runner's temporary directory and is deleted in an `always()` cleanup step.
+The app registration must have the Artifact Signing Certificate Profile Signer role on `signalridgelabs` / `SRL-Public`. Add the same three repository secrets used by Spectra-PDF:
+
+- `AZURE_CLIENT_ID`
+- `AZURE_TENANT_ID`
+- `AZURE_SUBSCRIPTION_ID`
+
+GitHub exchanges its short-lived OIDC identity for Azure access; there is no client secret. The workflow uses SHA-256 Authenticode signatures and an RFC 3161 timestamp, then verifies the signer common name and timestamp on every first-party executable and DLL before it can publish.
 
 ## Publish a release
 
