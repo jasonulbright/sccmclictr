@@ -8,7 +8,7 @@
 - Portable ZIP staging that includes all runtime dependencies, plugins, bundled PowerShell scripts, license, changelog, and `build-info.json` provenance.
 - GitHub Actions CI and tag-driven release workflows.
 - Automated MSTest and Pester execution against the built Release binaries and CIM compatibility paths.
-- Required Authenticode signing for first-party EXEs/DLLs and the installer, RFC 3161 timestamping, SHA-256 checksums, and GitHub artifact attestations.
+- Required OIDC-backed Azure Artifact Signing for first-party EXEs/DLLs and the installer, signature/timestamp verification, SHA-256 checksums, and GitHub artifact attestations.
 - Dependabot configuration for GitHub Actions updates and release-maintainer documentation.
 - GitHub issue forms, pull-request checklist, contribution guidance, and a security policy for the maintained community fork.
 - Maintenance regression checks for plugin count, clean Release references, stale ClickOnce/signing configuration, attribution, credentials, and audited catch blocks.

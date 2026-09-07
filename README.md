@@ -22,7 +22,7 @@ Download the [latest release](https://github.com/jasonulbright/sccmclictr/releas
 - `ClientCenterForConfigMgr-Portable.zip` — extract anywhere and run `SCCMCliCtrWPF.exe`; no installation or registry changes.
 - `checksums.txt` — SHA-256 hashes for both release assets.
 
-Release binaries and the installer are Authenticode-signed. The release workflow refuses to publish when the signing certificate is unavailable, and GitHub build-provenance attestations are attached to the assets. To verify the checksum in PowerShell:
+Release binaries and the installer are Authenticode-signed through Azure Artifact Signing. The release workflow verifies the signer and timestamp before publication, and GitHub build-provenance attestations are attached to the assets. To verify the checksum in PowerShell:
 
 ```powershell
 Get-FileHash .\ClientCenterForConfigMgr-Setup.exe -Algorithm SHA256
