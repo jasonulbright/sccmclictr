@@ -161,7 +161,7 @@ namespace ClientCenter
                 dataGrid1.EndInit();
                 Listener.Filter = null;
                 //Fake message (we use the content from cache :-)
-                Listener.WriteLine(" get-wmiobject -query \"SELECT * FROM CCM_UpdateStatus\" -namespace \"root\\ccm\\SoftwareUpdates\\UpdatesStore\" | where {$_.status -eq \"Missing\"}");
+                Listener.WriteLine("Get-CimInstance -Query \"SELECT * FROM CCM_UpdateStatus\" -Namespace \"root\\ccm\\SoftwareUpdates\\UpdatesStore\" | Where-Object {$_.status -eq \"Missing\"}");
 
             }
             catch (Exception ex)

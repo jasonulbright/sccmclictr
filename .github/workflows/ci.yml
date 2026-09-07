@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build and validate (.NET Framework 4.8)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Run maintenance checks
+        shell: powershell
+        run: .\tools\test-maintenance.ps1
+
+      - name: Build application and all plugins
+        shell: powershell
+        run: .\scripts\build.ps1 -Configuration Release -OutputDirectory artifacts\stage
+
+      - name: Run unit tests
+        shell: powershell
+        run: .\scripts\test.ps1 -Configuration Release
+
+      - name: Install Pester
+        shell: powershell
+        run: Install-Module Pester -RequiredVersion 5.7.1 -Scope CurrentUser -Force -SkipPublisherCheck
+
+      - name: Run PowerShell validation tests
+        shell: powershell
+        run: .\scripts\test-pester.ps1
+
+      - name: Upload portable build
+        uses: actions/upload-artifact@v7
+        with:
+          name: ClientCenterForConfigMgr-${{ github.sha }}
+          path: artifacts/stage
+          if-no-files-found: error

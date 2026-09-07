@@ -1,5 +1,37 @@
 # Changelog
 
+## v1.4.0 -- Maintained Build & Distribution (2026-09-07)
+
+### Added
+- Reproducible `scripts/build.ps1` Release build for the WPF application and all 14 plugins.
+- Inno Setup installer with Apps & Features registration, Start menu shortcut, optional desktop shortcut, silent-install support, and a .NET Framework 4.8 prerequisite check.
+- Portable ZIP staging that includes all runtime dependencies, plugins, bundled PowerShell scripts, license, changelog, and `build-info.json` provenance.
+- GitHub Actions CI and tag-driven release workflows.
+- Automated MSTest and Pester execution against the built Release binaries and CIM compatibility paths.
+- Required Authenticode signing for first-party EXEs/DLLs and the installer, RFC 3161 timestamping, SHA-256 checksums, and GitHub artifact attestations.
+- Dependabot configuration for GitHub Actions updates and release-maintainer documentation.
+- GitHub issue forms, pull-request checklist, contribution guidance, and a security policy for the maintained community fork.
+- Maintenance regression checks for plugin count, clean Release references, stale ClickOnce/signing configuration, attribution, credentials, and audited catch blocks.
+
+### Fixed
+- Removed Jason Ulbright from the copyright line while retaining the contributor credit.
+- Removed the dormant PayPal handler left behind after the donation UI was retired.
+- Removed obsolete ClickOnce endpoints, workstation-specific post-build commands, and the expired `Zander - Tools` signing identity from active projects.
+- Fixed all plugin dependency paths so Release builds consume Release outputs instead of `bin\Debug`.
+- Fixed the App-V plugin's broken `Customization.dll` path and added deterministic WPFToolkit hint paths.
+- Fixed WMI Browser tree matching to use ordinal string value equality instead of object reference equality.
+- Updated WMI Browser class discovery and diagnostic text to use CIM cmdlets.
+- Made one-way image bindings return `Binding.DoNothing` instead of throwing from `ConvertBack`.
+- Removed a committed plaintext lab password; live integration tests now require environment-provided credentials and skip when they are not configured.
+- Removed compiler-warning dead code and unused exception variables.
+
+### Changed
+- Main assembly version is now `1.4.0.0`.
+- README now distinguishes the completed core CIM migration from optional legacy PowerShell scripts that intentionally remain compatible with Windows PowerShell 5.1.
+- Legacy AppV 4.6 and AMT plugins remain available but are accurately labeled as legacy integrations.
+
+---
+
 ## v1.3.1 -- Final Cleanup & Fork Signoff (2026-04-10)
 
 ### Changed

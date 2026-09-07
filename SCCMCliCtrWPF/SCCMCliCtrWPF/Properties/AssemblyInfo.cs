@@ -10,9 +10,9 @@ using System.Windows;
 [assembly: AssemblyTitle("SCCMCliCtr")]
 [assembly: AssemblyDescription("Client Center for Configuration Manager")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Community Fork")]
+[assembly: AssemblyCompany("Client Center Community")]
 [assembly: AssemblyProduct("SCCMCliCtr")]
-[assembly: AssemblyCopyright("Copyright © 2023 Roger Zander, 2026 Jason Ulbright")]
+[assembly: AssemblyCopyright("Copyright © 2023 Roger Zander")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -51,5 +51,5 @@ using System.Windows;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.1.0.*")]
-[assembly: AssemblyFileVersion("1.1.0.0")]
+[assembly: AssemblyVersion("1.4.0.0")]
+[assembly: AssemblyFileVersion("1.4.0.0")]

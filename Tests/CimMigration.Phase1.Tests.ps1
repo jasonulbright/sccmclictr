@@ -5,27 +5,28 @@
     in all migrated files, and that the replacement commands are functional.
 #>
 
+# These lists must exist during Pester discovery so the generated test cases are
+# not silently omitted. Runtime paths are initialized separately in BeforeAll.
+$AutomationDir = Join-Path (Split-Path $PSScriptRoot -Parent) 'sccmclictr.automation'
+$MigratedFiles = @(
+    'baseInit.cs'
+    'functions\agentproperties.cs'
+    'functions\inventory.cs'
+    'functions\health.cs'
+    'functions\softwareupdates.cs'
+    'policy\requestedConfig.cs'
+    'Properties\Settings.cs'
+    'Properties\Resources.resx'
+)
+
+$DeferredFiles = @(
+    'functions\processes.cs'     # Uses .GetOwner() WMI method
+    'policy\actualConfig.cs'     # Uses Set-WmiInstance
+)
+
 BeforeAll {
     $RepoRoot = Split-Path $PSScriptRoot -Parent
     $AutomationDir = Join-Path $RepoRoot 'sccmclictr.automation'
-
-    # Files that were migrated in Phase 1
-    $MigratedFiles = @(
-        'baseInit.cs'
-        'functions\agentproperties.cs'
-        'functions\inventory.cs'
-        'functions\health.cs'
-        'functions\softwareupdates.cs'
-        'policy\requestedConfig.cs'
-        'Properties\Settings.cs'
-        'Properties\Resources.resx'
-    )
-
-    # Files intentionally deferred to Phase 2
-    $DeferredFiles = @(
-        'functions\processes.cs'     # Uses .GetOwner() WMI method
-        'policy\actualConfig.cs'     # Uses Set-WmiInstance
-    )
 }
 
 Describe 'Phase 1: Static Analysis' {
@@ -158,10 +159,12 @@ Describe 'Phase 1: CIM Command Functionality (localhost)' {
 
 Describe 'Phase 1: Build Verification' {
     It 'Automation library builds without errors' {
-        $msbuild = 'C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\MSBuild.exe'
+        $vswhere = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio\Installer\vswhere.exe'
+        $installationPath = & $vswhere -latest -products * -requires Microsoft.Component.MSBuild -property installationPath
+        $msbuild = Join-Path $installationPath 'MSBuild\Current\Bin\MSBuild.exe'
         $csproj = Join-Path $AutomationDir 'sccmclictr.automation.csproj'
 
-        $output = & $msbuild $csproj -p:Configuration=Debug -verbosity:minimal 2>&1
+        $output = & $msbuild $csproj -p:Configuration=Debug -p:Platform=AnyCPU -verbosity:minimal 2>&1
         $LASTEXITCODE | Should -Be 0
         ($output | Select-String 'error').Count | Should -Be 0
     }

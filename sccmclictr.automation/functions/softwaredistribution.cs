@@ -361,7 +361,7 @@ public class softwaredistribution : baseInit
           (object) "en-US"
         }).ToString();
       }
-      catch (Exception ex)
+      catch (Exception)
       {
       }
       return errorMessage;

@@ -29,7 +29,6 @@ sccmclictr.automation/policy/localpolicy.cs:1
 sccmclictr.automation/SCCMAgent.cs:5
 sccmclictr.automation/schedule/ScheduleDecoding.cs:1
 sccmclictr.automation/WSMan.cs:3
-SCCMCliCtrWPF/SCCMCliCtrWPF/Controls/About.xaml.cs:1
 SCCMCliCtrWPF/SCCMCliCtrWPF/Controls/AdvertisementGrid.xaml.cs:7
 SCCMCliCtrWPF/SCCMCliCtrWPF/Controls/AgentComponents.xaml.cs:2
 SCCMCliCtrWPF/SCCMCliCtrWPF/Controls/AgentSettingItem.xaml.cs:3
