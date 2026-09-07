@@ -1,20 +1,20 @@
 # Bare Catch Block Audit
 
-Status: Categorized, not yet implemented. Implementation deferred to v2.0 modernization (see [MODERNIZATION_PLAN.md](MODERNIZATION_PLAN.md) phases C0ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“C6).
+Status: Categorized, with a no-growth regression guard. Remediation is maintenance work to be applied only where error reporting improves operator outcomes.
 
-**Last refreshed**: 2026-05-03 (C1 of v2.0 plan). Line numbers updated for the 14 files where SILENT-OK comments were added; 308 blocks reconcile to 308.
+**Last refreshed**: 2026-09-07. The retired PayPal handler and its catch block were removed; 307 blocks reconcile to 307.
 
 ## Summary
 
 | Category | Count | Action |
 |----------|-------|--------|
 | SILENT-OK | 40 | Leave as-is -- defensive probes, dispose, cleanup |
-| DEBUG | 91 | Add `Debug.WriteLine(ex.ToString())` |
+| DEBUG | 90 | Add `Debug.WriteLine(ex.ToString())` |
 | SURFACE | 114 | Add `Listener?.WriteError(ex.Message)` or trace |
 | SURFACE-ALREADY | 2 | Already has inline error handling in catch body |
 | UNVERIFIED | 61 | Need manual review (agent couldn't read full context) |
 
-Total: 308 bare catch blocks across 57 files.
+Total: 307 bare catch blocks across 56 files.
 
 ## Categories
 
@@ -297,11 +297,6 @@ Note: The automation library catch blocks are primarily in decompiled code. Most
 |------|----------|---------|
 | 33 | DEBUG | Log line parsing -- CMTrace/text format DateTime parse |
 | 56 | DEBUG | Log line parsing -- SCCM log format DateTime parse |
-
-### Controls/About.xaml.cs (1 block)
-| Line | Category | Context |
-|------|----------|---------|
-| 47 | DEBUG | `Process.Start` PayPal donation URL |
 
 ### Controls/AdvertisementGrid.xaml.cs (7 blocks)
 | Line | Category | Context |

@@ -1,0 +1,111 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+  id-token: write
+  attestations: write
+  artifact-metadata: write
+
+jobs:
+  release:
+    name: Build, sign, and publish
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Resolve and validate version
+        shell: pwsh
+        env:
+          SIGNING_CERTIFICATE_BASE64: ${{ secrets.SIGNING_CERTIFICATE_BASE64 }}
+          SIGNING_CERTIFICATE_PASSWORD: ${{ secrets.SIGNING_CERTIFICATE_PASSWORD }}
+        run: |
+          $version = '${{ github.ref_name }}' -replace '^v', ''
+          if ($version -notmatch '^\d+\.\d+\.\d+(?:\.\d+)?$') {
+            throw "Release tags must use vMAJOR.MINOR.PATCH[.REVISION]; got '${{ github.ref_name }}'."
+          }
+          if ([string]::IsNullOrWhiteSpace($env:SIGNING_CERTIFICATE_BASE64) -or
+              [string]::IsNullOrWhiteSpace($env:SIGNING_CERTIFICATE_PASSWORD)) {
+            throw 'Authenticode signing secrets are required. Configure SIGNING_CERTIFICATE_BASE64 and SIGNING_CERTIFICATE_PASSWORD before tagging a release.'
+          }
+          "RELEASE_VERSION=$version" >> $env:GITHUB_ENV
+
+      - name: Run maintenance checks
+        shell: powershell
+        run: .\tools\test-maintenance.ps1
+
+      - name: Build application and all plugins
+        shell: powershell
+        run: .\scripts\build.ps1 -Configuration Release -Version $env:RELEASE_VERSION -OutputDirectory artifacts\stage
+
+      - name: Run unit tests
+        shell: powershell
+        run: .\scripts\test.ps1 -Configuration Release
+
+      - name: Install Pester
+        shell: powershell
+        run: Install-Module Pester -RequiredVersion 5.7.1 -Scope CurrentUser -Force -SkipPublisherCheck
+
+      - name: Run PowerShell validation tests
+        shell: powershell
+        run: .\scripts\test-pester.ps1
+
+      - name: Decode signing certificate
+        shell: pwsh
+        env:
+          SIGNING_CERTIFICATE_BASE64: ${{ secrets.SIGNING_CERTIFICATE_BASE64 }}
+        run: |
+          $certificatePath = Join-Path $env:RUNNER_TEMP 'codesign.pfx'
+          [IO.File]::WriteAllBytes($certificatePath, [Convert]::FromBase64String($env:SIGNING_CERTIFICATE_BASE64))
+          "SIGNING_CERTIFICATE_PATH=$certificatePath" >> $env:GITHUB_ENV
+
+      - name: Authenticode-sign application binaries
+        shell: powershell
+        env:
+          SIGNING_CERTIFICATE_PASSWORD: ${{ secrets.SIGNING_CERTIFICATE_PASSWORD }}
+        run: .\scripts\sign.ps1 -Path artifacts\stage -CertificatePath $env:SIGNING_CERTIFICATE_PATH -CertificatePassword $env:SIGNING_CERTIFICATE_PASSWORD
+
+      - name: Install Inno Setup
+        shell: powershell
+        run: choco install innosetup --no-progress -y
+
+      - name: Create portable archive and installer
+        shell: powershell
+        run: .\scripts\new-release-assets.ps1 -StageDirectory artifacts\stage -Version $env:RELEASE_VERSION -OutputDirectory artifacts\release
+
+      - name: Authenticode-sign installer
+        shell: powershell
+        env:
+          SIGNING_CERTIFICATE_PASSWORD: ${{ secrets.SIGNING_CERTIFICATE_PASSWORD }}
+        run: .\scripts\sign.ps1 -Path artifacts\release\ClientCenterForConfigMgr-Setup.exe -CertificatePath $env:SIGNING_CERTIFICATE_PATH -CertificatePassword $env:SIGNING_CERTIFICATE_PASSWORD
+
+      - name: Generate checksums
+        shell: powershell
+        run: .\scripts\new-checksums.ps1 -Directory artifacts\release
+
+      - name: Attest release assets
+        uses: actions/attest@v4
+        with:
+          subject-path: artifacts/release/*
+
+      - name: Publish GitHub release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $assets = Get-ChildItem artifacts\release -File | ForEach-Object FullName
+          gh release create '${{ github.ref_name }}' @assets --verify-tag --title "Client Center for Configuration Manager ${{ github.ref_name }}" --generate-notes
+
+      - name: Remove temporary signing certificate
+        if: always()
+        shell: pwsh
+        run: |
+          if (-not [string]::IsNullOrWhiteSpace($env:SIGNING_CERTIFICATE_PATH)) {
+            Remove-Item -LiteralPath $env:SIGNING_CERTIFICATE_PATH -Force -ErrorAction SilentlyContinue
+          }

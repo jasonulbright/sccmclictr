@@ -1,0 +1,28 @@
+name: Maintenance enhancement
+description: Propose a focused compatibility, reliability, security, or usability improvement
+title: "[Enhancement]: "
+labels:
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This is a maintenance-focused .NET Framework 4.8 fork. Focused improvements are welcome; framework rewrites and unrelated product expansion are outside this repository's shipping scope.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem to solve
+      description: Describe the operator problem or compatibility gap, not only the proposed implementation.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed change
+    validations:
+      required: true
+  - type: textarea
+    id: validation
+    attributes:
+      label: ConfigMgr validation available
+      description: Which Windows and ConfigMgr versions can you use to test this change?

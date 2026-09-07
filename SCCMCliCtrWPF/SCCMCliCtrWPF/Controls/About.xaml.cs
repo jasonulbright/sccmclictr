@@ -37,16 +37,6 @@ namespace ClientCenter.Controls
             e.Handled = true;
         }
 
-        private void Image_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-            try
-            {
-                Process.Start("https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=TLTFJHYA69VHU");
-                e.Handled = true;
-            }
-            catch { }
-        }
-
         public bool MSG
         {
             get { return spMSG.IsVisible; }

@@ -18,39 +18,17 @@
     <EnableSecurityDebugging>true</EnableSecurityDebugging>
     <StartAction>Project</StartAction>
     <HostInBrowser>false</HostInBrowser>
-    <GenerateManifests>true</GenerateManifests>
+    <GenerateManifests>false</GenerateManifests>
     <SignManifests>false</SignManifests>
-    <IsWebBootstrapper>true</IsWebBootstrapper>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
     <SccProjectName>SAK</SccProjectName>
     <SccLocalPath>SAK</SccLocalPath>
     <SccAuxPath>SAK</SccAuxPath>
     <SccProvider>SAK</SccProvider>
-    <PublishUrl>D:\OneDrive\Dokumente\GitHub\sccmclictr\SCCMCliCtrWPF\SCCMCliCtrWPF\Publish\</PublishUrl>
-    <Install>true</Install>
-    <InstallFrom>Web</InstallFrom>
-    <UpdateEnabled>true</UpdateEnabled>
-    <UpdateMode>Background</UpdateMode>
-    <UpdateInterval>1</UpdateInterval>
-    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
-    <UpdatePeriodically>true</UpdatePeriodically>
-    <UpdateRequired>false</UpdateRequired>
-    <MapFileExtensions>true</MapFileExtensions>
-    <InstallUrl>http://sccmclictr.azurewebsites.net/ClickOnce/</InstallUrl>
-    <UpdateUrl>http://sccmclictr.azurewebsites.net/ClickOnce/</UpdateUrl>
-    <SupportUrl>https://github.com/rzander/sccmclictr/</SupportUrl>
-    <ErrorReportUrl>https://github.com/rzander/sccmclictr/clickonce/</ErrorReportUrl>
     <ProductName>Client Center for Configuration Manager</ProductName>
-    <PublisherName>Zander Tools</PublisherName>
-    <SuiteName>SCCM Tools</SuiteName>
-    <CreateWebPageOnPublish>true</CreateWebPageOnPublish>
-    <WebPage>default.htm</WebPage>
-    <OpenBrowserOnPublish>false</OpenBrowserOnPublish>
-    <TrustUrlParameters>true</TrustUrlParameters>
-    <ApplicationRevision>1</ApplicationRevision>
-    <ApplicationVersion>1.0.6.1</ApplicationVersion>
-    <UseApplicationTrust>true</UseApplicationTrust>
-    <PublishWizardCompleted>true</PublishWizardCompleted>
-    <BootstrapperEnabled>true</BootstrapperEnabled>
+    <PublisherName>Client Center Community</PublisherName>
+    <SuiteName>Configuration Manager Tools</SuiteName>
+    <BootstrapperEnabled>false</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -345,47 +323,6 @@
     <Resource Include="Images\SPY.ico" />
     <Resource Include="Images\User.ico" />
     <Resource Include="Images\Computer.ico" />
-    <Content Include="Plugin_AMTTools.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Plugin_CMRemote.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Plugin_CMResourceExplorer.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Plugin_CompMgmt.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Plugin_EnablePSRemoting.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Plugin_Explorer.dll" />
-    <Content Include="Plugin_FEP.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Plugin_MSInfo32.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Plugin_MSRA.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Plugin_PSScripts.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Plugin_RDP.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Plugin_Regedit.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <!-- Plugin_RuckZuck and Plugin_SelfUpdate removed: depend on external ruckzuck repo -->
-    <Content Include="Plugin_StatusMessageViewer.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Plugin_Explorer.dll.config">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Resource Include="Images\On.ico" />
     <Resource Include="Images\Tools.ico" />
     <Resource Include="Images\Icon16_256.png" />
@@ -409,23 +346,6 @@
     <None Include="Properties\app.manifest" />
     <AppDesigner Include="Properties\" />
     <None Include="SCCMCliCtrWPF.snk" />
-  </ItemGroup>
-  <ItemGroup>
-    <BootstrapperPackage Include=".NETFramework,Version=v4.6">
-      <Visible>False</Visible>
-      <ProductName>Microsoft .NET Framework 4.6 %28x86 and x64%29</ProductName>
-      <Install>true</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
-      <Install>false</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5 SP1</ProductName>
-      <Install>false</Install>
-    </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\shell32.dll_I0017_0409.ico" />
@@ -593,15 +513,7 @@
     <ApplicationIcon>Icon16.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
-    <TargetZone>Internet</TargetZone>
-  </PropertyGroup>
-  <PropertyGroup />
-  <PropertyGroup />
-  <PropertyGroup>
     <ApplicationManifest>Properties\app.manifest</ApplicationManifest>
-  </PropertyGroup>
-  <PropertyGroup>
-    <ManifestTimestampUrl>http://timestamp.verisign.com/scripts/timstamp.dll</ManifestTimestampUrl>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\sccmclictr.automation\sccmclictr.automation.csproj">
@@ -614,17 +526,6 @@
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup>
-    <PostBuildEvent>if "$(ConfigurationName)"=="Debug" GOTO  end
- "C:\tools\signtool.exe" sign /i "Sectigo RSA Code Signing CA" /n "Zander - Tools" /t "http://timestamp.comodoca.com/authenticode" /q "$(TargetPath)" 
-rd es /s /q
-rd fr /s /q
-rd it /s /q
-rd app.publish /s /q
-exit 0
-:end
-</PostBuildEvent>
-  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

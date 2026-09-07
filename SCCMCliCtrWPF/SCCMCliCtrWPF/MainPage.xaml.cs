@@ -48,7 +48,7 @@ namespace ClientCenter
             try
             {
                 this.Title = SCCMCliCtr.Customization.Title;
-                rStatus.AppendText("Client Center for Configuration Manager (c) 2023 Roger Zander, 2026 Jason Ulbright\n");
+                rStatus.AppendText("Client Center for Configuration Manager (c) 2023 Roger Zander\n");
                 rStatus.AppendText("Project-Page: https://github.com/jasonulbright/sccmclictr\n");
                 rStatus.AppendText("Current Version: " + FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion.ToString() + "\n");
                 rStatus.AppendText("Assembly Version: " + Assembly.GetExecutingAssembly().GetName().Version.ToString() + "\n");

@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Original project history
+    url: https://github.com/rzander/sccmclictr
+    about: Search the original project's issue history before filing a duplicate.

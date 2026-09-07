@@ -1,0 +1,66 @@
+name: Bug report
+description: Report a reproducible Client Center problem
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for helping maintain Client Center. Remove hostnames, usernames, site codes, and other environment-specific or sensitive data from logs and screenshots.
+  - type: input
+    id: version
+    attributes:
+      label: Client Center version
+      description: Shown on the About page or in build-info.json.
+      placeholder: 1.4.0.0
+    validations:
+      required: true
+  - type: input
+    id: host_os
+    attributes:
+      label: Host OS
+      placeholder: Windows 11 24H2
+    validations:
+      required: true
+  - type: input
+    id: target_os
+    attributes:
+      label: Target OS and ConfigMgr client version
+      placeholder: Windows 11 24H2; ConfigMgr client 5.00.x
+    validations:
+      required: true
+  - type: dropdown
+    id: auth
+    attributes:
+      label: Authentication and transport
+      options:
+        - Integrated authentication / WinRM HTTP
+        - Integrated authentication / WinRM HTTPS
+        - Explicit credentials / WinRM HTTP
+        - Explicit credentials / WinRM HTTPS
+        - Not connection-related
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: Include the expected result, actual result, and exact steps to reproduce.
+    validations:
+      required: true
+  - type: textarea
+    id: diagnostics
+    attributes:
+      label: Sanitized diagnostics
+      description: Paste relevant Client Center status output or ConfigMgr log excerpts after removing sensitive data.
+      render: text
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checks
+      options:
+        - label: I tested the latest published community-fork release.
+          required: true
+        - label: I removed credentials, hostnames, site codes, and other sensitive data.
+          required: true

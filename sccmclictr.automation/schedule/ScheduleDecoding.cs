@@ -330,7 +330,6 @@ public static class ScheduleDecoding
     {
       get
       {
-        DateTime unusedDefault = new DateTime();
         DateTime nextStartTime = this.StartTime.Subtract(new TimeSpan(this.DaySpan, this.HourSpan, this.MinuteSpan, 0));
         DateTime durationEndTime = nextStartTime + new TimeSpan(this.DayDuration, this.HourDuration, this.MinuteDuration, 0);
         while (durationEndTime < this.StartTime)

@@ -48,7 +48,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="sccmclictr.automation">
-      <HintPath>..\..\sccmclictr.automation\bin\Debug\sccmclictr.automation.dll</HintPath>
+      <HintPath>..\..\sccmclictr.automation\bin\$(Configuration)\sccmclictr.automation.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -114,11 +114,6 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-  </PropertyGroup>
-  <PropertyGroup>
-    <PostBuildEvent>if "$(ConfigurationName)"=="Debug" GOTO  end
- "C:\tools\signtool.exe" sign /i "Sectigo RSA Code Signing CA" /n "Zander - Tools" /t "http://timestamp.comodoca.com/authenticode" /q "$(TargetPath)" 
-:end</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

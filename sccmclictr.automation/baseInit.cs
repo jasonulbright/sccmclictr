@@ -24,7 +24,7 @@ namespace sccmclictr.automation;
 public class baseInit : IDisposable
 {
   internal MemoryCache Cache;
-  internal bool bShowPSCodeOnly;
+  internal bool bShowPSCodeOnly = false;
   internal TimeSpan cacheTime = new TimeSpan(0, 0, 30);
   /// <summary>Define the DebugLevel</summary>
   private TraceSwitch debugLevel = new TraceSwitch("DebugLevel", "DebugLevel from ConfigFile", "Verbose");

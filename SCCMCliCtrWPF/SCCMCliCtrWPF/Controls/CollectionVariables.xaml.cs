@@ -97,14 +97,14 @@ namespace ClientCenter
                             oAgent.disconnect();
                             oAgent.connect();
                         }
-                        catch (Exception ex)
+                        catch (Exception)
                         {
                             //Console.WriteLine(ex.Message);
                         }
                     }
                     catch { }
                     oAgent.PSCode.Listeners.Add(Listener);
-                    Listener.WriteLine("Get-Wmiobject -Namespace \"root\\ccm\\Policy\\Machine\\ActualConfig\" -Class \"CCM_CollectionVariable\"");
+                    Listener.WriteLine("Get-CimInstance -Namespace \"root\\ccm\\Policy\\Machine\\ActualConfig\" -ClassName \"CCM_CollectionVariable\"");
                     Listener.WriteLine("#... and some decoding stuff ;-) ...");
                     Mouse.OverrideCursor = Cursors.Arrow;
                 }

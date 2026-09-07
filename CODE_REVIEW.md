@@ -4,9 +4,9 @@
 - **Upstream**: https://github.com/rzander/sccmclictr
 - **Fork**: https://github.com/jasonulbright/sccmclictr
 - **Fork base**: Latest upstream commit (includes all 27 commits through v1.0.7.2)
-- **Current version**: v1.3.0
+- **Current version**: v1.4.0
 
-Original project effectively abandoned. Maintainer (rzander) stated in Jan 2026: "I currently don't have access to any test environments" and "there are no plans to refactor ClientCenter... In worst case it will die with Get-WMIObject." Removed from Microsoft Store and winget. Hangs on Windows 25H2.
+The original project is no longer actively developed. Its maintainer has noted that he no longer has a ConfigMgr test environment and does not plan a broad refactor away from the legacy WMI compatibility paths. This fork therefore focuses on conservative maintenance, supported Windows compatibility, and dependable distribution rather than feature expansion.
 
 ## Architecture
 - WPF app, .NET Framework 4.8, 14 plugins (2 removed: RuckZuck, SelfUpdate)
@@ -14,6 +14,7 @@ Original project effectively abandoned. Maintainer (rzander) stated in Jan 2026:
 - All WMI access is PS-mediated: PowerShell commands sent through a remote WinRM runspace. Zero direct C# WMI calls to remote machines.
 - WinRM on port 5985 (HTTP) or 5986 (HTTPS)
 - Plugin architecture via dynamic assembly loading
+- Reproducible GitHub Actions build with Authenticode-signed Inno Setup and portable releases
 
 ## Security
 
@@ -29,7 +30,7 @@ Original project effectively abandoned. Maintainer (rzander) stated in Jan 2026:
 ### Open
 | # | Issue | Status | Details |
 |---|-------|--------|---------|
-| 1 | 308 bare `catch { }` blocks | Audited | Categorized across 57 files. 40 SILENT-OK, 91 DEBUG, 114 SURFACE, 61 UNVERIFIED. See `CATCH_BLOCK_AUDIT.md`. |
+| 1 | 307 bare `catch { }` blocks | Audited | The inherited blocks are categorized and protected by a no-growth regression baseline. See `CATCH_BLOCK_AUDIT.md`. |
 | 2 | Outdated vendored dependencies | Accepted | NavigationPane (2016) and WPFToolkit (2012) are dead projects. Vendored in `lib/`. Functionally stable on .NET Framework 4.8, no known CVEs. Replacement would require UI rework — not justified for a maintenance fork. |
 
 ## Dependencies (all vendored -- zero NuGet)
@@ -70,7 +71,7 @@ The fork base includes all upstream commits through v1.0.7.2:
 | Theme | Issues | Fork Status |
 |-------|--------|-------------|
 | SSL/HTTPS | #199, #200, #203, #212 | Partially addressed (TLS fix) |
-| WMI deprecation | #58, #208 | **Fixed** — CIM migration complete (v1.2.0) |
+| WMI deprecation | #58, #208 | Substantially addressed in the core helpers; compatibility paths and optional scripts remain |
 | User-targeted deployments invisible | #82 (26 comments) | Open -- queries only IsMachineTarget |
 | Application Groups unsupported | #144, #207, #183 | Open |
 | Connectivity (Surface, VPN, proxy) | Various | Open |
@@ -89,20 +90,22 @@ The fork base includes all upstream commits through v1.0.7.2:
 | `root\sms` | Site provider discovery (admin server) |
 | `root\wmi` | WMI operational namespace |
 
-## CIM Migration -- COMPLETE (v1.2.0)
+## CIM Migration -- SUBSTANTIAL, NOT GLOBAL
 
-All deprecated `System.Management` / WMI usage removed. `System.Management` assembly reference removed from csproj. Only `System.Management.Automation` (PowerShell runspace) remains.
+Version 1.2.0 migrated the central automation helpers and many primary client operations to CIM. The `sccmclictr.automation` project no longer has a compile-time `System.Management` reference; it continues to host Windows PowerShell through `System.Management.Automation`.
+
+The earlier review overstated this as a repository-wide completion. Remaining PowerShell-mediated WMI compatibility paths include process-owner lookup, service-window creation, policy instance creation, embedded health/cache scripts, application settings, and the optional script library. These paths still work under the supported Windows PowerShell 5.1 runtime and should be migrated only with ConfigMgr integration coverage.
 
 **Key finding**: All WMI access was PS-mediated (PowerShell commands through remote runspace). Zero direct C# WMI calls to remote machines.
 
 | Phase | Status | Scope |
 |-------|--------|-------|
-| 1: `Get-WmiObject`/`gwmi` string replacement | **Complete** | 8 files, ~20 replacements |
+| 1: Primary `Get-WmiObject`/`gwmi` replacement | **Mostly complete** | Central helpers and common queries migrated; compatibility paths remain |
 | 2a: Property reads/writes | **Complete** | `baseInit.cs` + 3 function files |
 | 2b: No-arg method calls | **Complete** | `baseInit.cs` |
 | 2c: Parameterized method calls | **Complete** | Dynamic param discovery via `Get-CimClass` |
 | 3: Replace `ManagementDateTimeConverter` | **Complete** | Custom `DmtfToDateTime` parser, 51 call sites |
-| 4: Remove `System.Management` reference | **Complete** | Removed from csproj, all `using` statements removed |
+| 4: Remove `System.Management` from automation compile references | **Complete** | Removed from the automation project; the main app and some plugins retain it for compatibility |
 
 43 Pester tests (30 unit + 13 integration against live CM 2509). See `CIM_MIGRATION_PLAN.md`.
 
@@ -136,13 +139,27 @@ sccmclictr\
 - [x] Fix SSL, credentials, Invoke-Expression, saved passwords
 - [x] Vendor all external dependencies (zero NuGet)
 - [x] Clean decompiler variables (41 across 2 files)
-- [x] Audit catch blocks (308 across 57 files)
+- [x] Audit catch blocks (307 across 56 files; no-growth guard enabled)
 
-### Phase 2: CIM Migration -- COMPLETE (v1.2.0)
-`System.Management` dependency removed. See CIM Migration section above.
+### Phase 2: CIM Migration -- MAJORITY COMPLETE (v1.2.0+)
+The central automation layer is migrated. Remaining compatibility paths are listed in the CIM Migration section above and require live ConfigMgr validation.
 
 ### Phase 3: Catch Block Implementation (optional)
 Apply fixes from `CATCH_BLOCK_AUDIT.md`: 40 silent-ok (leave), 91 debug (`Debug.WriteLine`), 114 surface (`Listener?.WriteError`), 61 unverified (manual review). Low priority — cosmetic improvement, not a functional issue.
 
-### Phase 4: .NET 10 Migration (aspirational — not planned)
+### Phase 4: .NET 10 Migration (non-shipping experiment)
 Would require UI rework (NavigationPane, WPFToolkit replacements), ClickOnce to MSIX, 14 plugin recompiles, and PS 5.1 to 7.x hosting migration. .NET Framework 4.8 is supported through 2032+ and ships with Windows. This fork's value is "it works when the original doesn't" — a full rewrite is not justified unless there's a compelling functional reason.
+
+## Build and Release Review (v1.4.0)
+
+The former AppVeyor file targeted Visual Studio 2017, built only the main solution, did not assemble current plugin outputs, and could not publish a complete release. Active project files also contained Roger's retired local SignTool path and certificate identity, while plugin Release builds referenced `bin\Debug` dependencies.
+
+Version 1.4.0 replaces that path with:
+
+- `scripts/build.ps1` for repeatable main-app and 14-plugin Release builds and staging.
+- Explicit runtime-file validation so missing or stale plugin DLLs cannot be silently packaged.
+- An Inno Setup installer plus a portable ZIP with the same signed payload.
+- SHA-256 checksums, GitHub artifact attestations, and a tag-driven GitHub release.
+- Mandatory Authenticode signing through repository secrets; unsigned tag releases fail before publication.
+
+See `docs/RELEASING.md` for certificate setup and the release checklist.
