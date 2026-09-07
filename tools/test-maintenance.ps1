@@ -32,6 +32,9 @@ Assert-True ($about -match 'Contributors:[^\r\n]*Jason Ulbright') 'Jason Ulbrigh
 $integrationTests = Get-Content -LiteralPath (Join-Path $repoRoot 'Tests\CimMigration.Integration.Tests.ps1') -Raw
 Assert-True ($integrationTests -notmatch "ConvertTo-SecureString\s+'[^']+'\s+-AsPlainText") 'Integration tests contain a plaintext password.'
 
+$commonHelpers = Get-Content -LiteralPath (Join-Path $repoRoot 'sccmclictr.automation\common.cs') -Raw
+Assert-True ($commonHelpers -notmatch 'TripleDESCryptoServiceProvider') 'The common helpers instantiate the obsolete TripleDES provider.'
+
 $releaseWorkflow = Get-Content -LiteralPath (Join-Path $repoRoot '.github\workflows\release.yml') -Raw
 Assert-True ($releaseWorkflow -match 'azure/artifact-signing-action@v2') 'The release workflow does not require Azure Artifact Signing.'
 Assert-True ($releaseWorkflow -match 'verify-signatures\.ps1') 'The release workflow does not verify Authenticode signatures before publication.'
