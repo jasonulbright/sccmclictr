@@ -1,5 +1,26 @@
 # CIM Migration Plan: System.Management to Microsoft.Management.Infrastructure
 
+## Repair status (2026-09-08)
+
+The plan below is historical, not a declaration that every migration path works.
+Testing the rebuilt fork exposed a gap: replacing query cmdlets did not migrate
+the C# model constructors consuming their results. Pending and available updates
+failed when accessing absent WMI metadata, and date casts discarded CIM dates.
+
+The repair adds shared WMI/CIM metadata reads (including reconstruction of keyed
+relative paths from serialized CIM properties) and accepts native DateTime values
+alongside legacy DMTF strings throughout the affected models. It also corrects
+installed-product metadata assignments, preserves provider errors from object
+queries, replaces cached results on refresh using the requested TTL, and reports
+initial update-loading errors instead of silently hiding them.
+
+`Tests/CimModels.Tests.ps1` exercises compiled update models with serialized CIM
+instances, native/null/legacy dates, actual local CIM metadata, and query errors.
+These tests run without a ConfigMgr connection. Existing live tests remain gated
+by the documented environment variables; production client refresh and update
+installation still require validation in a ConfigMgr environment. Optional WMI
+scripts and other previously deferred paths are not declared fully migrated.
+
 ## Current Architecture
 
 ### Connection Model

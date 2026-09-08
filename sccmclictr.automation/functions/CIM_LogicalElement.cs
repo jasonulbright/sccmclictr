@@ -1,4 +1,4 @@
-﻿// Decompiled with JetBrains decompiler
+// Decompiled with JetBrains decompiler
 // Type: sccmclictr.automation.functions.CIM_LogicalElement
 // Assembly: sccmclictr.automation, Version=1.0.1.0, Culture=neutral, PublicKeyToken=null
 // MVID: 96476B75-C789-4A0A-9F55-EBB7DB29E9AB
@@ -26,9 +26,9 @@ public class CIM_LogicalElement : CIM_ManagedSystemElement
   {
     this.remoteRunspace = RemoteRunspace;
     this.pSCode = PSCode;
-    this.__CLASS = WMIObject.Properties["__CLASS"].Value as string;
-    this.__NAMESPACE = WMIObject.Properties["__NAMESPACE"].Value as string;
-    this.__RELPATH = WMIObject.Properties["__RELPATH"].Value as string;
+    this.__CLASS = common.ManagementProperty(WMIObject, "__CLASS");
+    this.__NAMESPACE = common.ManagementProperty(WMIObject, "__NAMESPACE");
+    this.__RELPATH = common.ManagementProperty(WMIObject, "__RELPATH");
     this.__INSTANCE = true;
     this.WMIObject = WMIObject;
   }

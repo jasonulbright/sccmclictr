@@ -1,4 +1,4 @@
-﻿// Decompiled with JetBrains decompiler
+// Decompiled with JetBrains decompiler
 // Type: sccmclictr.automation.functions.components
 // Assembly: sccmclictr.automation, Version=1.0.1.0, Culture=neutral, PublicKeyToken=null
 // MVID: 96476B75-C789-4A0A-9F55-EBB7DB29E9AB
@@ -90,9 +90,9 @@ public class components : baseInit
     {
       this.remoteRunspace = RemoteRunspace;
       this.pSCode = PSCode;
-      this.__CLASS = WMIObject.Properties[nameof (__CLASS)].Value as string;
-      this.__NAMESPACE = WMIObject.Properties[nameof (__NAMESPACE)].Value as string;
-      this.__RELPATH = WMIObject.Properties[nameof (__RELPATH)].Value as string;
+      this.__CLASS = common.ManagementProperty(WMIObject, nameof (__CLASS));
+      this.__NAMESPACE = common.ManagementProperty(WMIObject, nameof (__NAMESPACE));
+      this.__RELPATH = common.ManagementProperty(WMIObject, nameof (__RELPATH));
       this.__INSTANCE = true;
       this.WMIObject = WMIObject;
       this.DisplayName = WMIObject.Properties[nameof (DisplayName)].Value as string;
@@ -158,9 +158,9 @@ public class components : baseInit
     {
       this.remoteRunspace = RemoteRunspace;
       this.pSCode = PSCode;
-      this.__CLASS = WMIObject.Properties[nameof (__CLASS)].Value as string;
-      this.__NAMESPACE = WMIObject.Properties[nameof (__NAMESPACE)].Value as string;
-      this.__RELPATH = WMIObject.Properties[nameof (__RELPATH)].Value as string;
+      this.__CLASS = common.ManagementProperty(WMIObject, nameof (__CLASS));
+      this.__NAMESPACE = common.ManagementProperty(WMIObject, nameof (__NAMESPACE));
+      this.__RELPATH = common.ManagementProperty(WMIObject, nameof (__RELPATH));
       this.__INSTANCE = true;
       this.WMIObject = WMIObject;
       this.ComponentName = WMIObject.Properties[nameof (ComponentName)].Value as string;

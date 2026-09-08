@@ -1,4 +1,4 @@
-﻿// Decompiled with JetBrains decompiler
+// Decompiled with JetBrains decompiler
 // Type: sccmclictr.automation.common
 // Assembly: sccmclictr.automation, Version=1.0.1.0, Culture=neutral, PublicKeyToken=null
 // MVID: 96476B75-C789-4A0A-9F55-EBB7DB29E9AB
@@ -6,10 +6,13 @@
 // XML documentation location: C:\Users\jason\Downloads\sccmclictrlib.1.0.1\lib\net48\sccmclictr.automation.xml
 
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Globalization;
 using System.IO;
+using System.Management.Automation;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -19,6 +22,56 @@ namespace sccmclictr.automation;
 /// <summary>Class common.</summary>
 public static class common
 {
+  /// <summary>Read legacy WMI metadata or its CIM equivalent after remoting.</summary>
+  internal static string ManagementProperty(PSObject instance, string name)
+  {
+    if (instance == null) throw new ArgumentNullException(nameof(instance));
+    var legacy = instance.Properties[name]?.Value as string;
+    if (legacy != null) return legacy;
+    var system = instance.Properties["CimSystemProperties"]?.Value;
+    if (system == null) return null;
+    var properties = PSObject.AsPSObject(system).Properties;
+    if (name == "__CLASS") return properties["ClassName"]?.Value as string;
+    if (name == "__NAMESPACE") return (properties["Namespace"]?.Value as string)?.Replace('/', '\\');
+    if (name == "__RELPATH")
+    {
+      var path = properties["Path"]?.Value?.ToString();
+      if (string.IsNullOrEmpty(path))
+      {
+        var className = properties["ClassName"]?.Value as string;
+        var members = instance.Properties["CimInstanceProperties"]?.Value as IEnumerable;
+        if (className == null || members == null) return null;
+        var keys = new List<string>();
+        foreach (var member in members)
+        {
+          var key = PSObject.AsPSObject(member).Properties;
+          var flags = key["Flags"]?.Value?.ToString();
+          if (flags == null || Array.IndexOf(flags.Replace(" ", "").Split(','), "Key") < 0) continue;
+          var value = key["Value"]?.Value;
+          string literal = Convert.ToString(value, CultureInfo.InvariantCulture);
+          if (key["CimType"]?.Value?.ToString() == "String")
+            literal = "\"" + literal.Replace("\\", "\\\\").Replace("\"", "\\\"") + "\"";
+          keys.Add(key["Name"]?.Value + "=" + literal);
+        }
+        return className + (keys.Count == 0 ? "=@" : "." + string.Join(",", keys));
+      }
+      int separator = path.IndexOf(':');
+      return separator < 0 ? path : path.Substring(separator + 1);
+    }
+    return null;
+  }
+
+  internal static bool IsMissingDate(object value) => value == null || value is string text && string.IsNullOrEmpty(text);
+
+  /// <summary>Accept native CIM dates as well as legacy WMI DMTF strings.</summary>
+  public static DateTime DmtfToDateTime(object value)
+  {
+    if (value is PSObject wrapped) value = wrapped.BaseObject;
+    if (value is DateTime date) return date;
+    if (value is string text) return DmtfToDateTime(text);
+    throw new ArgumentException("Expected a CIM DateTime or WMI DMTF string.", nameof(value));
+  }
+
   /// <summary>Encrypt a string</summary>
   /// <param name="strPlainText"></param>
   /// <param name="strKey"></param>
@@ -116,7 +169,7 @@ public static class common
   /// </summary>
   public static DateTime DmtfToDateTime(string dmtfDate)
   {
-    if (string.IsNullOrEmpty(dmtfDate))
+    if (common.IsMissingDate(dmtfDate))
       throw new ArgumentNullException(nameof(dmtfDate));
 
     // Handle wildcard characters (****) that WMI uses for unknown fields

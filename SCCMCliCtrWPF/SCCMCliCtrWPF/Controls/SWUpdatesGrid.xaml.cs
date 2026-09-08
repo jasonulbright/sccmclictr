@@ -57,7 +57,7 @@ namespace ClientCenter
                                 dataGrid1.ItemsSource = iUpdates;
                                 dataGrid1.EndInit();
                             }
-                            catch { }
+                            catch (Exception ex) { Listener?.WriteError(ex.Message); }
                         }
                     }
                     catch { }
@@ -194,7 +194,7 @@ namespace ClientCenter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return value.ToString().Replace("ciJobState", "");
+            return value?.ToString().Replace("ciJobState", "") ?? string.Empty;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

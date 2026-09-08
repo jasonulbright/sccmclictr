@@ -1,4 +1,4 @@
-﻿// Decompiled with JetBrains decompiler
+// Decompiled with JetBrains decompiler
 // Type: sccmclictr.automation.functions.inventory
 // Assembly: sccmclictr.automation, Version=1.0.1.0, Culture=neutral, PublicKeyToken=null
 // MVID: 96476B75-C789-4A0A-9F55-EBB7DB29E9AB
@@ -195,9 +195,9 @@ public class inventory : baseInit
       this.remoteRunspace = RemoteRunspace;
       this.pSCode = PSCode;
       this.oNewBase = new baseInit(this.remoteRunspace, this.pSCode);
-      this.__CLASS = WMIObject.Properties[nameof (__CLASS)] == null ? WMIObject.Properties["CimClass"].Value as string : WMIObject.Properties[nameof (__CLASS)].Value as string;
-      this.__CLASS = WMIObject.Properties[nameof (__NAMESPACE)] == null ? "" : WMIObject.Properties[nameof (__NAMESPACE)].Value as string;
-      this.__CLASS = WMIObject.Properties[nameof (__RELPATH)] == null ? "" : WMIObject.Properties[nameof (__RELPATH)].Value as string;
+      this.__CLASS = common.ManagementProperty(WMIObject, nameof (__CLASS));
+      this.__NAMESPACE = common.ManagementProperty(WMIObject, nameof (__NAMESPACE));
+      this.__RELPATH = common.ManagementProperty(WMIObject, nameof (__RELPATH));
       this.__INSTANCE = true;
       this.WMIObject = WMIObject;
       this.ARPDisplayName = WMIObject.Properties[nameof (ARPDisplayName)].Value as string;
@@ -334,18 +334,18 @@ public class inventory : baseInit
     {
       this.remoteRunspace = RemoteRunspace;
       this.pSCode = PSCode;
-      this.__CLASS = WMIObject.Properties[nameof (__CLASS)].Value as string;
-      this.__NAMESPACE = WMIObject.Properties[nameof (__NAMESPACE)].Value as string;
-      this.__RELPATH = WMIObject.Properties[nameof (__RELPATH)].Value as string;
+      this.__CLASS = common.ManagementProperty(WMIObject, nameof (__CLASS));
+      this.__NAMESPACE = common.ManagementProperty(WMIObject, nameof (__NAMESPACE));
+      this.__RELPATH = common.ManagementProperty(WMIObject, nameof (__RELPATH));
       this.__INSTANCE = true;
       this.WMIObject = WMIObject;
       this.InventoryActionID = WMIObject.Properties[nameof (InventoryActionID)].Value as string;
-      string dmtfDate1 = WMIObject.Properties[nameof (LastCycleStartedDate)].Value as string;
-      this.LastCycleStartedDate = !string.IsNullOrEmpty(dmtfDate1) ? new DateTime?(common.DmtfToDateTime(dmtfDate1)) : new DateTime?();
+      object dmtfDate1 = WMIObject.Properties[nameof (LastCycleStartedDate)]?.Value;
+      this.LastCycleStartedDate = !common.IsMissingDate(dmtfDate1) ? new DateTime?(common.DmtfToDateTime(dmtfDate1)) : new DateTime?();
       this.LastMajorReportVersion = WMIObject.Properties[nameof (LastMajorReportVersion)].Value as uint?;
       this.LastMinorReportVersion = WMIObject.Properties[nameof (LastMinorReportVersion)].Value as uint?;
-      string dmtfDate2 = WMIObject.Properties[nameof (LastReportDate)].Value as string;
-      if (string.IsNullOrEmpty(dmtfDate2))
+      object dmtfDate2 = WMIObject.Properties[nameof (LastReportDate)]?.Value;
+      if (common.IsMissingDate(dmtfDate2))
         this.LastReportDate = new DateTime?();
       else
         this.LastReportDate = new DateTime?(common.DmtfToDateTime(dmtfDate2));
@@ -382,13 +382,13 @@ public class inventory : baseInit
     {
       this.remoteRunspace = RemoteRunspace;
       this.pSCode = PSCode;
-      this.__CLASS = WMIObject.Properties[nameof (__CLASS)].Value as string;
-      this.__NAMESPACE = WMIObject.Properties[nameof (__NAMESPACE)].Value as string;
-      this.__RELPATH = WMIObject.Properties[nameof (__RELPATH)].Value as string;
+      this.__CLASS = common.ManagementProperty(WMIObject, nameof (__CLASS));
+      this.__NAMESPACE = common.ManagementProperty(WMIObject, nameof (__NAMESPACE));
+      this.__RELPATH = common.ManagementProperty(WMIObject, nameof (__RELPATH));
       this.__INSTANCE = true;
       this.WMIObject = WMIObject;
-      string dmtfDate = WMIObject.Properties[nameof (Date)].Value as string;
-      this.Date = !string.IsNullOrEmpty(dmtfDate) ? new DateTime?(common.DmtfToDateTime(dmtfDate)) : new DateTime?();
+      object dmtfDate = WMIObject.Properties[nameof (Date)]?.Value;
+      this.Date = !common.IsMissingDate(dmtfDate) ? new DateTime?(common.DmtfToDateTime(dmtfDate)) : new DateTime?();
       this.hr0_1 = WMIObject.Properties[nameof (hr0_1)].Value as uint?;
       this.hr10_11 = WMIObject.Properties[nameof (hr10_11)].Value as uint?;
       this.hr11_12 = WMIObject.Properties[nameof (hr11_12)].Value as uint?;
@@ -495,13 +495,13 @@ public class inventory : baseInit
     {
       this.remoteRunspace = RemoteRunspace;
       this.pSCode = PSCode;
-      this.__CLASS = WMIObject.Properties[nameof (__CLASS)].Value as string;
-      this.__NAMESPACE = WMIObject.Properties[nameof (__NAMESPACE)].Value as string;
-      this.__RELPATH = WMIObject.Properties[nameof (__RELPATH)].Value as string;
+      this.__CLASS = common.ManagementProperty(WMIObject, nameof (__CLASS));
+      this.__NAMESPACE = common.ManagementProperty(WMIObject, nameof (__NAMESPACE));
+      this.__RELPATH = common.ManagementProperty(WMIObject, nameof (__RELPATH));
       this.__INSTANCE = true;
       this.WMIObject = WMIObject;
-      string dmtfDate = WMIObject.Properties[nameof (LKGTime)].Value as string;
-      if (string.IsNullOrEmpty(dmtfDate))
+      object dmtfDate = WMIObject.Properties[nameof (LKGTime)]?.Value;
+      if (common.IsMissingDate(dmtfDate))
         this.LKGTime = new DateTime?();
       else
         this.LKGTime = new DateTime?(common.DmtfToDateTime(dmtfDate));
@@ -533,9 +533,9 @@ public class inventory : baseInit
     {
       this.remoteRunspace = RemoteRunspace;
       this.pSCode = PSCode;
-      this.__CLASS = WMIObject.Properties[nameof (__CLASS)].Value as string;
-      this.__NAMESPACE = WMIObject.Properties[nameof (__NAMESPACE)].Value as string;
-      this.__RELPATH = WMIObject.Properties[nameof (__RELPATH)].Value as string;
+      this.__CLASS = common.ManagementProperty(WMIObject, nameof (__CLASS));
+      this.__NAMESPACE = common.ManagementProperty(WMIObject, nameof (__NAMESPACE));
+      this.__RELPATH = common.ManagementProperty(WMIObject, nameof (__RELPATH));
       this.__INSTANCE = true;
       this.WMIObject = WMIObject;
       this.ClientID = WMIObject.Properties[nameof (ClientID)].Value as string;
@@ -543,8 +543,8 @@ public class inventory : baseInit
       this.ComputerOnState = WMIObject.Properties[nameof (ComputerOnState)].Value as uint?;
       this.ComputerShutdownState = WMIObject.Properties[nameof (ComputerShutdownState)].Value as uint?;
       this.ComputerSleepState = WMIObject.Properties[nameof (ComputerSleepState)].Value as uint?;
-      string dmtfDate = WMIObject.Properties[nameof (LastRecordedDate)].Value as string;
-      this.LastRecordedDate = !string.IsNullOrEmpty(dmtfDate) ? new DateTime?(common.DmtfToDateTime(dmtfDate)) : new DateTime?();
+      object dmtfDate = WMIObject.Properties[nameof (LastRecordedDate)]?.Value;
+      this.LastRecordedDate = !common.IsMissingDate(dmtfDate) ? new DateTime?(common.DmtfToDateTime(dmtfDate)) : new DateTime?();
       this.MonitorOnState = WMIObject.Properties[nameof (MonitorOnState)].Value as uint?;
     }
 
@@ -586,15 +586,15 @@ public class inventory : baseInit
     {
       this.remoteRunspace = RemoteRunspace;
       this.pSCode = PSCode;
-      this.__CLASS = WMIObject.Properties[nameof (__CLASS)].Value as string;
-      this.__NAMESPACE = WMIObject.Properties[nameof (__NAMESPACE)].Value as string;
-      this.__RELPATH = WMIObject.Properties[nameof (__RELPATH)].Value as string;
+      this.__CLASS = common.ManagementProperty(WMIObject, nameof (__CLASS));
+      this.__NAMESPACE = common.ManagementProperty(WMIObject, nameof (__NAMESPACE));
+      this.__RELPATH = common.ManagementProperty(WMIObject, nameof (__RELPATH));
       this.__INSTANCE = true;
       this.WMIObject = WMIObject;
       this.eventID = WMIObject.Properties[nameof (eventID)].Value as uint?;
       this.GUID = WMIObject.Properties[nameof (GUID)].Value as string;
-      string dmtfDate = WMIObject.Properties[nameof (time)].Value as string;
-      if (string.IsNullOrEmpty(dmtfDate))
+      object dmtfDate = WMIObject.Properties[nameof (time)]?.Value;
+      if (common.IsMissingDate(dmtfDate))
         this.time = new DateTime?();
       else
         this.time = new DateTime?(common.DmtfToDateTime(dmtfDate));
@@ -630,9 +630,9 @@ public class inventory : baseInit
     {
       this.remoteRunspace = RemoteRunspace;
       this.pSCode = PSCode;
-      this.__CLASS = WMIObject.Properties[nameof (__CLASS)].Value as string;
-      this.__NAMESPACE = WMIObject.Properties[nameof (__NAMESPACE)].Value as string;
-      this.__RELPATH = WMIObject.Properties[nameof (__RELPATH)].Value as string;
+      this.__CLASS = common.ManagementProperty(WMIObject, nameof (__CLASS));
+      this.__NAMESPACE = common.ManagementProperty(WMIObject, nameof (__NAMESPACE));
+      this.__RELPATH = common.ManagementProperty(WMIObject, nameof (__RELPATH));
       this.__INSTANCE = true;
       this.WMIObject = WMIObject;
       this.AdditionalCode = WMIObject.Properties[nameof (AdditionalCode)].Value as uint?;
@@ -641,8 +641,8 @@ public class inventory : baseInit
       this.RequesterInfo = WMIObject.Properties[nameof (RequesterInfo)].Value as string;
       this.RequesterType = WMIObject.Properties[nameof (RequesterType)].Value as string;
       this.RequestType = WMIObject.Properties[nameof (RequestType)].Value as string;
-      string dmtfDate = WMIObject.Properties[nameof (Time)].Value as string;
-      this.Time = !string.IsNullOrEmpty(dmtfDate) ? new DateTime?(common.DmtfToDateTime(dmtfDate)) : new DateTime?();
+      object dmtfDate = WMIObject.Properties[nameof (Time)]?.Value;
+      this.Time = !common.IsMissingDate(dmtfDate) ? new DateTime?(common.DmtfToDateTime(dmtfDate)) : new DateTime?();
       this.UnknownRequester = WMIObject.Properties[nameof (UnknownRequester)].Value as bool?;
     }
 
@@ -683,9 +683,9 @@ public class inventory : baseInit
     {
       this.remoteRunspace = RemoteRunspace;
       this.pSCode = PSCode;
-      this.__CLASS = WMIObject.Properties[nameof (__CLASS)].Value as string;
-      this.__NAMESPACE = WMIObject.Properties[nameof (__NAMESPACE)].Value as string;
-      this.__RELPATH = WMIObject.Properties[nameof (__RELPATH)].Value as string;
+      this.__CLASS = common.ManagementProperty(WMIObject, nameof (__CLASS));
+      this.__NAMESPACE = common.ManagementProperty(WMIObject, nameof (__NAMESPACE));
+      this.__RELPATH = common.ManagementProperty(WMIObject, nameof (__RELPATH));
       this.__INSTANCE = true;
       this.WMIObject = WMIObject;
       this.minutesComputerActive = WMIObject.Properties[nameof (minutesComputerActive)].Value as uint?;
@@ -694,8 +694,8 @@ public class inventory : baseInit
       this.minutesComputerSleep = WMIObject.Properties[nameof (minutesComputerSleep)].Value as uint?;
       this.minutesMonitorOn = WMIObject.Properties[nameof (minutesMonitorOn)].Value as uint?;
       this.minutesTotal = WMIObject.Properties[nameof (minutesTotal)].Value as uint?;
-      string dmtfDate = WMIObject.Properties[nameof (MonthStart)].Value as string;
-      if (string.IsNullOrEmpty(dmtfDate))
+      object dmtfDate = WMIObject.Properties[nameof (MonthStart)]?.Value;
+      if (common.IsMissingDate(dmtfDate))
         this.MonthStart = new DateTime?();
       else
         this.MonthStart = new DateTime?(common.DmtfToDateTime(dmtfDate));
@@ -739,9 +739,9 @@ public class inventory : baseInit
     {
       this.remoteRunspace = RemoteRunspace;
       this.pSCode = PSCode;
-      this.__CLASS = WMIObject.Properties[nameof (__CLASS)].Value as string;
-      this.__NAMESPACE = WMIObject.Properties[nameof (__NAMESPACE)].Value as string;
-      this.__RELPATH = WMIObject.Properties[nameof (__RELPATH)].Value as string;
+      this.__CLASS = common.ManagementProperty(WMIObject, nameof (__CLASS));
+      this.__NAMESPACE = common.ManagementProperty(WMIObject, nameof (__NAMESPACE));
+      this.__RELPATH = common.ManagementProperty(WMIObject, nameof (__RELPATH));
       this.__INSTANCE = true;
       this.WMIObject = WMIObject;
       this.ApmPresent = WMIObject.Properties[nameof (ApmPresent)].Value as bool?;
@@ -818,9 +818,9 @@ public class inventory : baseInit
     {
       this.remoteRunspace = RemoteRunspace;
       this.pSCode = PSCode;
-      this.__CLASS = WMIObject.Properties[nameof (__CLASS)].Value as string;
-      this.__NAMESPACE = WMIObject.Properties[nameof (__NAMESPACE)].Value as string;
-      this.__RELPATH = WMIObject.Properties[nameof (__RELPATH)].Value as string;
+      this.__CLASS = common.ManagementProperty(WMIObject, nameof (__CLASS));
+      this.__NAMESPACE = common.ManagementProperty(WMIObject, nameof (__NAMESPACE));
+      this.__RELPATH = common.ManagementProperty(WMIObject, nameof (__RELPATH));
       this.__INSTANCE = true;
       this.WMIObject = WMIObject;
       this.IsClientOptOut = WMIObject.Properties[nameof (IsClientOptOut)].Value as bool?;
@@ -849,9 +849,9 @@ public class inventory : baseInit
     {
       this.remoteRunspace = RemoteRunspace;
       this.pSCode = PSCode;
-      this.__CLASS = WMIObject.Properties[nameof (__CLASS)].Value as string;
-      this.__NAMESPACE = WMIObject.Properties[nameof (__NAMESPACE)].Value as string;
-      this.__RELPATH = WMIObject.Properties[nameof (__RELPATH)].Value as string;
+      this.__CLASS = common.ManagementProperty(WMIObject, nameof (__CLASS));
+      this.__NAMESPACE = common.ManagementProperty(WMIObject, nameof (__NAMESPACE));
+      this.__RELPATH = common.ManagementProperty(WMIObject, nameof (__RELPATH));
       this.__INSTANCE = true;
       this.WMIObject = WMIObject;
       this.ACSettingIndex = WMIObject.Properties[nameof (ACSettingIndex)].Value as string;
