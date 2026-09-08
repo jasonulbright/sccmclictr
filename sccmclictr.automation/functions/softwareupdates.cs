@@ -1,4 +1,4 @@
-﻿// Decompiled with JetBrains decompiler
+// Decompiled with JetBrains decompiler
 // Type: sccmclictr.automation.functions.softwareupdates
 // Assembly: sccmclictr.automation, Version=1.0.1.0, Culture=neutral, PublicKeyToken=null
 // MVID: 96476B75-C789-4A0A-9F55-EBB7DB29E9AB
@@ -250,9 +250,9 @@ public class softwareupdates : baseInit
     {
       this.remoteRunspace = RemoteRunspace;
       this.pSCode = PSCode;
-      this.__CLASS = WMIObject.Properties[nameof (__CLASS)].Value as string;
-      this.__NAMESPACE = WMIObject.Properties[nameof (__NAMESPACE)].Value as string;
-      this.__RELPATH = WMIObject.Properties[nameof (__RELPATH)].Value as string;
+      this.__CLASS = common.ManagementProperty(WMIObject, nameof (__CLASS));
+      this.__NAMESPACE = common.ManagementProperty(WMIObject, nameof (__NAMESPACE));
+      this.__RELPATH = common.ManagementProperty(WMIObject, nameof (__RELPATH));
       this.__INSTANCE = true;
       this.WMIObject = WMIObject;
       this.Article = WMIObject.Properties[nameof (Article)].Value as string;
@@ -260,8 +260,8 @@ public class softwareupdates : baseInit
       this.Language = WMIObject.Properties[nameof (Language)].Value as string;
       this.ProductID = WMIObject.Properties[nameof (ProductID)].Value as string;
       this.RevisionNumber = WMIObject.Properties[nameof (RevisionNumber)].Value as uint?;
-      string scanTimeDmtf = WMIObject.Properties[nameof (ScanTime)].Value as string;
-      this.ScanTime = !string.IsNullOrEmpty(scanTimeDmtf) ? new DateTime?(common.DmtfToDateTime(scanTimeDmtf)) : new DateTime?();
+      object scanTimeDmtf = WMIObject.Properties[nameof (ScanTime)]?.Value;
+      this.ScanTime = !common.IsMissingDate(scanTimeDmtf) ? new DateTime?(common.DmtfToDateTime(scanTimeDmtf)) : new DateTime?();
       this.Sources = (softwareupdates.CCM_SourceStatus[]) null;
       this.SourceType = WMIObject.Properties[nameof (SourceType)].Value as uint?;
       this.SourceUniqueId = WMIObject.Properties[nameof (SourceUniqueId)].Value as string;
@@ -350,9 +350,9 @@ public class softwareupdates : baseInit
     {
       this.remoteRunspace = RemoteRunspace;
       this.pSCode = PSCode;
-      this.__CLASS = WMIObject.Properties[nameof (__CLASS)].Value as string;
-      this.__NAMESPACE = WMIObject.Properties[nameof (__NAMESPACE)].Value as string;
-      this.__RELPATH = WMIObject.Properties[nameof (__RELPATH)].Value as string;
+      this.__CLASS = common.ManagementProperty(WMIObject, nameof (__CLASS));
+      this.__NAMESPACE = common.ManagementProperty(WMIObject, nameof (__NAMESPACE));
+      this.__RELPATH = common.ManagementProperty(WMIObject, nameof (__RELPATH));
       this.__INSTANCE = true;
       this.WMIObject = WMIObject;
       this.RevisionNumber = WMIObject.Properties[nameof (RevisionNumber)].Value as uint?;
@@ -417,9 +417,9 @@ public class softwareupdates : baseInit
     {
       this.remoteRunspace = RemoteRunspace;
       this.pSCode = PSCode;
-      this.__CLASS = WMIObject.Properties[nameof (__CLASS)].Value as string;
-      this.__NAMESPACE = WMIObject.Properties[nameof (__NAMESPACE)].Value as string;
-      this.__RELPATH = WMIObject.Properties[nameof (__RELPATH)].Value as string;
+      this.__CLASS = common.ManagementProperty(WMIObject, nameof (__CLASS));
+      this.__NAMESPACE = common.ManagementProperty(WMIObject, nameof (__NAMESPACE));
+      this.__RELPATH = common.ManagementProperty(WMIObject, nameof (__RELPATH));
       this.__INSTANCE = true;
       this.WMIObject = WMIObject;
       this.AssignmentId = WMIObject.Properties[nameof (AssignmentId)].Value as string;
@@ -471,9 +471,9 @@ public class softwareupdates : baseInit
     {
       this.remoteRunspace = RemoteRunspace;
       this.pSCode = PSCode;
-      this.__CLASS = WMIObject.Properties[nameof (__CLASS)].Value as string;
-      this.__NAMESPACE = WMIObject.Properties[nameof (__NAMESPACE)].Value as string;
-      this.__RELPATH = WMIObject.Properties[nameof (__RELPATH)].Value as string;
+      this.__CLASS = common.ManagementProperty(WMIObject, nameof (__CLASS));
+      this.__NAMESPACE = common.ManagementProperty(WMIObject, nameof (__NAMESPACE));
+      this.__RELPATH = common.ManagementProperty(WMIObject, nameof (__RELPATH));
       this.__INSTANCE = true;
       this.WMIObject = WMIObject;
       this.AssignmentId = WMIObject.Properties[nameof (AssignmentId)].Value as string;
@@ -540,16 +540,16 @@ public class softwareupdates : baseInit
     {
       this.remoteRunspace = RemoteRunspace;
       this.pSCode = PSCode;
-      this.__CLASS = WMIObject.Properties[nameof (__CLASS)].Value as string;
-      this.__NAMESPACE = WMIObject.Properties[nameof (__NAMESPACE)].Value as string;
-      this.__RELPATH = WMIObject.Properties[nameof (__RELPATH)].Value as string;
+      this.__CLASS = common.ManagementProperty(WMIObject, nameof (__CLASS));
+      this.__NAMESPACE = common.ManagementProperty(WMIObject, nameof (__NAMESPACE));
+      this.__RELPATH = common.ManagementProperty(WMIObject, nameof (__RELPATH));
       this.__INSTANCE = true;
       this.WMIObject = WMIObject;
       this.ComponentName = WMIObject.Properties[nameof (ComponentName)].Value as string;
       this.MaxPauseDuration = WMIObject.Properties[nameof (MaxPauseDuration)].Value as uint?;
       this.PauseCookie = WMIObject.Properties[nameof (PauseCookie)].Value as uint?;
-      string pauseStartTimeDmtf = WMIObject.Properties[nameof (PauseStartTime)].Value as string;
-      this.PauseStartTime = !string.IsNullOrEmpty(pauseStartTimeDmtf) ? new DateTime?(common.DmtfToDateTime(pauseStartTimeDmtf)) : new DateTime?();
+      object pauseStartTimeDmtf = WMIObject.Properties[nameof (PauseStartTime)]?.Value;
+      this.PauseStartTime = !common.IsMissingDate(pauseStartTimeDmtf) ? new DateTime?(common.DmtfToDateTime(pauseStartTimeDmtf)) : new DateTime?();
       this.Reserved = WMIObject.Properties[nameof (Reserved)].Value as string;
     }
 
@@ -600,9 +600,9 @@ public class softwareupdates : baseInit
     {
       this.remoteRunspace = RemoteRunspace;
       this.pSCode = PSCode;
-      this.__CLASS = WMIObject.Properties[nameof (__CLASS)].Value as string;
-      this.__NAMESPACE = WMIObject.Properties[nameof (__NAMESPACE)].Value as string;
-      this.__RELPATH = WMIObject.Properties[nameof (__RELPATH)].Value as string;
+      this.__CLASS = common.ManagementProperty(WMIObject, nameof (__CLASS));
+      this.__NAMESPACE = common.ManagementProperty(WMIObject, nameof (__NAMESPACE));
+      this.__RELPATH = common.ManagementProperty(WMIObject, nameof (__RELPATH));
       this.__INSTANCE = true;
       this.WMIObject = WMIObject;
       this.AssignmentId = WMIObject.Properties[nameof (AssignmentId)].Value as string;
@@ -664,9 +664,9 @@ public class softwareupdates : baseInit
     {
       this.remoteRunspace = RemoteRunspace;
       this.pSCode = PSCode;
-      this.__CLASS = WMIObject.Properties[nameof (__CLASS)].Value as string;
-      this.__NAMESPACE = WMIObject.Properties[nameof (__NAMESPACE)].Value as string;
-      this.__RELPATH = WMIObject.Properties[nameof (__RELPATH)].Value as string;
+      this.__CLASS = common.ManagementProperty(WMIObject, nameof (__CLASS));
+      this.__NAMESPACE = common.ManagementProperty(WMIObject, nameof (__NAMESPACE));
+      this.__RELPATH = common.ManagementProperty(WMIObject, nameof (__RELPATH));
       this.__INSTANCE = true;
       this.WMIObject = WMIObject;
       this.nKey = WMIObject.Properties[nameof (nKey)].Value as uint?;
@@ -713,13 +713,13 @@ public class softwareupdates : baseInit
     {
       this.remoteRunspace = RemoteRunspace;
       this.pSCode = PSCode;
-      this.__CLASS = WMIObject.Properties[nameof (__CLASS)].Value as string;
-      this.__NAMESPACE = WMIObject.Properties[nameof (__NAMESPACE)].Value as string;
-      this.__RELPATH = WMIObject.Properties[nameof (__RELPATH)].Value as string;
+      this.__CLASS = common.ManagementProperty(WMIObject, nameof (__CLASS));
+      this.__NAMESPACE = common.ManagementProperty(WMIObject, nameof (__NAMESPACE));
+      this.__RELPATH = common.ManagementProperty(WMIObject, nameof (__RELPATH));
       this.__INSTANCE = true;
       this.WMIObject = WMIObject;
-      string deadlineDmtf = WMIObject.Properties[nameof (Deadline)].Value as string;
-      this.Deadline = !string.IsNullOrEmpty(deadlineDmtf) ? new DateTime?(common.DmtfToDateTime(deadlineDmtf)) : new DateTime?();
+      object deadlineDmtf = WMIObject.Properties[nameof (Deadline)]?.Value;
+      this.Deadline = !common.IsMissingDate(deadlineDmtf) ? new DateTime?(common.DmtfToDateTime(deadlineDmtf)) : new DateTime?();
       this.DisableMomAlerts = WMIObject.Properties[nameof (DisableMomAlerts)].Value as bool?;
       this.DownloadSize = WMIObject.Properties[nameof (DownloadSize)].Value as uint?;
       this.DPLocality = WMIObject.Properties[nameof (DPLocality)].Value as uint?;
@@ -729,14 +729,14 @@ public class softwareupdates : baseInit
       this.OverrideServiceWindows = WMIObject.Properties[nameof (OverrideServiceWindows)].Value as bool?;
       this.PercentComplete = WMIObject.Properties[nameof (PercentComplete)].Value as uint?;
       this.RaiseMomAlertsOnFailure = WMIObject.Properties[nameof (RaiseMomAlertsOnFailure)].Value as bool?;
-      string rebootDeadlineDmtf = WMIObject.Properties[nameof (RebootDeadline)].Value as string;
-      this.RebootDeadline = !string.IsNullOrEmpty(rebootDeadlineDmtf) ? new DateTime?(common.DmtfToDateTime(rebootDeadlineDmtf)) : new DateTime?();
+      object rebootDeadlineDmtf = WMIObject.Properties[nameof (RebootDeadline)]?.Value;
+      this.RebootDeadline = !common.IsMissingDate(rebootDeadlineDmtf) ? new DateTime?(common.DmtfToDateTime(rebootDeadlineDmtf)) : new DateTime?();
       this.RebootOutsideOfServiceWindows = WMIObject.Properties[nameof (RebootOutsideOfServiceWindows)].Value as bool?;
       this.RefAssignments = WMIObject.Properties[nameof (RefAssignments)].Value as string;
       this.Reserved = WMIObject.Properties[nameof (Reserved)].Value as string;
       this.ScheduledUpdateOptions = WMIObject.Properties[nameof (ScheduledUpdateOptions)].Value as uint?;
-      string startTimeDmtf = WMIObject.Properties[nameof (StartTime)].Value as string;
-      this.StartTime = !string.IsNullOrEmpty(startTimeDmtf) ? new DateTime?(common.DmtfToDateTime(startTimeDmtf)) : new DateTime?();
+      object startTimeDmtf = WMIObject.Properties[nameof (StartTime)]?.Value;
+      this.StartTime = !common.IsMissingDate(startTimeDmtf) ? new DateTime?(common.DmtfToDateTime(startTimeDmtf)) : new DateTime?();
       this.UpdateAction = WMIObject.Properties[nameof (UpdateAction)].Value as uint?;
       this.UpdateApplicability = WMIObject.Properties[nameof (UpdateApplicability)].Value as uint?;
       this.UpdateId = WMIObject.Properties[nameof (UpdateId)].Value as string;
@@ -865,9 +865,9 @@ public class softwareupdates : baseInit
     {
       this.remoteRunspace = RemoteRunspace;
       this.pSCode = PSCode;
-      this.__CLASS = WMIObject.Properties[nameof (__CLASS)].Value as string;
-      this.__NAMESPACE = WMIObject.Properties[nameof (__NAMESPACE)].Value as string;
-      this.__RELPATH = WMIObject.Properties[nameof (__RELPATH)].Value as string;
+      this.__CLASS = common.ManagementProperty(WMIObject, nameof (__CLASS));
+      this.__NAMESPACE = common.ManagementProperty(WMIObject, nameof (__NAMESPACE));
+      this.__RELPATH = common.ManagementProperty(WMIObject, nameof (__RELPATH));
       this.__INSTANCE = true;
       this.WMIObject = WMIObject;
       this.CachedContentInUse = WMIObject.Properties[nameof (CachedContentInUse)].Value as uint?;
@@ -949,9 +949,9 @@ public class softwareupdates : baseInit
     {
       this.remoteRunspace = RemoteRunspace;
       this.pSCode = PSCode;
-      this.__CLASS = WMIObject.Properties[nameof (__CLASS)].Value as string;
-      this.__NAMESPACE = WMIObject.Properties[nameof (__NAMESPACE)].Value as string;
-      this.__RELPATH = WMIObject.Properties[nameof (__RELPATH)].Value as string;
+      this.__CLASS = common.ManagementProperty(WMIObject, nameof (__CLASS));
+      this.__NAMESPACE = common.ManagementProperty(WMIObject, nameof (__NAMESPACE));
+      this.__RELPATH = common.ManagementProperty(WMIObject, nameof (__RELPATH));
       this.__INSTANCE = true;
       this.WMIObject = WMIObject;
       this.CachedContentInUse = WMIObject.Properties[nameof (CachedContentInUse)].Value as uint?;
@@ -1046,9 +1046,9 @@ public class softwareupdates : baseInit
     {
       this.remoteRunspace = RemoteRunspace;
       this.pSCode = PSCode;
-      this.__CLASS = WMIObject.Properties[nameof (__CLASS)].Value as string;
-      this.__NAMESPACE = WMIObject.Properties[nameof (__NAMESPACE)].Value as string;
-      this.__RELPATH = WMIObject.Properties[nameof (__RELPATH)].Value as string;
+      this.__CLASS = common.ManagementProperty(WMIObject, nameof (__CLASS));
+      this.__NAMESPACE = common.ManagementProperty(WMIObject, nameof (__NAMESPACE));
+      this.__RELPATH = common.ManagementProperty(WMIObject, nameof (__RELPATH));
       this.__INSTANCE = true;
       this.WMIObject = WMIObject;
       this.HandleForMTC = WMIObject.Properties[nameof (HandleForMTC)].Value as string;
@@ -1135,9 +1135,9 @@ public class softwareupdates : baseInit
     {
       this.remoteRunspace = RemoteRunspace;
       this.pSCode = PSCode;
-      this.__CLASS = WMIObject.Properties[nameof (__CLASS)].Value as string;
-      this.__NAMESPACE = WMIObject.Properties[nameof (__NAMESPACE)].Value as string;
-      this.__RELPATH = WMIObject.Properties[nameof (__RELPATH)].Value as string;
+      this.__CLASS = common.ManagementProperty(WMIObject, nameof (__CLASS));
+      this.__NAMESPACE = common.ManagementProperty(WMIObject, nameof (__NAMESPACE));
+      this.__RELPATH = common.ManagementProperty(WMIObject, nameof (__RELPATH));
       this.__INSTANCE = true;
       this.WMIObject = WMIObject;
       this.ContentLocation = WMIObject.Properties[nameof (ContentLocation)].Value as string;
@@ -1195,9 +1195,9 @@ public class softwareupdates : baseInit
       this.remoteRunspace = RemoteRunspace;
       this.pSCode = PSCode;
       this.oNewBase = new baseInit(this.remoteRunspace, this.pSCode);
-      this.__CLASS = WMIObject.Properties["__CLASS"].Value as string;
-      this.__NAMESPACE = WMIObject.Properties["__NAMESPACE"].Value as string;
-      this.__RELPATH = WMIObject.Properties["__RELPATH"].Value as string;
+      this.__CLASS = common.ManagementProperty(WMIObject, "__CLASS");
+      this.__NAMESPACE = common.ManagementProperty(WMIObject, "__NAMESPACE");
+      this.__RELPATH = common.ManagementProperty(WMIObject, "__RELPATH");
       this.__INSTANCE = true;
       this.WMIObject = WMIObject;
       this.ArticleID = WMIObject.Properties[nameof (ArticleID)].Value as string;
@@ -1206,8 +1206,8 @@ public class softwareupdates : baseInit
       this.ExclusiveUpdate = WMIObject.Properties[nameof (ExclusiveUpdate)].Value as bool?;
       this.OverrideServiceWindows = WMIObject.Properties[nameof (OverrideServiceWindows)].Value as bool?;
       this.RebootOutsideServiceWindows = WMIObject.Properties[nameof (RebootOutsideServiceWindows)].Value as bool?;
-      string restartDeadlineDmtf = WMIObject.Properties[nameof (RestartDeadline)].Value as string;
-      if (string.IsNullOrEmpty(restartDeadlineDmtf))
+      object restartDeadlineDmtf = WMIObject.Properties[nameof (RestartDeadline)]?.Value;
+      if (common.IsMissingDate(restartDeadlineDmtf))
       {
         this.RestartDeadline = new DateTime?();
       }

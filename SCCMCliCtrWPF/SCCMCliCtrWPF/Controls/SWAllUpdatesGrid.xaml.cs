@@ -65,7 +65,7 @@ namespace ClientCenter
                                 dataGrid1.ItemsSource = iUpdates;
                                 dataGrid1.EndInit();
                             }
-                            catch { }
+                            catch (Exception ex) { Listener?.WriteError(ex.Message); }
                         }
                     }
                     catch { }

@@ -1,4 +1,4 @@
-﻿// Decompiled with JetBrains decompiler
+// Decompiled with JetBrains decompiler
 // Type: sccmclictr.automation.functions.softwaredistribution
 // Assembly: sccmclictr.automation, Version=1.0.1.0, Culture=neutral, PublicKeyToken=null
 // MVID: 96476B75-C789-4A0A-9F55-EBB7DB29E9AB
@@ -399,14 +399,14 @@ public class softwaredistribution : baseInit
     /// <param name="WMIObject">The WMI object.</param>
     public CCM_SoftwareBase(PSObject WMIObject)
     {
-      this.__CLASS = WMIObject.Properties[nameof (__CLASS)].Value as string;
-      this.__NAMESPACE = WMIObject.Properties[nameof (__NAMESPACE)].Value as string;
-      this.__RELPATH = WMIObject.Properties[nameof (__RELPATH)].Value as string;
+      this.__CLASS = common.ManagementProperty(WMIObject, nameof (__CLASS));
+      this.__NAMESPACE = common.ManagementProperty(WMIObject, nameof (__NAMESPACE));
+      this.__RELPATH = common.ManagementProperty(WMIObject, nameof (__RELPATH));
       this.__INSTANCE = true;
       this.ContentSize = WMIObject.Properties[nameof (ContentSize)].Value as uint?;
-      string deadlineDmtf = WMIObject.Properties[nameof (Deadline)].Value as string;
+      object deadlineDmtf = WMIObject.Properties[nameof (Deadline)]?.Value;
       DateTime? utcConverted;
-      if (string.IsNullOrEmpty(deadlineDmtf))
+      if (common.IsMissingDate(deadlineDmtf))
       {
         this.Deadline = new DateTime?();
       }
@@ -423,8 +423,8 @@ public class softwaredistribution : baseInit
       this.EvaluationState = WMIObject.Properties[nameof (EvaluationState)].Value as uint?;
       this.FullName = WMIObject.Properties[nameof (FullName)].Value as string;
       this.Name = WMIObject.Properties[nameof (Name)].Value as string;
-      string nextUserTimeDmtf = WMIObject.Properties[nameof (NextUserScheduledTime)].Value as string;
-      if (string.IsNullOrEmpty(nextUserTimeDmtf))
+      object nextUserTimeDmtf = WMIObject.Properties[nameof (NextUserScheduledTime)]?.Value;
+      if (common.IsMissingDate(nextUserTimeDmtf))
       {
         utcConverted = new DateTime?();
         this.NextUserScheduledTime = utcConverted;
@@ -519,8 +519,8 @@ public class softwaredistribution : baseInit
       this.DeploymentReport = WMIObject.Properties[nameof (DeploymentReport)].Value as string;
       this.Id = WMIObject.Properties[nameof (Id)].Value as string;
       this.InstallState = WMIObject.Properties[nameof (InstallState)].Value as string;
-      string lastEvalDmtf = WMIObject.Properties[nameof (LastEvalTime)].Value as string;
-      this.LastEvalTime = !string.IsNullOrEmpty(lastEvalDmtf) ? new DateTime?(common.DmtfToDateTime(lastEvalDmtf)) : new DateTime?();
+      object lastEvalDmtf = WMIObject.Properties[nameof (LastEvalTime)]?.Value;
+      this.LastEvalTime = !common.IsMissingDate(lastEvalDmtf) ? new DateTime?(common.DmtfToDateTime(lastEvalDmtf)) : new DateTime?();
       this.PostInstallAction = WMIObject.Properties[nameof (PostInstallAction)].Value as string;
       this.ResolvedState = WMIObject.Properties[nameof (ResolvedState)].Value as string;
       this.RetriesRemaining = WMIObject.Properties[nameof (RetriesRemaining)].Value as uint?;
@@ -775,9 +775,9 @@ public class softwaredistribution : baseInit
       this.remoteRunspace = RemoteRunspace;
       this.pSCode = PSCode;
       this.oNewBase = new baseInit(this.remoteRunspace, this.pSCode);
-      this.__CLASS = WMIObject.Properties["__CLASS"].Value as string;
-      this.__NAMESPACE = WMIObject.Properties["__NAMESPACE"].Value as string;
-      this.__RELPATH = WMIObject.Properties["__RELPATH"].Value as string;
+      this.__CLASS = common.ManagementProperty(WMIObject, "__CLASS");
+      this.__NAMESPACE = common.ManagementProperty(WMIObject, "__NAMESPACE");
+      this.__RELPATH = common.ManagementProperty(WMIObject, "__RELPATH");
       this.__INSTANCE = true;
       this.WMIObject = WMIObject;
       List<string> stringList = new List<string>();
@@ -809,8 +809,8 @@ public class softwaredistribution : baseInit
       this.InstallState = WMIObject.Properties[nameof (InstallState)].Value as string;
       this.IsMachineTarget = WMIObject.Properties[nameof (IsMachineTarget)].Value as bool?;
       this.IsPreflightOnly = WMIObject.Properties[nameof (IsPreflightOnly)].Value as bool?;
-      string lastEvalDmtf = WMIObject.Properties[nameof (LastEvalTime)].Value as string;
-      if (string.IsNullOrEmpty(lastEvalDmtf))
+      object lastEvalDmtf = WMIObject.Properties[nameof (LastEvalTime)]?.Value;
+      if (common.IsMissingDate(lastEvalDmtf))
       {
         this.LastEvalTime = new DateTime?();
       }
@@ -826,8 +826,8 @@ public class softwaredistribution : baseInit
         {
         }
       }
-      string lastInstallDmtf = WMIObject.Properties[nameof (LastInstallTime)].Value as string;
-      if (string.IsNullOrEmpty(lastInstallDmtf))
+      object lastInstallDmtf = WMIObject.Properties[nameof (LastInstallTime)]?.Value;
+      if (common.IsMissingDate(lastInstallDmtf))
       {
         this.LastInstallTime = new DateTime?();
       }
@@ -846,8 +846,8 @@ public class softwaredistribution : baseInit
       this.NotifyUser = WMIObject.Properties[nameof (NotifyUser)].Value as bool?;
       this.OverrideServiceWindow = WMIObject.Properties[nameof (OverrideServiceWindow)].Value as bool?;
       this.RebootOutsideServiceWindow = WMIObject.Properties[nameof (RebootOutsideServiceWindow)].Value as bool?;
-      string releaseDateDmtf = WMIObject.Properties[nameof (ReleaseDate)].Value as string;
-      if (string.IsNullOrEmpty(releaseDateDmtf))
+      object releaseDateDmtf = WMIObject.Properties[nameof (ReleaseDate)]?.Value;
+      if (common.IsMissingDate(releaseDateDmtf))
       {
         this.ReleaseDate = new DateTime?();
       }
@@ -866,8 +866,8 @@ public class softwaredistribution : baseInit
       this.ResolvedState = WMIObject.Properties[nameof (ResolvedState)].Value as string;
       this.Revision = WMIObject.Properties[nameof (Revision)].Value as string;
       this.SoftwareVersion = WMIObject.Properties[nameof (SoftwareVersion)].Value as string;
-      string startTimeDmtf = WMIObject.Properties[nameof (StartTime)].Value as string;
-      if (string.IsNullOrEmpty(startTimeDmtf))
+      object startTimeDmtf = WMIObject.Properties[nameof (StartTime)]?.Value;
+      if (common.IsMissingDate(startTimeDmtf))
       {
         this.StartTime = new DateTime?();
       }
@@ -898,17 +898,17 @@ public class softwaredistribution : baseInit
     {
       this.remoteRunspace = RemoteRunspace;
       this.pSCode = PSCode;
-      this.__CLASS = WMIObject.Properties[nameof (__CLASS)].Value as string;
-      this.__NAMESPACE = WMIObject.Properties[nameof (__NAMESPACE)].Value as string;
-      this.__RELPATH = WMIObject.Properties[nameof (__RELPATH)].Value as string;
+      this.__CLASS = common.ManagementProperty(WMIObject, nameof (__CLASS));
+      this.__NAMESPACE = common.ManagementProperty(WMIObject, nameof (__NAMESPACE));
+      this.__RELPATH = common.ManagementProperty(WMIObject, nameof (__RELPATH));
       this.__INSTANCE = true;
       this.WMIObject = WMIObject;
-      string nextRevalDmtf = WMIObject.Properties[nameof (NextGlobalRevalTime)].Value as string;
-      this.NextGlobalRevalTime = !string.IsNullOrEmpty(nextRevalDmtf) ? new DateTime?(common.DmtfToDateTime(nextRevalDmtf)) : new DateTime?();
-      string nextRetryDmtf = WMIObject.Properties[nameof (NextRetryTime)].Value as string;
-      this.NextRetryTime = !string.IsNullOrEmpty(nextRetryDmtf) ? new DateTime?(common.DmtfToDateTime(nextRetryDmtf)) : new DateTime?();
-      string nextServiceWindowDmtf = WMIObject.Properties[nameof (NextServiceWindowTime)].Value as string;
-      if (string.IsNullOrEmpty(nextServiceWindowDmtf))
+      object nextRevalDmtf = WMIObject.Properties[nameof (NextGlobalRevalTime)]?.Value;
+      this.NextGlobalRevalTime = !common.IsMissingDate(nextRevalDmtf) ? new DateTime?(common.DmtfToDateTime(nextRevalDmtf)) : new DateTime?();
+      object nextRetryDmtf = WMIObject.Properties[nameof (NextRetryTime)]?.Value;
+      this.NextRetryTime = !common.IsMissingDate(nextRetryDmtf) ? new DateTime?(common.DmtfToDateTime(nextRetryDmtf)) : new DateTime?();
+      object nextServiceWindowDmtf = WMIObject.Properties[nameof (NextServiceWindowTime)]?.Value;
+      if (common.IsMissingDate(nextServiceWindowDmtf))
         this.NextServiceWindowTime = new DateTime?();
       else
         this.NextServiceWindowTime = new DateTime?(common.DmtfToDateTime(nextServiceWindowDmtf));
@@ -943,9 +943,9 @@ public class softwaredistribution : baseInit
     /// <param name="WMIObject">The WMI object.</param>
     public CCM_Policy(PSObject WMIObject)
     {
-      this.__CLASS = WMIObject.Properties[nameof (__CLASS)].Value as string;
-      this.__NAMESPACE = WMIObject.Properties[nameof (__NAMESPACE)].Value as string;
-      this.__RELPATH = WMIObject.Properties[nameof (__RELPATH)].Value as string;
+      this.__CLASS = common.ManagementProperty(WMIObject, nameof (__CLASS));
+      this.__NAMESPACE = common.ManagementProperty(WMIObject, nameof (__NAMESPACE));
+      this.__RELPATH = common.ManagementProperty(WMIObject, nameof (__RELPATH));
       this.__INSTANCE = true;
       this.WMIObject = WMIObject;
     }
@@ -981,27 +981,27 @@ public class softwaredistribution : baseInit
       this.remoteRunspace = RemoteRunspace;
       this.pSCode = PSCode;
       this.oNewBase = new baseInit(this.remoteRunspace, this.pSCode);
-      this.__CLASS = WMIObject.Properties["__CLASS"].Value as string;
-      this.__NAMESPACE = WMIObject.Properties["__NAMESPACE"].Value as string;
-      this.__RELPATH = WMIObject.Properties["__RELPATH"].Value as string;
+      this.__CLASS = common.ManagementProperty(WMIObject, "__CLASS");
+      this.__NAMESPACE = common.ManagementProperty(WMIObject, "__NAMESPACE");
+      this.__RELPATH = common.ManagementProperty(WMIObject, "__RELPATH");
       this.__INSTANCE = true;
       this.WMIObject = WMIObject;
-      string activeTimeDmtf = WMIObject.Properties[nameof (ADV_ActiveTime)].Value as string;
-      this.ADV_ActiveTime = !string.IsNullOrEmpty(activeTimeDmtf) ? new DateTime?(common.DmtfToDateTime(activeTimeDmtf)) : new DateTime?();
+      object activeTimeDmtf = WMIObject.Properties[nameof (ADV_ActiveTime)]?.Value;
+      this.ADV_ActiveTime = !common.IsMissingDate(activeTimeDmtf) ? new DateTime?(common.DmtfToDateTime(activeTimeDmtf)) : new DateTime?();
       this.ADV_ActiveTimeIsGMT = WMIObject.Properties[nameof (ADV_ActiveTimeIsGMT)].Value as bool?;
       this.ADV_ADF_Published = WMIObject.Properties[nameof (ADV_ADF_Published)].Value as bool?;
       this.ADV_ADF_RunNotification = WMIObject.Properties[nameof (ADV_ADF_RunNotification)].Value as bool?;
       this.ADV_AdvertisementID = WMIObject.Properties[nameof (ADV_AdvertisementID)].Value as string;
-      string expirationTimeDmtf = WMIObject.Properties[nameof (ADV_ExpirationTime)].Value as string;
-      this.ADV_ExpirationTime = !string.IsNullOrEmpty(expirationTimeDmtf) ? new DateTime?(common.DmtfToDateTime(expirationTimeDmtf)) : new DateTime?();
+      object expirationTimeDmtf = WMIObject.Properties[nameof (ADV_ExpirationTime)]?.Value;
+      this.ADV_ExpirationTime = !common.IsMissingDate(expirationTimeDmtf) ? new DateTime?(common.DmtfToDateTime(expirationTimeDmtf)) : new DateTime?();
       this.ADV_ExpirationTimeIsGMT = WMIObject.Properties[nameof (ADV_ExpirationTimeIsGMT)].Value as bool?;
       this.ADV_FirstRunBehavior = WMIObject.Properties[nameof (ADV_FirstRunBehavior)].Value as string;
       this.ADV_MandatoryAssignments = WMIObject.Properties[nameof (ADV_MandatoryAssignments)].Value as bool?;
       this.ADV_ProgramWindowIsGMT = WMIObject.Properties[nameof (ADV_ProgramWindowIsGMT)].Value as bool?;
-      string windowStartDmtf = WMIObject.Properties[nameof (ADV_ProgramWindowStartTime)].Value as string;
-      this.ADV_ProgramWindowStartTime = !string.IsNullOrEmpty(windowStartDmtf) ? new DateTime?(common.DmtfToDateTime(windowStartDmtf)) : new DateTime?();
-      string windowStopDmtf = WMIObject.Properties[nameof (ADV_ProgramWindowStopTime)].Value as string;
-      this.ADV_ProgramWindowStopTime = !string.IsNullOrEmpty(windowStopDmtf) ? new DateTime?(common.DmtfToDateTime(windowStopDmtf)) : new DateTime?();
+      object windowStartDmtf = WMIObject.Properties[nameof (ADV_ProgramWindowStartTime)]?.Value;
+      this.ADV_ProgramWindowStartTime = !common.IsMissingDate(windowStartDmtf) ? new DateTime?(common.DmtfToDateTime(windowStartDmtf)) : new DateTime?();
+      object windowStopDmtf = WMIObject.Properties[nameof (ADV_ProgramWindowStopTime)]?.Value;
+      this.ADV_ProgramWindowStopTime = !common.IsMissingDate(windowStopDmtf) ? new DateTime?(common.DmtfToDateTime(windowStopDmtf)) : new DateTime?();
       this.ADV_RCF_InstallFromCDOptions = WMIObject.Properties[nameof (ADV_RCF_InstallFromCDOptions)].Value as string;
       this.ADV_RCF_InstallFromLocalDPOptions = WMIObject.Properties[nameof (ADV_RCF_InstallFromLocalDPOptions)].Value as string;
       this.ADV_RCF_InstallFromRemoteDPOptions = WMIObject.Properties[nameof (ADV_RCF_InstallFromRemoteDPOptions)].Value as string;
@@ -1202,7 +1202,7 @@ public class softwaredistribution : baseInit
         XmlDocument xmlDocument = new XmlDocument();
         xmlDocument.LoadXml(this.PRG_Requirements);
         string str = xmlDocument.SelectSingleNode("/SWDReserved/ScheduledMessageID").InnerText.ToString();
-        foreach (PSObject WMIObject in this.oNewBase.GetObjects(this.WMIObject.Properties["__NAMESPACE"].Value.ToString(), $"SELECT * FROM CCM_Scheduler_ScheduledMessage WHERE ScheduledMessageID='{str}'"))
+        foreach (PSObject WMIObject in this.oNewBase.GetObjects(common.ManagementProperty(this.WMIObject, "__NAMESPACE"), $"SELECT * FROM CCM_Scheduler_ScheduledMessage WHERE ScheduledMessageID='{str}'"))
         {
           try
           {
@@ -1284,15 +1284,15 @@ public class softwaredistribution : baseInit
     {
       this.remoteRunspace = RemoteRunspace;
       this.pSCode = PSCode;
-      this.__CLASS = WMIObject.Properties["__CLASS"].Value as string;
-      this.__NAMESPACE = WMIObject.Properties["__NAMESPACE"].Value as string;
-      this.__RELPATH = WMIObject.Properties["__RELPATH"].Value as string;
+      this.__CLASS = common.ManagementProperty(WMIObject, "__CLASS");
+      this.__NAMESPACE = common.ManagementProperty(WMIObject, "__NAMESPACE");
+      this.__RELPATH = common.ManagementProperty(WMIObject, "__RELPATH");
       this.__INSTANCE = true;
       this.WMIObject = WMIObject;
       this.Reserved = WMIObject.Properties[nameof (Reserved)].Value as string;
       this.TS_BootImageID = WMIObject.Properties[nameof (TS_BootImageID)].Value as string;
-      string tsDeadlineDmtf = WMIObject.Properties[nameof (TS_Deadline)].Value as string;
-      this.TS_Deadline = !string.IsNullOrEmpty(tsDeadlineDmtf) ? new DateTime?(common.DmtfToDateTime(tsDeadlineDmtf)) : new DateTime?();
+      object tsDeadlineDmtf = WMIObject.Properties[nameof (TS_Deadline)]?.Value;
+      this.TS_Deadline = !common.IsMissingDate(tsDeadlineDmtf) ? new DateTime?(common.DmtfToDateTime(tsDeadlineDmtf)) : new DateTime?();
       this.TS_MandatoryCountdown = WMIObject.Properties[nameof (TS_MandatoryCountdown)].Value as uint?;
       this.TS_PopupReminderInterval = WMIObject.Properties[nameof (TS_PopupReminderInterval)].Value as uint?;
       this.TS_References = WMIObject.Properties[nameof (TS_References)].Value as string[];
@@ -1335,13 +1335,13 @@ public class softwaredistribution : baseInit
     {
       this.remoteRunspace = RemoteRunspace;
       this.pSCode = PSCode;
-      this.__CLASS = WMIObject.Properties[nameof (__CLASS)].Value as string;
-      this.__NAMESPACE = WMIObject.Properties[nameof (__NAMESPACE)].Value as string;
-      this.__RELPATH = WMIObject.Properties[nameof (__RELPATH)].Value as string;
+      this.__CLASS = common.ManagementProperty(WMIObject, nameof (__CLASS));
+      this.__NAMESPACE = common.ManagementProperty(WMIObject, nameof (__NAMESPACE));
+      this.__RELPATH = common.ManagementProperty(WMIObject, nameof (__RELPATH));
       this.__INSTANCE = true;
       this.WMIObject = WMIObject;
-      string activationDmtf = WMIObject.Properties[nameof (ActivationTime)].Value as string;
-      this.ActivationTime = !string.IsNullOrEmpty(activationDmtf) ? new DateTime?(common.DmtfToDateTime(activationDmtf)) : new DateTime?();
+      object activationDmtf = WMIObject.Properties[nameof (ActivationTime)]?.Value;
+      this.ActivationTime = !common.IsMissingDate(activationDmtf) ? new DateTime?(common.DmtfToDateTime(activationDmtf)) : new DateTime?();
       this.AdvertisedDirectly = WMIObject.Properties[nameof (AdvertisedDirectly)].Value as bool?;
       this.Categories = WMIObject.Properties[nameof (Categories)].Value as string[];
       this.CompletionAction = WMIObject.Properties[nameof (CompletionAction)].Value as uint?;
@@ -1350,14 +1350,14 @@ public class softwaredistribution : baseInit
       this.DependentProgramID = WMIObject.Properties[nameof (DependentProgramID)].Value as string;
       this.DiskSpaceRequired = WMIObject.Properties[nameof (DiskSpaceRequired)].Value as string;
       this.Duration = WMIObject.Properties[nameof (Duration)].Value as uint?;
-      string expirationDmtf = WMIObject.Properties[nameof (ExpirationTime)].Value as string;
-      this.ExpirationTime = !string.IsNullOrEmpty(expirationDmtf) ? new DateTime?(common.DmtfToDateTime(expirationDmtf)) : new DateTime?();
+      object expirationDmtf = WMIObject.Properties[nameof (ExpirationTime)]?.Value;
+      this.ExpirationTime = !common.IsMissingDate(expirationDmtf) ? new DateTime?(common.DmtfToDateTime(expirationDmtf)) : new DateTime?();
       this.ForceDependencyToRun = WMIObject.Properties[nameof (ForceDependencyToRun)].Value as bool?;
       this.HighImpact = WMIObject.Properties[nameof (HighImpact)].Value as bool?;
       this.LastExitCode = WMIObject.Properties[nameof (LastExitCode)].Value as uint?;
       this.LastRunStatus = WMIObject.Properties[nameof (LastRunStatus)].Value as string;
-      string lastRunDmtf = WMIObject.Properties[nameof (LastRunTime)].Value as string;
-      this.LastRunTime = !string.IsNullOrEmpty(lastRunDmtf) ? new DateTime?(common.DmtfToDateTime(lastRunDmtf)) : new DateTime?();
+      object lastRunDmtf = WMIObject.Properties[nameof (LastRunTime)]?.Value;
+      this.LastRunTime = !common.IsMissingDate(lastRunDmtf) ? new DateTime?(common.DmtfToDateTime(lastRunDmtf)) : new DateTime?();
       this.Level = WMIObject.Properties[nameof (Level)].Value as uint?;
       this.NotifyUser = WMIObject.Properties[nameof (NotifyUser)].Value as bool?;
       this.PackageID = WMIObject.Properties[nameof (PackageID)].Value as string;
@@ -1465,19 +1465,19 @@ public class softwaredistribution : baseInit
     {
       this.remoteRunspace = RemoteRunspace;
       this.pSCode = PSCode;
-      this.__CLASS = WMIObject.Properties["__CLASS"].Value as string;
-      this.__NAMESPACE = WMIObject.Properties["__NAMESPACE"].Value as string;
-      this.__RELPATH = WMIObject.Properties["__RELPATH"].Value as string;
+      this.__CLASS = common.ManagementProperty(WMIObject, "__CLASS");
+      this.__NAMESPACE = common.ManagementProperty(WMIObject, "__NAMESPACE");
+      this.__RELPATH = common.ManagementProperty(WMIObject, "__RELPATH");
       this.__INSTANCE = true;
       this.WMIObject = WMIObject;
       this.ActiveMessage = WMIObject.Properties[nameof (ActiveMessage)].Value as string;
-      string activeTimeDmtf = WMIObject.Properties[nameof (ActiveTime)].Value as string;
-      this.ActiveTime = !string.IsNullOrEmpty(activeTimeDmtf) ? new DateTime?(common.DmtfToDateTime(activeTimeDmtf)) : new DateTime?();
+      object activeTimeDmtf = WMIObject.Properties[nameof (ActiveTime)]?.Value;
+      this.ActiveTime = !common.IsMissingDate(activeTimeDmtf) ? new DateTime?(common.DmtfToDateTime(activeTimeDmtf)) : new DateTime?();
       this.ActiveTimeIsGMT = WMIObject.Properties[nameof (ActiveTimeIsGMT)].Value as bool?;
       this.DeliverMode = WMIObject.Properties[nameof (DeliverMode)].Value as string;
       this.ExpireMessage = WMIObject.Properties[nameof (ExpireMessage)].Value as string;
-      string expireTimeDmtf = WMIObject.Properties[nameof (ExpireTime)].Value as string;
-      this.ExpireTime = !string.IsNullOrEmpty(expireTimeDmtf) ? new DateTime?(common.DmtfToDateTime(expireTimeDmtf)) : new DateTime?();
+      object expireTimeDmtf = WMIObject.Properties[nameof (ExpireTime)]?.Value;
+      this.ExpireTime = !common.IsMissingDate(expireTimeDmtf) ? new DateTime?(common.DmtfToDateTime(expireTimeDmtf)) : new DateTime?();
       this.ExpireTimeIsGMT = WMIObject.Properties[nameof (ExpireTimeIsGMT)].Value as bool?;
       this.MessageName = WMIObject.Properties[nameof (MessageName)].Value as string;
       this.MessageTimeout = WMIObject.Properties[nameof (MessageTimeout)].Value as string;
@@ -1536,21 +1536,21 @@ public class softwaredistribution : baseInit
     {
       this.remoteRunspace = RemoteRunspace;
       this.pSCode = PSCode;
-      this.__CLASS = WMIObject.Properties[nameof (__CLASS)].Value as string;
-      this.__NAMESPACE = WMIObject.Properties[nameof (__NAMESPACE)].Value as string;
-      this.__RELPATH = WMIObject.Properties[nameof (__RELPATH)].Value as string;
+      this.__CLASS = common.ManagementProperty(WMIObject, nameof (__CLASS));
+      this.__NAMESPACE = common.ManagementProperty(WMIObject, nameof (__NAMESPACE));
+      this.__RELPATH = common.ManagementProperty(WMIObject, nameof (__RELPATH));
       this.__INSTANCE = true;
       this.WMIObject = WMIObject;
-      string activationSentDmtf = WMIObject.Properties[nameof (ActivationMessageSent)].Value as string;
-      this.ActivationMessageSent = !string.IsNullOrEmpty(activationSentDmtf) ? new DateTime?(common.DmtfToDateTime(activationSentDmtf)) : new DateTime?();
+      object activationSentDmtf = WMIObject.Properties[nameof (ActivationMessageSent)]?.Value;
+      this.ActivationMessageSent = !common.IsMissingDate(activationSentDmtf) ? new DateTime?(common.DmtfToDateTime(activationSentDmtf)) : new DateTime?();
       this.ActivationMessageSentIsGMT = WMIObject.Properties[nameof (ActivationMessageSentIsGMT)].Value as bool?;
-      string expirationSentDmtf = WMIObject.Properties[nameof (ExpirationMessageSent)].Value as string;
-      this.ExpirationMessageSent = !string.IsNullOrEmpty(expirationSentDmtf) ? new DateTime?(common.DmtfToDateTime(expirationSentDmtf)) : new DateTime?();
+      object expirationSentDmtf = WMIObject.Properties[nameof (ExpirationMessageSent)]?.Value;
+      this.ExpirationMessageSent = !common.IsMissingDate(expirationSentDmtf) ? new DateTime?(common.DmtfToDateTime(expirationSentDmtf)) : new DateTime?();
       this.ExpirationMessageSentIsGMT = WMIObject.Properties[nameof (ExpirationMessageSentIsGMT)].Value as bool?;
-      string firstEvalDmtf = WMIObject.Properties[nameof (FirstEvalTime)].Value as string;
-      this.FirstEvalTime = !string.IsNullOrEmpty(firstEvalDmtf) ? new DateTime?(common.DmtfToDateTime(firstEvalDmtf)) : new DateTime?();
-      string lastTriggerDmtf = WMIObject.Properties[nameof (LastTriggerTime)].Value as string;
-      this.LastTriggerTime = !string.IsNullOrEmpty(lastTriggerDmtf) ? new DateTime?(common.DmtfToDateTime(lastTriggerDmtf)) : new DateTime?();
+      object firstEvalDmtf = WMIObject.Properties[nameof (FirstEvalTime)]?.Value;
+      this.FirstEvalTime = !common.IsMissingDate(firstEvalDmtf) ? new DateTime?(common.DmtfToDateTime(firstEvalDmtf)) : new DateTime?();
+      object lastTriggerDmtf = WMIObject.Properties[nameof (LastTriggerTime)]?.Value;
+      this.LastTriggerTime = !common.IsMissingDate(lastTriggerDmtf) ? new DateTime?(common.DmtfToDateTime(lastTriggerDmtf)) : new DateTime?();
       this.ScheduleID = WMIObject.Properties[nameof (ScheduleID)].Value as string;
       this.TriggerState = WMIObject.Properties[nameof (TriggerState)].Value as string;
       this.UserSID = WMIObject.Properties[nameof (UserSID)].Value as string;
@@ -1602,9 +1602,9 @@ public class softwaredistribution : baseInit
     {
       this.remoteRunspace = RemoteRunspace;
       this.pSCode = PSCode;
-      this.__CLASS = WMIObject.Properties[nameof (__CLASS)].Value as string;
-      this.__NAMESPACE = WMIObject.Properties[nameof (__NAMESPACE)].Value as string;
-      this.__RELPATH = WMIObject.Properties[nameof (__RELPATH)].Value as string;
+      this.__CLASS = common.ManagementProperty(WMIObject, nameof (__CLASS));
+      this.__NAMESPACE = common.ManagementProperty(WMIObject, nameof (__NAMESPACE));
+      this.__RELPATH = common.ManagementProperty(WMIObject, nameof (__RELPATH));
       this.__INSTANCE = true;
       this.WMIObject = WMIObject;
       this.ArticleID = WMIObject.Properties[nameof (ArticleID)].Value as string;
@@ -1615,10 +1615,10 @@ public class softwaredistribution : baseInit
       this.NotifyUser = WMIObject.Properties[nameof (NotifyUser)].Value as bool?;
       this.OverrideServiceWindows = WMIObject.Properties[nameof (OverrideServiceWindows)].Value as bool?;
       this.RebootOutsideServiceWindows = WMIObject.Properties[nameof (RebootOutsideServiceWindows)].Value as bool?;
-      string restartDeadlineDmtf = WMIObject.Properties[nameof (RestartDeadline)].Value as string;
-      this.RestartDeadline = !string.IsNullOrEmpty(restartDeadlineDmtf) ? new DateTime?(common.DmtfToDateTime(restartDeadlineDmtf)) : new DateTime?();
-      string startTimeDmtf = WMIObject.Properties[nameof (StartTime)].Value as string;
-      this.StartTime = !string.IsNullOrEmpty(startTimeDmtf) ? new DateTime?(common.DmtfToDateTime(startTimeDmtf)) : new DateTime?();
+      object restartDeadlineDmtf = WMIObject.Properties[nameof (RestartDeadline)]?.Value;
+      this.RestartDeadline = !common.IsMissingDate(restartDeadlineDmtf) ? new DateTime?(common.DmtfToDateTime(restartDeadlineDmtf)) : new DateTime?();
+      object startTimeDmtf = WMIObject.Properties[nameof (StartTime)]?.Value;
+      this.StartTime = !common.IsMissingDate(startTimeDmtf) ? new DateTime?(common.DmtfToDateTime(startTimeDmtf)) : new DateTime?();
       this.UpdateID = WMIObject.Properties[nameof (UpdateID)].Value as string;
       this.URL = WMIObject.Properties[nameof (URL)].Value as string;
       this.UserUIExperience = WMIObject.Properties[nameof (UserUIExperience)].Value as bool?;
@@ -2200,9 +2200,9 @@ public class softwaredistribution : baseInit
     {
       this.remoteRunspace = RemoteRunspace;
       this.pSCode = PSCode;
-      this.__CLASS = WMIObject.Properties[nameof (__CLASS)].Value as string;
-      this.__NAMESPACE = WMIObject.Properties[nameof (__NAMESPACE)].Value as string;
-      this.__RELPATH = WMIObject.Properties[nameof (__RELPATH)].Value as string;
+      this.__CLASS = common.ManagementProperty(WMIObject, nameof (__CLASS));
+      this.__NAMESPACE = common.ManagementProperty(WMIObject, nameof (__NAMESPACE));
+      this.__RELPATH = common.ManagementProperty(WMIObject, nameof (__RELPATH));
       this.__INSTANCE = true;
       this.WMIObject = WMIObject;
       this.ClassName = WMIObject.Properties[nameof (ClassName)].Value as string;
@@ -2240,9 +2240,9 @@ public class softwaredistribution : baseInit
     {
       this.remoteRunspace = RemoteRunspace;
       this.pSCode = PSCode;
-      this.__CLASS = WMIObject.Properties[nameof (__CLASS)].Value as string;
-      this.__NAMESPACE = WMIObject.Properties[nameof (__NAMESPACE)].Value as string;
-      this.__RELPATH = WMIObject.Properties[nameof (__RELPATH)].Value as string;
+      this.__CLASS = common.ManagementProperty(WMIObject, nameof (__CLASS));
+      this.__NAMESPACE = common.ManagementProperty(WMIObject, nameof (__NAMESPACE));
+      this.__RELPATH = common.ManagementProperty(WMIObject, nameof (__RELPATH));
       this.__INSTANCE = true;
       this.WMIObject = WMIObject;
       this.ActionType = WMIObject.Properties[nameof (ActionType)].Value as string;
@@ -2296,9 +2296,9 @@ public class softwaredistribution : baseInit
     {
       this.remoteRunspace = RemoteRunspace;
       this.pSCode = PSCode;
-      this.__CLASS = WMIObject.Properties[nameof (__CLASS)].Value as string;
-      this.__NAMESPACE = WMIObject.Properties[nameof (__NAMESPACE)].Value as string;
-      this.__RELPATH = WMIObject.Properties[nameof (__RELPATH)].Value as string;
+      this.__CLASS = common.ManagementProperty(WMIObject, nameof (__CLASS));
+      this.__NAMESPACE = common.ManagementProperty(WMIObject, nameof (__NAMESPACE));
+      this.__RELPATH = common.ManagementProperty(WMIObject, nameof (__RELPATH));
       this.__INSTANCE = true;
       this.WMIObject = WMIObject;
       this.AllowedTarget = WMIObject.Properties[nameof (AllowedTarget)].Value as string;
@@ -2375,9 +2375,9 @@ public class softwaredistribution : baseInit
     {
       this.remoteRunspace = RemoteRunspace;
       this.pSCode = PSCode;
-      this.__CLASS = WMIObject.Properties[nameof (__CLASS)].Value as string;
-      this.__NAMESPACE = WMIObject.Properties[nameof (__NAMESPACE)].Value as string;
-      this.__RELPATH = WMIObject.Properties[nameof (__RELPATH)].Value as string;
+      this.__CLASS = common.ManagementProperty(WMIObject, nameof (__CLASS));
+      this.__NAMESPACE = common.ManagementProperty(WMIObject, nameof (__NAMESPACE));
+      this.__RELPATH = common.ManagementProperty(WMIObject, nameof (__RELPATH));
       this.__INSTANCE = true;
       this.WMIObject = WMIObject;
       this.AppDeliveryTypeId = WMIObject.Properties[nameof (AppDeliveryTypeId)].Value as string;
@@ -2427,9 +2427,9 @@ public class softwaredistribution : baseInit
     {
       this.remoteRunspace = RemoteRunspace;
       this.pSCode = PSCode;
-      this.__CLASS = WMIObject.Properties[nameof (__CLASS)].Value as string;
-      this.__NAMESPACE = WMIObject.Properties[nameof (__NAMESPACE)].Value as string;
-      this.__RELPATH = WMIObject.Properties[nameof (__RELPATH)].Value as string;
+      this.__CLASS = common.ManagementProperty(WMIObject, nameof (__CLASS));
+      this.__NAMESPACE = common.ManagementProperty(WMIObject, nameof (__NAMESPACE));
+      this.__RELPATH = common.ManagementProperty(WMIObject, nameof (__RELPATH));
       this.__INSTANCE = true;
       this.WMIObject = WMIObject;
       this.AppDeliveryTypeId = WMIObject.Properties[nameof (AppDeliveryTypeId)].Value as string;
@@ -2478,9 +2478,9 @@ public class softwaredistribution : baseInit
     {
       this.remoteRunspace = RemoteRunspace;
       this.pSCode = PSCode;
-      this.__CLASS = WMIObject.Properties[nameof (__CLASS)].Value as string;
-      this.__NAMESPACE = WMIObject.Properties[nameof (__NAMESPACE)].Value as string;
-      this.__RELPATH = WMIObject.Properties[nameof (__RELPATH)].Value as string;
+      this.__CLASS = common.ManagementProperty(WMIObject, nameof (__CLASS));
+      this.__NAMESPACE = common.ManagementProperty(WMIObject, nameof (__NAMESPACE));
+      this.__RELPATH = common.ManagementProperty(WMIObject, nameof (__RELPATH));
       this.__INSTANCE = true;
       this.WMIObject = WMIObject;
       this.AppDeliveryTypeId = WMIObject.Properties[nameof (AppDeliveryTypeId)].Value as string;
@@ -2538,9 +2538,9 @@ public class softwaredistribution : baseInit
     {
       this.remoteRunspace = RemoteRunspace;
       this.pSCode = PSCode;
-      this.__CLASS = WMIObject.Properties[nameof (__CLASS)].Value as string;
-      this.__NAMESPACE = WMIObject.Properties[nameof (__NAMESPACE)].Value as string;
-      this.__RELPATH = WMIObject.Properties[nameof (__RELPATH)].Value as string;
+      this.__CLASS = common.ManagementProperty(WMIObject, nameof (__CLASS));
+      this.__NAMESPACE = common.ManagementProperty(WMIObject, nameof (__NAMESPACE));
+      this.__RELPATH = common.ManagementProperty(WMIObject, nameof (__RELPATH));
       this.__INSTANCE = true;
       this.WMIObject = WMIObject;
       this.AppDeliveryTypeId = WMIObject.Properties[nameof (AppDeliveryTypeId)].Value as string;
@@ -2616,9 +2616,9 @@ public class softwaredistribution : baseInit
     {
       this.remoteRunspace = RemoteRunspace;
       this.pSCode = PSCode;
-      this.__CLASS = WMIObject.Properties[nameof (__CLASS)].Value as string;
-      this.__NAMESPACE = WMIObject.Properties[nameof (__NAMESPACE)].Value as string;
-      this.__RELPATH = WMIObject.Properties[nameof (__RELPATH)].Value as string;
+      this.__CLASS = common.ManagementProperty(WMIObject, nameof (__CLASS));
+      this.__NAMESPACE = common.ManagementProperty(WMIObject, nameof (__NAMESPACE));
+      this.__RELPATH = common.ManagementProperty(WMIObject, nameof (__RELPATH));
       this.__INSTANCE = true;
       this.WMIObject = WMIObject;
       this.ActionType = WMIObject.Properties[nameof (ActionType)].Value as string;
@@ -2665,9 +2665,9 @@ public class softwaredistribution : baseInit
     {
       this.remoteRunspace = RemoteRunspace;
       this.pSCode = PSCode;
-      this.__CLASS = WMIObject.Properties[nameof (__CLASS)].Value as string;
-      this.__NAMESPACE = WMIObject.Properties[nameof (__NAMESPACE)].Value as string;
-      this.__RELPATH = WMIObject.Properties[nameof (__RELPATH)].Value as string;
+      this.__CLASS = common.ManagementProperty(WMIObject, nameof (__CLASS));
+      this.__NAMESPACE = common.ManagementProperty(WMIObject, nameof (__NAMESPACE));
+      this.__RELPATH = common.ManagementProperty(WMIObject, nameof (__RELPATH));
       this.__INSTANCE = true;
       this.WMIObject = WMIObject;
       this.ContentId = WMIObject.Properties[nameof (ContentId)].Value as string;
@@ -2708,9 +2708,9 @@ public class softwaredistribution : baseInit
     {
       this.remoteRunspace = RemoteRunspace;
       this.pSCode = PSCode;
-      this.__CLASS = WMIObject.Properties[nameof (__CLASS)].Value as string;
-      this.__NAMESPACE = WMIObject.Properties[nameof (__NAMESPACE)].Value as string;
-      this.__RELPATH = WMIObject.Properties[nameof (__RELPATH)].Value as string;
+      this.__CLASS = common.ManagementProperty(WMIObject, nameof (__CLASS));
+      this.__NAMESPACE = common.ManagementProperty(WMIObject, nameof (__NAMESPACE));
+      this.__RELPATH = common.ManagementProperty(WMIObject, nameof (__RELPATH));
       this.__INSTANCE = true;
       this.WMIObject = WMIObject;
       try
@@ -2734,10 +2734,10 @@ public class softwaredistribution : baseInit
       this.DesiredConfigType = WMIObject.Properties[nameof (DesiredConfigType)].Value as uint?;
       this.DisableMomAlerts = WMIObject.Properties[nameof (DisableMomAlerts)].Value as bool?;
       this.DPLocality = WMIObject.Properties[nameof (DPLocality)].Value as uint?;
-      string enforcementDmtf = WMIObject.Properties[nameof (EnforcementDeadline)].Value as string;
-      this.EnforcementDeadline = !string.IsNullOrEmpty(enforcementDmtf) ? new DateTime?(common.DmtfToDateTime(enforcementDmtf)) : new DateTime?();
-      string expirationDmtf = WMIObject.Properties[nameof (ExpirationTime)].Value as string;
-      this.ExpirationTime = !string.IsNullOrEmpty(expirationDmtf) ? new DateTime?(common.DmtfToDateTime(expirationDmtf)) : new DateTime?();
+      object enforcementDmtf = WMIObject.Properties[nameof (EnforcementDeadline)]?.Value;
+      this.EnforcementDeadline = !common.IsMissingDate(enforcementDmtf) ? new DateTime?(common.DmtfToDateTime(enforcementDmtf)) : new DateTime?();
+      object expirationDmtf = WMIObject.Properties[nameof (ExpirationTime)]?.Value;
+      this.ExpirationTime = !common.IsMissingDate(expirationDmtf) ? new DateTime?(common.DmtfToDateTime(expirationDmtf)) : new DateTime?();
       this.LogComplianceToWinEvent = WMIObject.Properties[nameof (LogComplianceToWinEvent)].Value as bool?;
       this.NonComplianceCriticality = WMIObject.Properties[nameof (NonComplianceCriticality)].Value as uint?;
       this.NotifyUser = WMIObject.Properties[nameof (NotifyUser)].Value as bool?;
@@ -2751,12 +2751,12 @@ public class softwaredistribution : baseInit
       this.SendDetailedNonComplianceStatus = WMIObject.Properties[nameof (SendDetailedNonComplianceStatus)].Value as bool?;
       this.SettingTypes = WMIObject.Properties[nameof (SettingTypes)].Value as string;
       this.SoftDeadlineEnabled = WMIObject.Properties[nameof (SoftDeadlineEnabled)].Value as bool?;
-      string startTimeDmtf = WMIObject.Properties[nameof (StartTime)].Value as string;
-      this.StartTime = !string.IsNullOrEmpty(startTimeDmtf) ? new DateTime?(common.DmtfToDateTime(startTimeDmtf)) : new DateTime?();
+      object startTimeDmtf = WMIObject.Properties[nameof (StartTime)]?.Value;
+      this.StartTime = !common.IsMissingDate(startTimeDmtf) ? new DateTime?(common.DmtfToDateTime(startTimeDmtf)) : new DateTime?();
       this.StateMessagePriority = WMIObject.Properties[nameof (StateMessagePriority)].Value as uint?;
       this.SuppressReboot = WMIObject.Properties[nameof (SuppressReboot)].Value as uint?;
-      string updateDeadlineDmtf = WMIObject.Properties[nameof (UpdateDeadline)].Value as string;
-      this.UpdateDeadline = !string.IsNullOrEmpty(updateDeadlineDmtf) ? new DateTime?(common.DmtfToDateTime(updateDeadlineDmtf)) : new DateTime?();
+      object updateDeadlineDmtf = WMIObject.Properties[nameof (UpdateDeadline)]?.Value;
+      this.UpdateDeadline = !common.IsMissingDate(updateDeadlineDmtf) ? new DateTime?(common.DmtfToDateTime(updateDeadlineDmtf)) : new DateTime?();
       this.UseGMTTimes = WMIObject.Properties[nameof (UseGMTTimes)].Value as bool?;
       this.UseSiteEvaluation = WMIObject.Properties[nameof (UseSiteEvaluation)].Value as bool?;
       this.WoLEnabled = WMIObject.Properties[nameof (WoLEnabled)].Value as bool?;
@@ -2853,9 +2853,9 @@ public class softwaredistribution : baseInit
     {
       this.remoteRunspace = RemoteRunspace;
       this.pSCode = PSCode;
-      this.__CLASS = WMIObject.Properties[nameof (__CLASS)].Value as string;
-      this.__NAMESPACE = WMIObject.Properties[nameof (__NAMESPACE)].Value as string;
-      this.__RELPATH = WMIObject.Properties[nameof (__RELPATH)].Value as string;
+      this.__CLASS = common.ManagementProperty(WMIObject, nameof (__CLASS));
+      this.__NAMESPACE = common.ManagementProperty(WMIObject, nameof (__NAMESPACE));
+      this.__RELPATH = common.ManagementProperty(WMIObject, nameof (__RELPATH));
       this.__INSTANCE = true;
       this.WMIObject = WMIObject;
       this.Priority = WMIObject.Properties[nameof (Priority)].Value as uint?;

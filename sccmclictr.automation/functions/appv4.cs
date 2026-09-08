@@ -1,4 +1,4 @@
-﻿// Decompiled with JetBrains decompiler
+// Decompiled with JetBrains decompiler
 // Type: sccmclictr.automation.functions.appv4
 // Assembly: sccmclictr.automation, Version=1.0.1.0, Culture=neutral, PublicKeyToken=null
 // MVID: 96476B75-C789-4A0A-9F55-EBB7DB29E9AB
@@ -97,15 +97,15 @@ public class appv4 : baseInit
     {
       this.remoteRunspace = RemoteRunspace;
       this.pSCode = PSCode;
-      this.__CLASS = WMIObject.Properties[nameof (__CLASS)].Value as string;
-      this.__NAMESPACE = WMIObject.Properties[nameof (__NAMESPACE)].Value as string;
-      this.__RELPATH = WMIObject.Properties[nameof (__RELPATH)].Value as string;
+      this.__CLASS = common.ManagementProperty(WMIObject, nameof (__CLASS));
+      this.__NAMESPACE = common.ManagementProperty(WMIObject, nameof (__NAMESPACE));
+      this.__RELPATH = common.ManagementProperty(WMIObject, nameof (__RELPATH));
       this.__INSTANCE = true;
       this.WMIObject = WMIObject;
       this.CachedOsdPath = WMIObject.Properties[nameof (CachedOsdPath)].Value as string;
       this.GlobalRunningCount = WMIObject.Properties[nameof (GlobalRunningCount)].Value as uint?;
-      string dmtfDate = WMIObject.Properties[nameof (LastLaunchOnSystem)].Value as string;
-      this.LastLaunchOnSystem = !string.IsNullOrEmpty(dmtfDate) ? new DateTime?(common.DmtfToDateTime(dmtfDate)) : new DateTime?();
+      object dmtfDate = WMIObject.Properties[nameof (LastLaunchOnSystem)]?.Value;
+      this.LastLaunchOnSystem = !common.IsMissingDate(dmtfDate) ? new DateTime?(common.DmtfToDateTime(dmtfDate)) : new DateTime?();
       this.Loading = WMIObject.Properties[nameof (Loading)].Value as bool?;
       this.Name = WMIObject.Properties[nameof (Name)].Value as string;
       this.OriginalOsdPath = WMIObject.Properties[nameof (OriginalOsdPath)].Value as string;
@@ -156,9 +156,9 @@ public class appv4 : baseInit
     {
       this.remoteRunspace = RemoteRunspace;
       this.pSCode = PSCode;
-      this.__CLASS = WMIObject.Properties[nameof (__CLASS)].Value as string;
-      this.__NAMESPACE = WMIObject.Properties[nameof (__NAMESPACE)].Value as string;
-      this.__RELPATH = WMIObject.Properties[nameof (__RELPATH)].Value as string;
+      this.__CLASS = common.ManagementProperty(WMIObject, nameof (__CLASS));
+      this.__NAMESPACE = common.ManagementProperty(WMIObject, nameof (__NAMESPACE));
+      this.__RELPATH = common.ManagementProperty(WMIObject, nameof (__RELPATH));
       this.__INSTANCE = true;
       this.WMIObject = WMIObject;
       this.CachedLaunchSize = WMIObject.Properties[nameof (CachedLaunchSize)].Value as ulong?;

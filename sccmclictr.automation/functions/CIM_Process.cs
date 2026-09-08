@@ -1,4 +1,4 @@
-﻿// Decompiled with JetBrains decompiler
+// Decompiled with JetBrains decompiler
 // Type: sccmclictr.automation.functions.CIM_Process
 // Assembly: sccmclictr.automation, Version=1.0.1.0, Culture=neutral, PublicKeyToken=null
 // MVID: 96476B75-C789-4A0A-9F55-EBB7DB29E9AB
@@ -27,14 +27,14 @@ public class CIM_Process : CIM_LogicalElement
   {
     this.remoteRunspace = RemoteRunspace;
     this.pSCode = PSCode;
-    this.__CLASS = WMIObject.Properties["__CLASS"].Value as string;
-    this.__NAMESPACE = WMIObject.Properties["__NAMESPACE"].Value as string;
-    this.__RELPATH = WMIObject.Properties["__RELPATH"].Value as string;
+    this.__CLASS = common.ManagementProperty(WMIObject, "__CLASS");
+    this.__NAMESPACE = common.ManagementProperty(WMIObject, "__NAMESPACE");
+    this.__RELPATH = common.ManagementProperty(WMIObject, "__RELPATH");
     this.__INSTANCE = true;
     this.WMIObject = WMIObject;
     this.CreationClassName = WMIObject.Properties[nameof (CreationClassName)].Value as string;
-    string dmtfDate1 = WMIObject.Properties[nameof (CreationDate)].Value as string;
-    this.CreationDate = !string.IsNullOrEmpty(dmtfDate1) ? new DateTime?(common.DmtfToDateTime(dmtfDate1)) : new DateTime?();
+    object dmtfDate1 = WMIObject.Properties[nameof (CreationDate)]?.Value;
+    this.CreationDate = !common.IsMissingDate(dmtfDate1) ? new DateTime?(common.DmtfToDateTime(dmtfDate1)) : new DateTime?();
     this.CSCreationClassName = WMIObject.Properties[nameof (CSCreationClassName)].Value as string;
     this.CSName = WMIObject.Properties[nameof (CSName)].Value as string;
     this.ExecutionState = WMIObject.Properties[nameof (ExecutionState)].Value as ushort?;
@@ -43,8 +43,8 @@ public class CIM_Process : CIM_LogicalElement
     this.OSCreationClassName = WMIObject.Properties[nameof (OSCreationClassName)].Value as string;
     this.OSName = WMIObject.Properties[nameof (OSName)].Value as string;
     this.Priority = WMIObject.Properties[nameof (Priority)].Value as uint?;
-    string dmtfDate2 = WMIObject.Properties[nameof (TerminationDate)].Value as string;
-    this.TerminationDate = !string.IsNullOrEmpty(dmtfDate2) ? new DateTime?(common.DmtfToDateTime(dmtfDate2)) : new DateTime?();
+    object dmtfDate2 = WMIObject.Properties[nameof (TerminationDate)]?.Value;
+    this.TerminationDate = !common.IsMissingDate(dmtfDate2) ? new DateTime?(common.DmtfToDateTime(dmtfDate2)) : new DateTime?();
     this.UserModeTime = WMIObject.Properties[nameof (UserModeTime)].Value as ulong?;
     this.WorkingSetSize = WMIObject.Properties[nameof (WorkingSetSize)].Value as ulong?;
   }

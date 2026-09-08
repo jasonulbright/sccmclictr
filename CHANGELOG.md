@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased
+
+- Fixed pending/available update models failing on CIM results without WMI metadata.
+- Preserved native CIM dates in update, deployment, inventory and related models.
+- Restored CIM instance metadata and corrected installed-product metadata assignments.
+- Object queries now report provider errors instead of treating errors as result rows.
+- Refresh replaces cached query results and honors the requested cache lifetime.
+- Added compiled-model regression tests and surfaced initial update-load failures.
+
 ## v1.3.0.1 -- Maintained Build & Distribution (2026-09-07)
 
 ### Added

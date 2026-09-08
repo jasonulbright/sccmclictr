@@ -1,4 +1,4 @@
-﻿// Decompiled with JetBrains decompiler
+// Decompiled with JetBrains decompiler
 // Type: sccmclictr.automation.baseInit
 // Assembly: sccmclictr.automation, Version=1.0.1.0, Culture=neutral, PublicKeyToken=null
 // MVID: 96476B75-C789-4A0A-9F55-EBB7DB29E9AB
@@ -717,7 +717,7 @@ public class baseInit : IDisposable
       }
       else
       {
-        foreach (PSObject psObject in WSMan.RunPSScript(str, this.remoteRunspace))
+        foreach (PSObject psObject in WSMan.RunPSScript(str, this.remoteRunspace, true))
         {
           try
           {
@@ -728,7 +728,7 @@ public class baseInit : IDisposable
             Trace.WriteLineIf(this.debugLevel.TraceError, ex.Message);
           }
         }
-        this.Cache.Add(hash, (object) objects, (DateTimeOffset) (DateTime.Now + this.cacheTime));
+        this.Cache.Set(hash, (object) objects, (DateTimeOffset) (DateTime.Now + tCacheTime));
       }
     }
     this.tsPSCode.TraceInformation(str);
@@ -761,7 +761,7 @@ public class baseInit : IDisposable
       }
       else
       {
-        foreach (PSObject psObject in WSMan.RunPSScript(str, this.remoteRunspace))
+        foreach (PSObject psObject in WSMan.RunPSScript(str, this.remoteRunspace, true))
         {
           try
           {
@@ -772,7 +772,7 @@ public class baseInit : IDisposable
             Trace.WriteLineIf(this.debugLevel.TraceError, ex.Message);
           }
         }
-        this.Cache.Add(hash, (object) cimObjects, (DateTimeOffset) (DateTime.Now + this.cacheTime));
+        this.Cache.Set(hash, (object) cimObjects, (DateTimeOffset) (DateTime.Now + tCacheTime));
       }
     }
     this.tsPSCode.TraceInformation(str);

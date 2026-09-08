@@ -32,7 +32,7 @@ internal static class WSMan
   /// <param name="scriptText"></param>
   /// <param name="remoteRunspace"></param>
   /// <returns></returns>
-  internal static Collection<PSObject> RunPSScript(string scriptText, Runspace remoteRunspace)
+  internal static Collection<PSObject> RunPSScript(string scriptText, Runspace remoteRunspace, bool throwOnError = false)
   {
     try
     {
@@ -41,6 +41,8 @@ internal static class WSMan
         powerShell.Runspace = remoteRunspace;
         powerShell.AddScript(scriptText);
         List<PSObject> list = powerShell.Invoke().Where<PSObject>((Func<PSObject, bool>) (t => t != null)).ToList<PSObject>();
+        if (throwOnError && powerShell.HadErrors)
+          throw new InvalidOperationException(string.Join(Environment.NewLine, powerShell.Streams.Error.Select(error => error.ToString())));
         Collection<PSObject> collection = new Collection<PSObject>();
         foreach (PSObject psObject in list)
         {
@@ -60,6 +62,7 @@ internal static class WSMan
     }
     catch
     {
+      if (throwOnError) throw;
     }
     return (Collection<PSObject>) null;
   }
