@@ -1,5 +1,12 @@
 # CIM Migration Plan: System.Management to Microsoft.Management.Infrastructure
 
+> **Withdrawn / historical (2026-09-09).** This migration is not the current
+> implementation or roadmap. Recovery restores Roger's public Framework 4.8
+> source and original WMI model/query behavior. Tests and reconstructed source
+> named below were removed from the active build and remain in Git history.
+> Claims of complete functionality below were not established by live testing.
+> See [UPSTREAM.md](UPSTREAM.md) and [current review](../CODE_REVIEW.md).
+
 ## Repair status (2026-09-08)
 
 The plan below is historical, not a declaration that every migration path works.

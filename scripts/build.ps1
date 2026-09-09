@@ -159,6 +159,25 @@ try {
         Copy-RequiredFile -Source (Join-Path $repoRoot $document) -Destination (Join-Path $OutputDirectory $document)
     }
 
+    # Ship corresponding LGPL library source and build instructions with both
+    # installer and portable output. Never fetch a precompiled automation DLL.
+    $sourceBundle = Join-Path $OutputDirectory 'library-source'
+    $libraryRoot = Join-Path $repoRoot 'sccmclictr.automation'
+    Get-ChildItem -LiteralPath $libraryRoot -Recurse -File |
+        Where-Object { $_.FullName -notmatch '\\(bin|obj)\\' -and
+            ($_.Extension -in '.cs', '.csproj', '.resx', '.settings', '.txt' -or
+             $_.Name -in 'LICENSE.md', 'UPSTREAM.md', 'COPYING') } |
+        ForEach-Object {
+            $relative = $_.FullName.Substring($repoRoot.Length + 1)
+            $destination = Join-Path $sourceBundle $relative
+            New-Item -ItemType Directory -Path (Split-Path $destination -Parent) -Force | Out-Null
+            Copy-RequiredFile -Source $_.FullName -Destination $destination
+        }
+    New-Item -ItemType Directory -Path (Join-Path $sourceBundle 'tools') -Force | Out-Null
+    foreach ($file in @('check-bare-catches.ps1', 'bare-catches.baseline')) {
+        Copy-RequiredFile -Source (Join-Path $repoRoot "tools\$file") -Destination (Join-Path $sourceBundle "tools\$file")
+    }
+
     $commit = 'unknown'
     try { $commit = (& git rev-parse HEAD 2>$null).Trim() } catch { }
     $buildInfo = [ordered]@{
@@ -167,6 +186,7 @@ try {
         configuration = $Configuration
         builtAtUtc = [DateTime]::UtcNow.ToString('o')
         targetFramework = '.NET Framework 4.8'
+        automationSource = 'rzander/sccmclictrlib@1c875c00ab04144741247873cea1b69cb25ef1ea + documented maintenance patches'
     }
     $buildInfo | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $OutputDirectory 'build-info.json') -Encoding UTF8
 

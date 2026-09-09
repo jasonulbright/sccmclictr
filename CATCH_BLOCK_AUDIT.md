@@ -1,5 +1,9 @@
 # Bare Catch Block Audit
 
+> Historical audit of the reconstructed library, superseded by source recovery
+> on 2026-09-09. Counts and classifications below are not current. The new guard
+> baseline records original-source catches; it does not certify them safe.
+
 Status: Categorized, with a no-growth regression guard. Remediation is maintenance work to be applied only where error reporting improves operator outcomes.
 
 **Last refreshed**: 2026-09-07. The retired PayPal handler and its catch block were removed; 307 blocks reconcile to 307.

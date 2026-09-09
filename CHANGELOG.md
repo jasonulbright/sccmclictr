@@ -2,12 +2,22 @@
 
 ## Unreleased
 
-- Fixed pending/available update models failing on CIM results without WMI metadata.
-- Preserved native CIM dates in update, deployment, inventory and related models.
-- Restored CIM instance metadata and corrected installed-product metadata assignments.
-- Object queries now report provider errors instead of treating errors as result rows.
-- Refresh replaces cached query results and honors the requested cache lifetime.
-- Added compiled-model regression tests and surfaced initial update-load failures.
+- Replaced the reconstructed automation library with Roger Zander's public source
+  at 1c875c00ab04144741247873cea1b69cb25ef1ea, built locally on Framework 4.8.
+- Withdrew the broad WMI-to-CIM migration; restored original WMI model/query behavior.
+- Preserved narrow credential, DPAPI, MSI command, query-error and refresh-cache fixes.
+- Corrected the original mandatory-update call to pass a deadline-filtered WMI
+  collection. Live installation validation is still required.
+- Retained application/plugin build, signing, installer, portable packaging and attribution.
+- Added recovery regression and opt-in read-only live parity tests; retired migration-only tests.
+- Corrected the closed-source/black-box claim, acknowledged other maintained forks,
+  and documented the OS-lifecycle rationale for remaining on Framework 4.8.
+- Included automation-library LGPL/GPL notices and corresponding source in packaging.
+- No new version or release: the existing public v1.3.0.1 assets predate this recovery.
+
+Earlier entries below describe historical changes, not the current implementation.
+Prior claims of a closed-source library or a completed functional CIM migration
+were incorrect; see CODE_REVIEW.md for the current validation boundary.
 
 ## v1.3.0.1 -- Maintained Build & Distribution (2026-09-07)
 
@@ -107,7 +117,7 @@ All deprecated `System.Management` / WMI usage removed from the automation libra
 - **SSL certificate validation re-enabled.** The original code globally disabled all SSL/TLS certificate validation via `ServerCertificateValidationCallback = delegate { return true; }` and `CheckCertificateRevocationList = false`. This accepted any certificate including fraudulent ones, enabling man-in-the-middle attacks on all HTTPS connections (including WinRM over HTTPS). Replaced with TLS 1.2/1.3 enforcement. If you connect to endpoints with self-signed certificates, you may need to add them to the trusted certificate store.
 
 ### Automation Library (sccmclictr.automation)
-The closed-source `sccmclictrlib` NuGet package v1.0.1 has been decompiled via JetBrains dotPeek and integrated as a source project. The NuGet dependency has been removed from all 17 projects (main app + 16 plugins).
+Historically, this fork decompiled `sccmclictrlib` NuGet package v1.0.1 via JetBrains dotPeek and integrated it as source, removing the package dependency from 17 projects. The assumption that the library was closed-source was wrong; the current recovery uses Roger's public source instead.
 
 - 38 C# source files, ~15,600 lines of code
 - .NET Framework 4.8, zero external NuGet dependencies
