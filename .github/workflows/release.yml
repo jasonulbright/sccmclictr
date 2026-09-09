@@ -129,7 +129,9 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           $assets = Get-ChildItem artifacts\release -File | ForEach-Object FullName
-          gh release create '${{ github.ref_name }}' @assets --draft --verify-tag --title "Client Center for Configuration Manager ${{ github.ref_name }}" --generate-notes
+          $notes = 'docs/releases/${{ github.ref_name }}.md'
+          if (!(Test-Path -LiteralPath $notes)) { throw "Release notes missing: $notes" }
+          gh release create '${{ github.ref_name }}' @assets --draft --verify-tag --title "Client Center for Configuration Manager ${{ github.ref_name }}" --notes-file $notes
 
       - name: Publish release
         shell: pwsh

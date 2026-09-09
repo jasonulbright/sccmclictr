@@ -16,7 +16,7 @@ This is a maintenance-focused community continuation of [Roger Zander's original
 
 This is **one of several community forks**, not the only maintained fork. See also [drummachine24's fork](https://github.com/drummachine24/sccmclictr), which takes a .NET 10 modernization approach.
 
-**Recovery status:** current source restores Roger's original automation-library source and WMI behavior after regressions in our reconstructed WMI-to-CIM migration. The user has verified the single-update installation and restart workflow on a live client. Broader feature checks remain pending. The published v1.3.0.1 assets predate this recovery; see [CODE_REVIEW.md](CODE_REVIEW.md) for validation status.
+**Recovery release (1.3.0.2):** restores Roger's original automation-library source and WMI behavior after regressions in our reconstructed WMI-to-CIM migration. Manual workstation checks were completed, including a live single-update installation, restart and Installed status. Log access and additional domain-context checks remain unverified from that workstation; see [CODE_REVIEW.md](CODE_REVIEW.md). Version 1.3.0.1 predates this recovery.
 
 ## Install
 
@@ -108,7 +108,7 @@ The original library was not closed-source: it is available at [rzander/sccmclic
 | Plaintext password persistence | Removed |
 | `Invoke-Expression` command injection | Removed |
 | Password on the command line | Removed |
-| Query compatibility | Original WMI behavior restored; single-update workflow live-validated, broader checks pending |
+| Query compatibility | Original WMI behavior restored; manual workstation checks completed; domain-context checks remain |
 | Bare catch blocks | Legacy instances remain; a regression baseline prevents new ones |
 | Vendored UI dependencies | Accepted for the .NET Framework maintenance lifecycle |
 | Release integrity | Authenticode, SHA-256 checksums, and GitHub attestations |
@@ -146,7 +146,7 @@ Run the recovery regression and optional read-only live-parity checks with Peste
 No NuGet restore is required; the automation library is a project reference and the stable third-party controls and MSTest assemblies are vendored under `lib\`. Recovery builds include the automation library's corresponding source, build instructions, and LGPL/GPL license texts under `library-source\` in both installer and portable staging. To compile the installer locally, install Inno Setup 6 or 7 and run:
 
 ```powershell
-.\scripts\new-release-assets.ps1 -StageDirectory .\artifacts\stage -Version 1.3.0.1
+.\scripts\new-release-assets.ps1 -StageDirectory .\artifacts\stage -Version 1.3.0.2
 ```
 
 Release signing and publication are documented in [docs/RELEASING.md](docs/RELEASING.md).
