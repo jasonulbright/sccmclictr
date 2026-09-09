@@ -259,9 +259,15 @@ namespace sccmclictr.automation.functions
                 pSCode = PSCode;
                 oNewBase = new baseInit(remoteRunspace, pSCode);
 
-                this.__CLASS = (WMIObject.Properties["__CLASS"] == null) ? WMIObject.Properties["CimClass"].Value as string : WMIObject.Properties["__CLASS"].Value as string;
-                this.__CLASS = (WMIObject.Properties["__NAMESPACE"] == null) ? "" as string : WMIObject.Properties["__NAMESPACE"].Value as string;
-                this.__CLASS = (WMIObject.Properties["__RELPATH"] == null) ? "" : WMIObject.Properties["__RELPATH"].Value as string;
+                // This upstream inventory query already uses CIM; other callers
+                // can supply WMI rows. Preserve each metadata field independently.
+                object systemValue = WMIObject.Properties["CimSystemProperties"]?.Value;
+                PSObject systemProperties = systemValue == null ? null : PSObject.AsPSObject(systemValue);
+                this.__CLASS = WMIObject.Properties["__CLASS"]?.Value as string
+                    ?? systemProperties?.Properties["ClassName"]?.Value as string ?? "";
+                this.__NAMESPACE = WMIObject.Properties["__NAMESPACE"]?.Value as string
+                    ?? (systemProperties?.Properties["Namespace"]?.Value as string)?.Replace('/', '\\') ?? "";
+                this.__RELPATH = WMIObject.Properties["__RELPATH"]?.Value as string ?? "";
 
                 this.__INSTANCE = true;
                 this.WMIObject = WMIObject;

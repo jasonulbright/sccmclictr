@@ -44,7 +44,7 @@ contain the earlier implementation; local recovery binaries are unsigned.
 ## Validation boundaries
 
 - Local recovery validation: all 14 plugins and the application built successfully;
-  10 offline Pester tests and 2 MSTest tests passed. The 2 live parity tests were
+  12 offline Pester tests and 2 MSTest tests passed. The 2 live parity tests were
   skipped because no authenticated test session was supplied. Original-source
   compiler warnings remain; this is not a warning-free or complete audit.
 - Build checks cover the main application and all 14 plugins against the restored API.
@@ -56,9 +56,14 @@ contain the earlier implementation; local recovery binaries are unsigned.
   integrated authentication or optional environment-provided credentials.
 - Roger's installed 1.0.6.1 was shown displaying two pending updates and populated
   All Updates on CLIENT01 after the lab synchronization issue was fixed.
-- The restored build has **not yet been validated live** against CLIENT01.
-  Update installation, policy actions, and other remote writes remain unverified.
-  No live update installation or reboot is performed by these tests.
+- User-observed live validation on CLIENT01 (2026-09-09): restored update lists
+  populated; right-click installation of .NET update KB5126052 progressed through
+  Downloading to PendingSoftReboot with error 0. The app's forced-restart action
+  rebooted the client; after reconnect/refresh the update displayed Installed.
+  This validates that update/restart path, not every administrative feature.
+- Applications, inventory, services, cache and log access still need smoke-test
+  results. Policy triggers and bulk update-install actions are not yet verified.
+  Automated live tests are read-only; the install and restart above were user-run.
 
 Do not publish the recovery as functionally restored until live read/action parity
 has been demonstrated. Compilation and skipped integration tests are insufficient.

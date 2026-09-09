@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- Fixed upstream installed-software metadata overwriting the class name with
+  namespace/path values; regression coverage includes WMI and serialized CIM input.
+- Added a read-only live smoke-test script comparing library results with provider
+  rows for updates, applications, services, cache and inventory, plus remote log reads.
+- User validated the recovered single-update workflow on CLIENT01: KB5126052
+  downloaded, reached PendingSoftReboot, and displayed Installed after the app's
+  forced restart. Other feature checks remain separate from this evidence.
 - Replaced the reconstructed automation library with Roger Zander's public source
   at 1c875c00ab04144741247873cea1b69cb25ef1ea, built locally on Framework 4.8.
 - Withdrew the broad WMI-to-CIM migration; restored original WMI model/query behavior.

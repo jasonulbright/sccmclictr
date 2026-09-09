@@ -35,6 +35,10 @@ be tested separately.
   the generated command.
 - Retain the bare-catch regression guard with a new original-source baseline.
   Existing upstream catches are not thereby certified safe.
+- Correct installed-software metadata assignments: the upstream constructor
+  overwrote __CLASS with namespace and relative path. Preserve WMI fields separately
+  and obtain class/namespace from serialized CIM system properties for the original
+  CIM inventory query. A WMI relative path is not invented for CIM rows.
 
 No blanket CIM conversion, modern .NET retarget, or new NuGet dependency is part
 of this recovery. The source files keep their upstream notices. The former
