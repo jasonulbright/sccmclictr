@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## v1.3.0.2 -- Original-source recovery (2026-09-09)
 
 - Fixed upstream installed-software metadata overwriting the class name with
   namespace/path values; regression coverage includes WMI and serialized CIM input.
@@ -20,7 +20,10 @@
 - Corrected the closed-source/black-box claim, acknowledged other maintained forks,
   and documented the OS-lifecycle rationale for remaining on Framework 4.8.
 - Included automation-library LGPL/GPL notices and corresponding source in packaging.
-- No new version or release: the existing public v1.3.0.1 assets predate this recovery.
+- Application version is 1.3.0.2; library assembly identity remains 1.0.1.0.
+- Manual workstation validation was completed by the maintainer. Remote log access
+  and additional domain-context checks require a domain-joined test context;
+  incomplete cross-domain authentication checks are not evidence of an app defect.
 
 Earlier entries below describe historical changes, not the current implementation.
 Prior claims of a closed-source library or a completed functional CIM migration

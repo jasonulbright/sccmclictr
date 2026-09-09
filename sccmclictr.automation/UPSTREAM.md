@@ -6,7 +6,7 @@ and not a downloaded NuGet DLL.
 - Repository: https://github.com/rzander/sccmclictrlib
 - Pinned revision: `1c875c00ab04144741247873cea1b69cb25ef1ea` (Update to .NET 4.8).
 - Imported: 2026-09-09, from the upstream `sccmclictr.automation` directory.
-- Original assembly/file version: 1.0.1.0; application version remains 1.3.0.1.
+- Original library assembly/file version: 1.0.1.0; recovery application version: 1.3.0.2.
 - License: LGPL-3.0-or-later, as stated in the original source headers.
   See LICENSE.md and COPYING. The application's MS-PL license does not replace this license.
 

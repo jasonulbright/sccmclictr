@@ -38,8 +38,9 @@ bare-catch baseline is a regression guard, not a statement that catches are safe
 
 The application is MS-PL; the automation library is LGPL-3.0-or-later. Recovery
 packages include corresponding library source and license texts in library-source.
-No release has been published from this recovery. Public v1.3.0.1 binaries still
-contain the earlier implementation; local recovery binaries are unsigned.
+Release 1.3.0.2 contains this recovery; v1.3.0.1 contains the earlier implementation.
+Published first-party binaries are signed by the release pipeline; ordinary local
+builds are unsigned.
 
 ## Validation boundaries
 
@@ -61,12 +62,17 @@ contain the earlier implementation; local recovery binaries are unsigned.
   Downloading to PendingSoftReboot with error 0. The app's forced-restart action
   rebooted the client; after reconnect/refresh the update displayed Installed.
   This validates that update/restart path, not every administrative feature.
-- Applications, inventory, services, cache and log access still need smoke-test
-  results. Policy triggers and bulk update-install actions are not yet verified.
-  Automated live tests are read-only; the install and restart above were user-run.
+- The maintainer reports completing all manual checks available from the workstation.
+  This is manual validation, not a completed automated feature-by-feature parity run.
+  Log access and additional verification must be tested inside the target domain;
+  cross-domain credential attempts did not establish a library or UI defect.
+- Bulk update-install actions and individual policy triggers have no separately
+  recorded results. Automated live tests remain uncompleted; the install and restart
+  above were user-run.
 
-Do not publish the recovery as functionally restored until live read/action parity
-has been demonstrated. Compilation and skipped integration tests are insufficient.
+The maintainer authorized release 1.3.0.2 after the manual checks above. Release
+notes must retain these boundaries; compilation and skipped integration tests
+alone do not establish full functional parity.
 
 The [old review](docs/history/PRE_RECOVERY_REVIEW.md) is retained solely as history;
 its source-availability and completed-migration claims are superseded.

@@ -1,7 +1,7 @@
 # Releasing
 
-> Recovery is unreleased. Live client parity is a release gate; see the recovery
-> release gate below. Do not overwrite public v1.3.0.1 assets with an unvalidated build.
+> Publish the recovery as v1.3.0.2, preserving v1.3.0.1 rather than overwriting its
+> tag or assets. Manual validation and remaining limitations are in CODE_REVIEW.md.
 
 The `Release` GitHub Actions workflow builds every .NET Framework 4.8 project, Authenticode-signs the first-party executables and DLLs, creates an Inno Setup installer and portable ZIP, generates SHA-256 checksums, adds GitHub build-provenance attestations, and publishes the assets to a GitHub release.
 
@@ -26,7 +26,7 @@ GitHub exchanges its short-lived OIDC identity for Azure access; there is no cli
 ## Publish a release
 
 1. Update `AssemblyFileVersion` and `AssemblyVersion` in `SCCMCliCtrWPF/SCCMCliCtrWPF/Properties/AssemblyInfo.cs`.
-2. Add the release notes to `CHANGELOG.md`.
+2. Update the installer default, changelog, and `docs/releases/vX.Y.Z.md` release notes.
 3. Run `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\build.ps1 -Configuration Release -Version X.Y.Z`.
 4. Run `.\scripts\test.ps1 -Configuration Release` and `.\scripts\test-pester.ps1`.
 5. Commit and push the changes.
@@ -39,12 +39,13 @@ Published assets:
 - `ClientCenterForConfigMgr-Setup.exe`
 - `ClientCenterForConfigMgr-Portable.zip`
 - `checksums.txt`
-# Recovery release gate
+## Recovery release gate
 
-The source recovery is not yet published. Before tagging, validate the rebuilt
-Framework 4.8 app against a live ConfigMgr client, including pending/all-update
-queries, policy retrieval, and deliberately authorized update actions. A green
-offline build alone is insufficient.
+For 1.3.0.2, the maintainer completed workstation checks and confirmed a live
+single-update download/install, app-triggered restart and final Installed status.
+Additional domain-context testing (including log access) is not claimed complete.
+The maintainer authorized publication with these documented limits. A green
+offline build alone is insufficient evidence for future functional changes.
 
 Verify that both packages include `library-source` with the original-source
 automation project, local patches, LGPL/GPL license texts, and build instructions.
