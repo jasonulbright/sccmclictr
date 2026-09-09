@@ -1,836 +1,930 @@
-// Decompiled with JetBrains decompiler
-// Type: sccmclictr.automation.baseInit
-// Assembly: sccmclictr.automation, Version=1.0.1.0, Culture=neutral, PublicKeyToken=null
-// MVID: 96476B75-C789-4A0A-9F55-EBB7DB29E9AB
-// Assembly location: C:\Users\jason\Downloads\sccmclictrlib.1.0.1\lib\net48\sccmclictr.automation.dll
-// XML documentation location: C:\Users\jason\Downloads\sccmclictrlib.1.0.1\lib\net48\sccmclictr.automation.xml
+//SCCM Client Center Automation Library (SCCMCliCtr.automation)
+//Copyright (c) 2018 by Roger Zander
+
+//This program is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation; either version 3 of the License, or any later version. 
+//This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details. 
+//GNU General Public License: http://www.gnu.org/licenses/lgpl.html
 
 using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Diagnostics;
+using System.Text;
 using System.Management.Automation;
 using System.Management.Automation.Runspaces;
+using System.Diagnostics;
 using System.Runtime.Caching;
-using System.Security.Cryptography;
-using System.Text;
 
-#nullable disable
-namespace sccmclictr.automation;
-
-/// <summary>
-/// 
-/// </summary>
-public class baseInit : IDisposable
+namespace sccmclictr.automation
 {
-  internal MemoryCache Cache;
-  internal bool bShowPSCodeOnly = false;
-  internal TimeSpan cacheTime = new TimeSpan(0, 0, 30);
-  /// <summary>Define the DebugLevel</summary>
-  private TraceSwitch debugLevel = new TraceSwitch("DebugLevel", "DebugLevel from ConfigFile", "Verbose");
-
-  /// <summary>
-  /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
-  /// </summary>
-  public void Dispose()
-  {
-    try
+    /// <summary>
+    /// 
+    /// </summary>
+    public class baseInit : IDisposable
     {
-      if (this.remoteRunspace != null)
-      {
-        this.remoteRunspace.Close();
-        this.remoteRunspace.Dispose();
-      }
-      if (this.tsPSCode != null)
-      {
-        try
+        /// <summary>
+        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        /// </summary>
+        public void Dispose()
         {
-          this.tsPSCode.Close();
-        }
-        // silent: dispose path; tsPSCode.Close() inside Dispose
-        catch
-        {
-        }
-        this.tsPSCode = (TraceSource) null;
-      }
-      try
-      {
-        if (this.Cache == null)
-          return;
-        foreach (KeyValuePair<string, object> keyValuePair in (IEnumerable<KeyValuePair<string, object>>) this.Cache)
-          this.Cache.Remove(keyValuePair.Key, (string) null);
-        this.Cache.Dispose();
-      }
-      // silent: dispose path; Cache.Dispose() inside Dispose
-      catch
-      {
-      }
-    }
-    // silent: dispose path; outer catch wrapping entire Dispose body
-    catch
-    {
-    }
-  }
-
-  private Runspace remoteRunspace { get; set; }
-
-  internal string CreateHash(string str)
-  {
-    Encoder encoder = Encoding.Unicode.GetEncoder();
-    byte[] buffer = new byte[str.Length * 2];
-    char[] charArray = str.ToCharArray();
-    int length = str.Length;
-    byte[] bytes = buffer;
-    encoder.GetBytes(charArray, 0, length, bytes, 0, true);
-    byte[] hash = new SHA1CryptoServiceProvider().ComputeHash(buffer);
-    StringBuilder stringBuilder = new StringBuilder();
-    for (int index = 0; index < hash.Length; ++index)
-      stringBuilder.Append(hash[index].ToString("X2"));
-    return stringBuilder.ToString();
-  }
-
-  /// <summary>Trace Source for PowerShell Commands</summary>
-  private TraceSource tsPSCode { get; set; }
-
-  /// <summary>
-  /// Converts a WMI path like "ROOT\ccm:SMS_Client=@" or "ROOT\ccm\invagt:InventoryActionStatus.Key='Val'"
-  /// into a CIM Get-CimInstance command string. Handles singletons (=@), keyed instances (.Key='Val'),
-  /// and plain class references.
-  /// </summary>
-  internal static string WmiPathToCimQuery(string wmiPath)
-  {
-    int colonIdx = wmiPath.IndexOf(':');
-    if (colonIdx < 0)
-      return $"Get-CimInstance -Namespace \"{wmiPath}\"";
-
-    string ns = wmiPath.Substring(0, colonIdx);
-    string classAndKey = wmiPath.Substring(colonIdx + 1);
-
-    // Singleton: ROOT\ccm:SMS_Client=@
-    if (classAndKey.EndsWith("=@"))
-    {
-      string className = classAndKey.Substring(0, classAndKey.Length - 2);
-      return $"Get-CimInstance -Namespace \"{ns}\" -ClassName \"{className}\"";
-    }
-
-    // Keyed instance: ROOT\ccm\invagt:InventoryActionStatus.InventoryActionID='{guid}'
-    int dotIdx = classAndKey.IndexOf('.');
-    if (dotIdx > 0)
-    {
-      string className = classAndKey.Substring(0, dotIdx);
-      string filter = classAndKey.Substring(dotIdx + 1);
-      return $"Get-CimInstance -Namespace \"{ns}\" -ClassName \"{className}\" -Filter \"{filter}\"";
-    }
-
-    // Plain class: ROOT\ccm:SMS_Client
-    return $"Get-CimInstance -Namespace \"{ns}\" -ClassName \"{classAndKey}\"";
-  }
-
-  /// <summary>
-  /// Extracts namespace and class name from a WMI path for use with Invoke-CimMethod.
-  /// </summary>
-  internal static (string Namespace, string ClassName) ParseWmiPathForMethod(string wmiPath)
-  {
-    int colonIdx = wmiPath.IndexOf(':');
-    if (colonIdx < 0)
-      return (wmiPath, "");
-
-    string ns = wmiPath.Substring(0, colonIdx);
-    string classAndKey = wmiPath.Substring(colonIdx + 1);
-
-    // Strip =@ suffix if present
-    if (classAndKey.EndsWith("=@"))
-      classAndKey = classAndKey.Substring(0, classAndKey.Length - 2);
-
-    // Strip .Key=Value suffix if present
-    int dotIdx = classAndKey.IndexOf('.');
-    if (dotIdx > 0)
-      classAndKey = classAndKey.Substring(0, dotIdx);
-
-    return (ns, classAndKey);
-  }
-
-  /// <summary>Constructor</summary>
-  /// <param name="RemoteRunspace">PowerShell RunSpace</param>
-  /// <param name="PSCode">TraceSource for PowerShell Commands</param>
-  public baseInit(Runspace RemoteRunspace, TraceSource PSCode)
-  {
-    this.remoteRunspace = RemoteRunspace;
-    this.tsPSCode = PSCode;
-    this.Cache = new MemoryCache(RemoteRunspace.ConnectionInfo.ComputerName, new NameValueCollection());
-  }
-
-  /// <summary>Gets a string from cache or from a WMI class method.</summary>
-  /// <param name="WMIPath">The WMI path.</param>
-  /// <param name="WMIMethod">The WMI method.</param>
-  /// <param name="ResultProperty">The name of the property you are trying to retrieve.</param>
-  /// <returns>Command results as a string.</returns>
-  /// <example><code>string siteCode = base.GetStringFromClassMethod(@"ROOT\ccm:SMS_Client", "GetAssignedSite()", "sSiteCode");</code></example>
-  public string GetStringFromClassMethod(string WMIPath, string WMIMethod, string ResultProperty)
-  {
-    return this.GetStringFromClassMethod(WMIPath, WMIMethod, ResultProperty, false);
-  }
-
-  /// <summary>
-  /// Gets a string from cache(if Reload==False) or from a WMI class method.
-  /// </summary>
-  /// <param name="WMIPath">The WMI path.</param>
-  /// <param name="WMIMethod">The WMI method.</param>
-  /// <param name="ResultProperty">The name of the property you are trying to retrieve.</param>
-  /// <param name="Reload">Enforce reload. i.e. don't use cached results.</param>
-  /// <returns>Command results as a string.</returns>
-  /// <example><code>string siteCode = base.GetStringFromClassMethod(@"ROOT\ccm:SMS_Client", "GetAssignedSite()", "sSiteCode", True);</code></example>
-  public string GetStringFromClassMethod(
-    string WMIPath,
-    string WMIMethod,
-    string ResultProperty,
-    bool Reload)
-  {
-    if (!ResultProperty.StartsWith("."))
-      ResultProperty = "." + ResultProperty;
-    string stringFromClassMethod = "";
-    var (ns, cls) = ParseWmiPathForMethod(WMIPath);
-    // Strip trailing () from method name if present
-    string methodName = WMIMethod.TrimEnd('(', ')');
-    string str = $"(Invoke-CimMethod -Namespace \"{ns}\" -ClassName \"{cls}\" -MethodName \"{methodName}\"){ResultProperty}";
-    if (!this.bShowPSCodeOnly)
-    {
-      string hash = this.CreateHash(WMIPath + WMIMethod + ResultProperty);
-      if (this.Cache.Get(hash, (string) null) != null & !Reload)
-      {
-        stringFromClassMethod = this.Cache.Get(hash, (string) null) as string;
-      }
-      else
-      {
-        foreach (PSObject psObject in WSMan.RunPSScript(str, this.remoteRunspace))
-        {
-          try
-          {
-            stringFromClassMethod = psObject.BaseObject.ToString();
-            if (psObject.BaseObject.GetType() == typeof (ErrorRecord))
+            try
             {
-              Trace.TraceError(psObject.ToString());
-              Trace.WriteLineIf(this.debugLevel.TraceError, psObject.ToString());
-              this.tsPSCode.TraceInformation("#ERROR:" + psObject.ToString());
-              stringFromClassMethod = "";
-              break;
+
+                if (remoteRunspace != null)
+                {
+                    remoteRunspace.Close();
+                    remoteRunspace.Dispose();
+                }
+                if (tsPSCode != null)
+                {
+                    try
+                    {
+                        tsPSCode.Close();
+                    }
+                    catch { }
+
+                    tsPSCode = null;
+                }
+
+                try
+                {
+                    if (Cache != null)
+                    {
+                        //Try to clean cache
+                        foreach (var element in Cache)
+                        {
+                            Cache.Remove(element.Key);
+                        }
+
+                        Cache.Dispose();
+                    }
+                        
+                }
+                catch { }
             }
-            this.Cache.Add(hash, (object) stringFromClassMethod, (DateTimeOffset) (DateTime.Now + this.cacheTime));
-            break;
-          }
-          catch (Exception ex)
-          {
-            Trace.WriteLineIf(this.debugLevel.TraceError, ex.Message);
-          }
+            catch { }
         }
-      }
-    }
-    this.tsPSCode.TraceInformation(str);
-    return stringFromClassMethod;
-  }
 
-  /// <summary>Gets a string from cache or from a WMI method.</summary>
-  /// <param name="WMIPath">The WMI path.</param>
-  /// <param name="WMIMethod">The WMI method.</param>
-  /// <param name="ResultProperty">The name of the property you are trying to retrieve.</param>
-  /// <returns>Command results a as string.</returns>
-  /// <example><code>bool multiUser = Boolean.Parse(GetStringFromMethod(@"ROOT\ccm\ClientSDK:CCM_ClientInternalUtilities=@", "AreMultiUsersLoggedOn", "MultiUsersLoggedOn"));</code></example>
-  public string GetStringFromMethod(string WMIPath, string WMIMethod, string ResultProperty)
-  {
-    return this.GetStringFromMethod(WMIPath, WMIMethod, ResultProperty, false);
-  }
+        private Runspace remoteRunspace { get; set; }
 
-  /// <summary>
-  /// Gets a string from cache(if Reload==False) or from a WMI method.
-  /// </summary>
-  /// <param name="WMIPath">The WMI path.</param>
-  /// <param name="WMIMethod">The WMI method.</param>
-  /// <param name="ResultProperty">The name of the property you are trying to retrieve.</param>
-  /// <param name="Reload">Enforce reload. i.e. don't use cached results.</param>
-  /// <returns>Command results as a string.</returns>
-  /// <example><code>bool multiUser = Boolean.Parse(GetStringFromMethod(@"ROOT\ccm\ClientSDK:CCM_ClientInternalUtilities=@", "AreMultiUsersLoggedOn", "MultiUsersLoggedOn", True));</code></example>
-  public string GetStringFromMethod(
-    string WMIPath,
-    string WMIMethod,
-    string ResultProperty,
-    bool Reload)
-  {
-    if (!ResultProperty.StartsWith("("))
-      ResultProperty = $"({ResultProperty})";
-    string stringFromMethod = "";
-    // Instance method: get the instance first, then invoke method on it
-    string cimGet = WmiPathToCimQuery(WMIPath);
-    // Strip trailing () from method name if present
-    string methodName = WMIMethod.TrimEnd('(', ')');
-    string str = $"({cimGet} | Invoke-CimMethod -MethodName \"{methodName}\"){ResultProperty}";
-    if (!this.bShowPSCodeOnly)
-    {
-      string hash = this.CreateHash(WMIPath + WMIMethod + ResultProperty);
-      if (this.Cache.Get(hash, (string) null) != null & !Reload)
-      {
-        stringFromMethod = this.Cache.Get(hash, (string) null) as string;
-      }
-      else
-      {
-        foreach (PSObject psObject in WSMan.RunPSScript(str, this.remoteRunspace))
+        internal string CreateHash(string str)
         {
-          try
-          {
-            stringFromMethod = psObject.BaseObject.ToString();
-            if (psObject.BaseObject.GetType() == typeof (ErrorRecord))
+            // First we need to convert the string into bytes, which
+            // means using a text encoder.
+            Encoder enc = Encoding.Unicode.GetEncoder();
+
+            // Create a buffer large enough to hold the string
+            byte[] unicodeText = new byte[str.Length * 2];
+            enc.GetBytes(str.ToCharArray(), 0, str.Length, unicodeText, 0, true);
+
+            //Change to be FIPS compliant 
+            System.Security.Cryptography.SHA1 sha1 = new System.Security.Cryptography.SHA1CryptoServiceProvider();
+            byte[] result = sha1.ComputeHash(unicodeText);
+
+
+            // Build the final string by converting each byte
+            // into hex and appending it to a StringBuilder
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < result.Length; i++)
             {
-              Trace.TraceError(psObject.ToString());
-              Trace.WriteLineIf(this.debugLevel.TraceError, psObject.ToString());
-              this.tsPSCode.TraceInformation("#ERROR:" + psObject.ToString());
-              stringFromMethod = "";
-              break;
+                sb.Append(result[i].ToString("X2"));
             }
-            this.Cache.Add(hash, (object) stringFromMethod, (DateTimeOffset) (DateTime.Now + this.cacheTime));
-            break;
-          }
-          catch (Exception ex)
-          {
-            Trace.WriteLineIf(this.debugLevel.TraceError, ex.Message);
-          }
+
+            // And return it
+            return sb.ToString();
         }
-      }
-    }
-    this.tsPSCode.TraceInformation(str);
-    return stringFromMethod;
-  }
 
-  /// <summary>Gets a PSObject from a WMI class method.</summary>
-  /// <param name="WMIPath">The WMI path.</param>
-  /// <param name="WMIMethod">The WMI method.</param>
-  /// <param name="MethodParams">The method parameters.</param>
-  /// <returns>Command results as a PSObject.</returns>
-  /// <example><code>base.CallClassMethod(@"ROOT\ccm:SMS_Client", "TriggerSchedule", "'{00000000-0000-0000-0000-000000000001}'");</code></example>
-  public PSObject CallClassMethod(string WMIPath, string WMIMethod, string MethodParams)
-  {
-    return this.CallClassMethod(WMIPath, WMIMethod, MethodParams, true);
-  }
+//        // Alternate Create Hash method for testing and consideration
+//        internal string CreateHash(string stringToHash)
+//        {
+//            // This method is used for generating a hash for caching not security, so an int32 precision will suffice and is a little faster than a 160 byte digest.
+//            System.Security.Cryptography.SHA1 sha1 = new System.Security.Cryptography.SHA1CryptoServiceProvider();
+//            return BitConverter.ToInt32(sha1.ComputeHash(Encoding.Default.GetBytes(stringToHash)), 0).ToString(("X"));
+//        }
 
-  /// <summary>
-  /// Gets a PSObject from cache(if Reload==False) or from a WMI class method.
-  /// </summary>
-  /// <param name="WMIPath">The WMI path.</param>
-  /// <param name="WMIMethod">The WMI method.</param>
-  /// <param name="MethodParams">The method parameters.</param>
-  /// <param name="Reload">Enforce reload. i.e. don't use cached results.</param>
-  /// <returns>Command results as a PSObject.</returns>
-  /// <example><code>base.CallClassMethod(@"ROOT\ccm:SMS_Client", "TriggerSchedule", "'{00000000-0000-0000-0000-000000000001}'", True);</code></example>
-  public PSObject CallClassMethod(
-    string WMIPath,
-    string WMIMethod,
-    string MethodParams,
-    bool Reload)
-  {
-    // Strip outer parens from params if present, for argument parsing
-    string rawParams = MethodParams.Trim();
-    if (rawParams.StartsWith("(") && rawParams.EndsWith(")"))
-      rawParams = rawParams.Substring(1, rawParams.Length - 2);
+        //This initialization is required in a multi threaded environment (e.g. Collection commander and orchestrator) !
+        //internal MemoryCache Cache = new MemoryCache("baseInit", new System.Collections.Specialized.NameValueCollection(99));
+        internal MemoryCache Cache;
 
-    var (ns, cls) = ParseWmiPathForMethod(WMIPath);
-    PSObject psObject1 = (PSObject) null;
-    string str;
-    if (string.IsNullOrWhiteSpace(rawParams))
-    {
-      // No-arg method call
-      str = $"Invoke-CimMethod -Namespace \"{ns}\" -ClassName \"{cls}\" -MethodName \"{WMIMethod}\"";
-    }
-    else
-    {
-      // Parameterized call: discover param names from CIM class, map positional args
-      str = $"$_pv = @({rawParams}); " +
-            $"$_pn = (Get-CimClass -Namespace '{ns}' -ClassName '{cls}').CimClassMethods['{WMIMethod}'].Parameters.Name; " +
-            $"$_a = @{{}}; for ($i=0; $i -lt $_pv.Count; $i++) {{ $_a[$_pn[$i]] = $_pv[$i] }}; " +
-            $"Invoke-CimMethod -Namespace \"{ns}\" -ClassName \"{cls}\" -MethodName \"{WMIMethod}\" -Arguments $_a";
-    }
-    if (!this.bShowPSCodeOnly)
-    {
-      string hash = this.CreateHash(WMIPath + WMIMethod + MethodParams);
-      if (this.Cache.Get(hash, (string) null) != null & !Reload)
-      {
-        psObject1 = this.Cache.Get(hash, (string) null) as PSObject;
-      }
-      else
-      {
-        foreach (PSObject psObject2 in WSMan.RunPSScript(str, this.remoteRunspace))
+        internal bool bShowPSCodeOnly = false;
+        internal TimeSpan cacheTime = new TimeSpan(0, 0, 30);
+
+        #region Initializing
+
+        /// <summary>
+        /// Define the DebugLevel
+        /// </summary>
+        private TraceSwitch debugLevel = new TraceSwitch("DebugLevel", "DebugLevel from ConfigFile", "Verbose");
+
+        /// <summary>
+        /// Trace Source for PowerShell Commands
+        /// </summary>
+        private TraceSource tsPSCode { get; set; }
+
+        #endregion
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="RemoteRunspace">PowerShell RunSpace</param>
+        /// <param name="PSCode">TraceSource for PowerShell Commands</param>
+        public baseInit(Runspace RemoteRunspace, TraceSource PSCode) : base()
         {
-          try
-          {
-            psObject1 = psObject2;
-            this.Cache.Add(hash, (object) psObject1, (DateTimeOffset) (DateTime.Now + this.cacheTime));
-            break;
-          }
-          catch (Exception ex)
-          {
-            Trace.WriteLineIf(this.debugLevel.TraceError, ex.Message);
-          }
+            remoteRunspace = RemoteRunspace;
+            tsPSCode = PSCode;
+
+            Cache = new MemoryCache(RemoteRunspace.ConnectionInfo.ComputerName, new System.Collections.Specialized.NameValueCollection());
         }
-      }
-    }
-    this.tsPSCode.TraceInformation(str);
-    return psObject1;
-  }
 
-  /// <summary>Gets a PSObject from a WMI instance method.</summary>
-  /// <param name="WMIPath">The WMI path.</param>
-  /// <param name="WMIMethod">The WMI method.</param>
-  /// <param name="MethodParams">The method parameters.</param>
-  /// <returns>Command results as a PSObject.</returns>
-  public PSObject CallInstanceMethod(string WMIPath, string WMIMethod, string MethodParams)
-  {
-    return this.CallInstanceMethod(WMIPath, WMIMethod, MethodParams, true);
-  }
-
-  /// <summary>
-  /// Gets a PSObject from cache(if Reload==False) of from a WMI instance method.
-  /// </summary>
-  /// <param name="WMIPath">The WMI path.</param>
-  /// <param name="WMIMethod">The WMI method.</param>
-  /// <param name="MethodParams">The method parameters.</param>
-  /// <param name="Reload">Enforce reload. i.e. don't use cached results.</param>
-  /// <returns>Command results as a PSObject.</returns>
-  public PSObject CallInstanceMethod(
-    string WMIPath,
-    string WMIMethod,
-    string MethodParams,
-    bool Reload)
-  {
-    PSObject psObject1 = (PSObject) null;
-    // Instance method: get CIM instance first, then invoke method on it
-    string cimGet = WmiPathToCimQuery(WMIPath);
-    var (ns, cls) = ParseWmiPathForMethod(WMIPath);
-    string rawParams = MethodParams?.Trim() ?? "";
-    string str;
-    if (string.IsNullOrWhiteSpace(rawParams))
-    {
-      str = $"{cimGet} | Invoke-CimMethod -MethodName \"{WMIMethod}\"";
-    }
-    else
-    {
-      str = $"$_pv = @({rawParams}); " +
-            $"$_pn = (Get-CimClass -Namespace '{ns}' -ClassName '{cls}').CimClassMethods['{WMIMethod}'].Parameters.Name; " +
-            $"$_a = @{{}}; for ($i=0; $i -lt $_pv.Count; $i++) {{ $_a[$_pn[$i]] = $_pv[$i] }}; " +
-            $"{cimGet} | Invoke-CimMethod -MethodName \"{WMIMethod}\" -Arguments $_a";
-    }
-    if (!this.bShowPSCodeOnly)
-    {
-      string hash = this.CreateHash(WMIPath + WMIMethod + MethodParams);
-      if (this.Cache.Get(hash, (string) null) != null & !Reload)
-      {
-        psObject1 = this.Cache.Get(hash, (string) null) as PSObject;
-      }
-      else
-      {
-        foreach (PSObject psObject2 in WSMan.RunPSScript(str, this.remoteRunspace))
+        /// <summary>
+        /// Gets a string from cache or from a WMI class method.
+        /// </summary>
+        /// <param name="WMIPath">The WMI path.</param>
+        /// <param name="WMIMethod">The WMI method.</param>
+        /// <param name="ResultProperty">The name of the property you are trying to retrieve.</param>
+        /// <returns>Command results as a string.</returns>
+        /// <example><code>string siteCode = base.GetStringFromClassMethod(@"ROOT\ccm:SMS_Client", "GetAssignedSite()", "sSiteCode");</code></example>
+        public string GetStringFromClassMethod(string WMIPath, string WMIMethod, string ResultProperty)
         {
-          try
-          {
-            psObject1 = psObject2;
-            this.Cache.Add(hash, (object) psObject1, (DateTimeOffset) (DateTime.Now + this.cacheTime));
-            break;
-          }
-          catch (Exception ex)
-          {
-            Trace.WriteLineIf(this.debugLevel.TraceError, ex.Message);
-          }
+            return GetStringFromClassMethod(WMIPath, WMIMethod, ResultProperty, false);
         }
-      }
-    }
-    this.tsPSCode.TraceInformation(str);
-    return psObject1;
-  }
 
-  /// <summary>
-  /// Gets a string from cache or from a PowerShell command.
-  /// </summary>
-  /// <param name="PSCode">The ps code.</param>
-  /// <returns>Command results as a string.</returns>
-  /// <example><code>string sPort = base.GetStringFromPS("(Get-ItemProperty(\"HKLM:\\SOFTWARE\\Microsoft\\CCM\")).$(\"HttpPort\")");</code></example>
-  public string GetStringFromPS(string PSCode) => this.GetStringFromPS(PSCode, false);
-
-  /// <summary>
-  /// Gets a string from cache(if Reload==False) or from a PowerShell command.
-  /// </summary>
-  /// <param name="PSCode">The ps code.</param>
-  /// <param name="Reload">Enforce reload. i.e. don't use cached results.</param>
-  /// <returns>Command results as a string.</returns>
-  /// <example><code>string sPort = base.GetStringFromPS("(Get-ItemProperty(\"HKLM:\\SOFTWARE\\Microsoft\\CCM\")).$(\"HttpPort\")", True);</code></example>
-  public string GetStringFromPS(string PSCode, bool Reload = false)
-  {
-    string stringFromPs = "";
-    if (!this.bShowPSCodeOnly)
-    {
-      string hash = this.CreateHash(PSCode);
-      if (this.Cache.Get(hash, (string) null) != null & !Reload)
-      {
-        stringFromPs = this.Cache.Get(hash, (string) null) as string;
-      }
-      else
-      {
-        foreach (PSObject psObject in WSMan.RunPSScript(PSCode, this.remoteRunspace))
+        /// <summary>
+        /// Gets a string from cache(if Reload==False) or from a WMI class method.
+        /// </summary>
+        /// <param name="WMIPath">The WMI path.</param>
+        /// <param name="WMIMethod">The WMI method.</param>
+        /// <param name="ResultProperty">The name of the property you are trying to retrieve.</param>
+        /// <param name="Reload">Enforce reload. i.e. don't use cached results.</param>
+        /// <returns>Command results as a string.</returns>
+        /// <example><code>string siteCode = base.GetStringFromClassMethod(@"ROOT\ccm:SMS_Client", "GetAssignedSite()", "sSiteCode", True);</code></example>
+        public string GetStringFromClassMethod(string WMIPath, string WMIMethod, string ResultProperty, bool Reload)
         {
-          try
-          {
-            stringFromPs = psObject.ToString();
-            if (psObject.BaseObject.GetType() == typeof (ErrorRecord))
+            if (!ResultProperty.StartsWith("."))
+                ResultProperty = "." + ResultProperty;
+
+            string sResult = "";
+            string sPSCode = string.Format("([wmiclass]\"{0}\").{1}{2}", WMIPath, WMIMethod, ResultProperty);
+
+            if (!bShowPSCodeOnly)
             {
-              Trace.TraceError(psObject.ToString());
-              Trace.WriteLineIf(this.debugLevel.TraceError, psObject.ToString());
-              this.tsPSCode.TraceInformation("#ERROR:" + psObject.ToString());
-              stringFromPs = "";
-              break;
+                string sHash = CreateHash(WMIPath + WMIMethod + ResultProperty);
+
+                if ((Cache.Get(sHash) != null) & !Reload)
+                {
+                    sResult = Cache.Get(sHash) as string;
+                }
+                else
+                {
+                    foreach (PSObject obj in WSMan.RunPSScript(sPSCode, remoteRunspace))
+                    {
+                        try
+                        {
+                            sResult = obj.BaseObject.ToString();
+                            if (obj.BaseObject.GetType() == typeof(ErrorRecord))
+                            {
+                                Trace.TraceError(obj.ToString());
+                                Trace.WriteLineIf(debugLevel.TraceError, obj.ToString());
+                                tsPSCode.TraceInformation("#ERROR:" + obj.ToString());
+                                sResult = "";
+                            }
+                            else
+                            {
+                                Cache.Add(sHash, sResult, DateTime.Now + cacheTime);
+                            }
+                            break;
+                        }
+                        catch (Exception ex)
+                        {
+                            Trace.WriteLineIf(debugLevel.TraceError, ex.Message);
+                        }
+                    }
+                }
             }
-            this.Cache.Add(hash, (object) stringFromPs, (DateTimeOffset) (DateTime.Now + this.cacheTime));
-            break;
-          }
-          catch (Exception ex)
-          {
-            Trace.WriteLineIf(this.debugLevel.TraceError, ex.Message);
-          }
+
+            //Trace the PowerShell Command
+            tsPSCode.TraceInformation(sPSCode);
+            return sResult;
         }
-      }
-    }
-    this.tsPSCode.TraceInformation(PSCode);
-    return stringFromPs;
-  }
 
-  /// <summary>Gets a string from cache or from a WMI property.</summary>
-  /// <param name="WMIPath">The WMI path.</param>
-  /// <param name="ResultProperty">The name of the property you are trying to retrieve.</param>
-  /// <returns>Command results as a string.</returns>
-  /// <example><code>string siteCode = base.GetStringFromClassMethod(@"ROOT\ccm:CCM_Client=@", "ClientVersion");</code></example>
-  public string GetProperty(string WMIPath, string ResultProperty)
-  {
-    return this.GetProperty(WMIPath, ResultProperty, false);
-  }
-
-  /// <summary>
-  /// Gets a string from cache(if Reload==False) or from a WMI property.
-  /// </summary>
-  /// <param name="WMIPath">The WMI path.</param>
-  /// <param name="ResultProperty">The name of the property you are trying to retrieve.</param>
-  /// <param name="Reload">Enforce reload. i.e. don't use cached results.</param>
-  /// <returns>Command results as a string.</returns>
-  /// <example><code>string siteCode = base.GetStringFromClassMethod(@"ROOT\ccm:CCM_Client=@", "ClientVersion", True);</code></example>
-  public string GetProperty(string WMIPath, string ResultProperty, bool Reload)
-  {
-    if (!ResultProperty.StartsWith("."))
-      ResultProperty = "." + ResultProperty;
-    string property = "";
-    string str = $"({WmiPathToCimQuery(WMIPath)}){ResultProperty}";
-    if (!this.bShowPSCodeOnly)
-    {
-      string hash = this.CreateHash(WMIPath + ResultProperty);
-      if (this.Cache.Get(hash, (string) null) != null & !Reload)
-      {
-        property = this.Cache.Get(hash, (string) null) as string;
-      }
-      else
-      {
-        foreach (PSObject psObject in WSMan.RunPSScript(str, this.remoteRunspace))
+        /// <summary>
+        /// Gets a string from cache or from a WMI method.
+        /// </summary>
+        /// <param name="WMIPath">The WMI path.</param>
+        /// <param name="WMIMethod">The WMI method.</param>
+        /// <param name="ResultProperty">The name of the property you are trying to retrieve.</param>
+        /// <returns>Command results a as string.</returns>
+        /// <example><code>bool multiUser = Boolean.Parse(GetStringFromMethod(@"ROOT\ccm\ClientSDK:CCM_ClientInternalUtilities=@", "AreMultiUsersLoggedOn", "MultiUsersLoggedOn"));</code></example>
+        public string GetStringFromMethod(string WMIPath, string WMIMethod, string ResultProperty)
         {
-          try
-          {
-            property = psObject.BaseObject.ToString();
-            if (psObject.BaseObject.GetType() == typeof (ErrorRecord))
+            return GetStringFromMethod(WMIPath, WMIMethod, ResultProperty, false);
+        }
+
+        /// <summary>
+        /// Gets a string from cache(if Reload==False) or from a WMI method.
+        /// </summary>
+        /// <param name="WMIPath">The WMI path.</param>
+        /// <param name="WMIMethod">The WMI method.</param>
+        /// <param name="ResultProperty">The name of the property you are trying to retrieve.</param>
+        /// <param name="Reload">Enforce reload. i.e. don't use cached results.</param>
+        /// <returns>Command results as a string.</returns>
+        /// <example><code>bool multiUser = Boolean.Parse(GetStringFromMethod(@"ROOT\ccm\ClientSDK:CCM_ClientInternalUtilities=@", "AreMultiUsersLoggedOn", "MultiUsersLoggedOn", True));</code></example>
+        public string GetStringFromMethod(string WMIPath, string WMIMethod, string ResultProperty, bool Reload)
+        {
+            if (!ResultProperty.StartsWith("("))
+                ResultProperty = "(" + ResultProperty + ")";
+
+            string sResult = "";
+            string sPSCode = string.Format("([wmi]\"{0}\").{1}{2}", WMIPath, WMIMethod, ResultProperty);
+
+            if (!bShowPSCodeOnly)
             {
-              Trace.TraceError(psObject.ToString());
-              Trace.WriteLineIf(this.debugLevel.TraceError, psObject.ToString());
-              this.tsPSCode.TraceInformation("#ERROR:" + psObject.ToString());
-              property = "";
-              break;
+                string sHash = CreateHash(WMIPath + WMIMethod + ResultProperty);
+
+                if ((Cache.Get(sHash) != null) & !Reload)
+                {
+                    sResult = Cache.Get(sHash) as string;
+                }
+                else
+                {
+                    foreach (PSObject obj in WSMan.RunPSScript(sPSCode, remoteRunspace))
+                    {
+                        try
+                        {
+                            sResult = obj.BaseObject.ToString();
+                            if (obj.BaseObject.GetType() == typeof(ErrorRecord))
+                            {
+                                Trace.TraceError(obj.ToString());
+                                Trace.WriteLineIf(debugLevel.TraceError, obj.ToString());
+                                tsPSCode.TraceInformation("#ERROR:" + obj.ToString());
+                                sResult = "";
+                            }
+                            else
+                            {
+                                Cache.Add(sHash, sResult, DateTime.Now + cacheTime);
+                            }
+                            break;
+                        }
+                        catch (Exception ex)
+                        {
+                            Trace.WriteLineIf(debugLevel.TraceError, ex.Message);
+                        }
+                    }
+                }
             }
-            this.Cache.Add(hash, (object) property, (DateTimeOffset) (DateTime.Now + this.cacheTime));
-            break;
-          }
-          catch (Exception ex)
-          {
-            Trace.WriteLineIf(this.debugLevel.TraceError, ex.Message);
-          }
+
+            //Trace the PowerShell Command
+            tsPSCode.TraceInformation(sPSCode);
+
+            return sResult;
         }
-      }
-    }
-    this.tsPSCode.TraceInformation(str);
-    return property;
-  }
 
-  /// <summary>
-  /// Gets a list of PSObjects from cache or from a WMI property.
-  /// </summary>
-  /// <param name="WMIPath">The WMI path.</param>
-  /// <param name="ResultProperty">The name of the property you are trying to retrieve.</param>
-  /// <returns>Command results as a list of PSObjects.</returns>
-  /// <example><code>List&lt;PSObject&gt; lPSAppDts = base.GetProperties(@"ROOT\ccm\clientsdk:CCM_Application", "AppDTs");</code></example>
-  public List<PSObject> GetProperties(string WMIPath, string ResultProperty)
-  {
-    return this.GetProperties(WMIPath, ResultProperty, false);
-  }
+        /// <summary>
+        /// Gets a PSObject from a WMI class method.
+        /// </summary>
+        /// <param name="WMIPath">The WMI path.</param>
+        /// <param name="WMIMethod">The WMI method.</param>
+        /// <param name="MethodParams">The method parameters.</param>
+        /// <returns>Command results as a PSObject.</returns>
+        /// <example><code>base.CallClassMethod(@"ROOT\ccm:SMS_Client", "TriggerSchedule", "'{00000000-0000-0000-0000-000000000001}'");</code></example>
+        public PSObject CallClassMethod(string WMIPath, string WMIMethod, string MethodParams)
+        {
+            //do not cache per default.
+            return CallClassMethod(WMIPath, WMIMethod, MethodParams, true);
+        }
 
-  /// <summary>
-  /// Gets a list of PSObjects from cache(if Reload==False) or from a WMI property.
-  /// </summary>
-  /// <param name="WMIPath">The WMI path.</param>
-  /// <param name="ResultProperty">The name of the property you are trying to retrieve.</param>
-  /// <param name="Reload">Enforce reload. i.e. don't use cached results.</param>
-  /// <returns>Command results as a list of PSObjects.</returns>
-  /// <example><code>List&lt;PSObject&gt; lPSAppDts = base.GetProperties(@"ROOT\ccm\clientsdk:CCM_Application", "AppDTs", True);</code></example>
-  public List<PSObject> GetProperties(string WMIPath, string ResultProperty, bool Reload)
-  {
-    if (!ResultProperty.StartsWith("."))
-      ResultProperty = "." + ResultProperty;
-    List<PSObject> properties = new List<PSObject>();
-    string str = $"({WmiPathToCimQuery(WMIPath)}){ResultProperty}";
-    if (!this.bShowPSCodeOnly)
+        /// <summary>
+        /// Gets a PSObject from cache(if Reload==False) or from a WMI class method.
+        /// </summary>
+        /// <param name="WMIPath">The WMI path.</param>
+        /// <param name="WMIMethod">The WMI method.</param>
+        /// <param name="MethodParams">The method parameters.</param>
+        /// <param name="Reload">Enforce reload. i.e. don't use cached results.</param>
+        /// <returns>Command results as a PSObject.</returns>
+        /// <example><code>base.CallClassMethod(@"ROOT\ccm:SMS_Client", "TriggerSchedule", "'{00000000-0000-0000-0000-000000000001}'", True);</code></example>
+        public PSObject CallClassMethod(string WMIPath, string WMIMethod, string MethodParams, bool Reload)
+        {
+            if (!MethodParams.StartsWith("("))
+                MethodParams = "(" + MethodParams + ")";
+
+            PSObject pResult = null; 
+            string sPSCode = string.Format("([wmiclass]'{0}').{1}{2}", WMIPath, WMIMethod, MethodParams);
+
+            if (!bShowPSCodeOnly)
+            {
+                string sHash = CreateHash(WMIPath + WMIMethod + MethodParams);
+
+                if ((Cache.Get(sHash) != null) & !Reload)
+                {
+                    pResult = Cache.Get(sHash) as PSObject;
+                }
+                else
+                {
+                    foreach (PSObject obj in WSMan.RunPSScript(sPSCode, remoteRunspace))
+                    {
+                        try
+                        {
+                            pResult = obj;
+                            Cache.Add(sHash, pResult, DateTime.Now + cacheTime);
+                            break;
+                        }
+                        catch (Exception ex)
+                        {
+                            Trace.WriteLineIf(debugLevel.TraceError, ex.Message);
+                        }
+                    }
+                }
+            }
+
+            //Trace the PowerShell Command
+            tsPSCode.TraceInformation(sPSCode);
+
+            return pResult;
+        }
+
+        /// <summary>
+        /// Gets a PSObject from a WMI instance method.
+        /// </summary>
+        /// <param name="WMIPath">The WMI path.</param>
+        /// <param name="WMIMethod">The WMI method.</param>
+        /// <param name="MethodParams">The method parameters.</param>
+        /// <returns>Command results as a PSObject.</returns>
+        public PSObject CallInstanceMethod(string WMIPath, string WMIMethod, string MethodParams)
+        {
+            //Do not cache per default
+            return CallInstanceMethod(WMIPath, WMIMethod, MethodParams, true);
+        }
+
+        /// <summary>
+        /// Gets a PSObject from cache(if Reload==False) of from a WMI instance method.
+        /// </summary>
+        /// <param name="WMIPath">The WMI path.</param>
+        /// <param name="WMIMethod">The WMI method.</param>
+        /// <param name="MethodParams">The method parameters.</param>
+        /// <param name="Reload">Enforce reload. i.e. don't use cached results.</param>
+        /// <returns>Command results as a PSObject.</returns>
+        public PSObject CallInstanceMethod(string WMIPath, string WMIMethod, string MethodParams, bool Reload)
+        {
+            PSObject pResult = null;
+            string sPSCode = string.Format("([wmi]'{0}').{1}({2})", WMIPath, WMIMethod, MethodParams);
+
+            if (!bShowPSCodeOnly)
+            {
+                string sHash = CreateHash(WMIPath + WMIMethod + MethodParams);
+
+                if ((Cache.Get(sHash) != null) & !Reload)
+                {
+                    pResult = Cache.Get(sHash) as PSObject;
+                }
+                else
+                {
+                    foreach (PSObject obj in WSMan.RunPSScript(sPSCode, remoteRunspace))
+                    {
+                        try
+                        {
+                            pResult = obj;
+                            Cache.Add(sHash, pResult, DateTime.Now + cacheTime);
+                            break;
+                        }
+                        catch (Exception ex)
+                        {
+                            Trace.WriteLineIf(debugLevel.TraceError, ex.Message);
+                        }
+                    }
+                }
+            }
+
+            //Trace the PowerShell Command
+            tsPSCode.TraceInformation(sPSCode);
+
+            return pResult;
+        }
+
+        /// <summary>
+        /// Gets a string from cache or from a PowerShell command.
+        /// </summary>
+        /// <param name="PSCode">The ps code.</param>
+        /// <returns>Command results as a string.</returns>
+        /// <example><code>string sPort = base.GetStringFromPS("(Get-ItemProperty(\"HKLM:\\SOFTWARE\\Microsoft\\CCM\")).$(\"HttpPort\")");</code></example>
+        public string GetStringFromPS(string PSCode)
+        {
+            return GetStringFromPS(PSCode, false);
+        }
+
+        /// <summary>
+        /// Gets a string from cache(if Reload==False) or from a PowerShell command.
+        /// </summary>
+        /// <param name="PSCode">The ps code.</param>
+        /// <param name="Reload">Enforce reload. i.e. don't use cached results.</param>
+        /// <returns>Command results as a string.</returns>
+        /// <example><code>string sPort = base.GetStringFromPS("(Get-ItemProperty(\"HKLM:\\SOFTWARE\\Microsoft\\CCM\")).$(\"HttpPort\")", True);</code></example>
+        public string GetStringFromPS(string PSCode, bool Reload = false)
+        {
+            string sResult = "";
+
+            if (!bShowPSCodeOnly)
+            {
+                string sHash = CreateHash(PSCode);
+
+                if ((Cache.Get(sHash) != null) & !Reload)
+                {
+                    sResult = Cache.Get(sHash) as string;
+                }
+                else
+                {
+                    foreach (PSObject obj in WSMan.RunPSScript(PSCode, remoteRunspace))
+                    {
+                        try
+                        {
+                            //sResult = obj.BaseObject.ToString();
+                            sResult = obj.ToString();
+                            if (obj.BaseObject.GetType() == typeof(ErrorRecord))
+                            {
+                                Trace.TraceError(obj.ToString());
+                                Trace.WriteLineIf(debugLevel.TraceError, obj.ToString());
+                                tsPSCode.TraceInformation("#ERROR:" + obj.ToString());
+                                sResult = "";
+                            }
+                            else
+                            {
+                                Cache.Add(sHash, sResult, DateTime.Now + cacheTime);
+                            }
+                            break;
+                        }
+                        catch (Exception ex)
+                        {
+                            Trace.WriteLineIf(debugLevel.TraceError, ex.Message);
+                        }
+                    }
+                }
+            }
+
+            //Trace the PowerShell Command
+            tsPSCode.TraceInformation(PSCode);
+            
+
+            return sResult;
+        }
+
+        /// <summary>
+        /// Gets a string from cache or from a WMI property.
+        /// </summary>
+        /// <param name="WMIPath">The WMI path.</param>
+        /// <param name="ResultProperty">The name of the property you are trying to retrieve.</param>
+        /// <returns>Command results as a string.</returns>
+        /// <example><code>string siteCode = base.GetStringFromClassMethod(@"ROOT\ccm:CCM_Client=@", "ClientVersion");</code></example>
+        public string GetProperty(string WMIPath, string ResultProperty)
+        {
+            return GetProperty(WMIPath, ResultProperty, false);
+        }
+
+        /// <summary>
+        /// Gets a string from cache(if Reload==False) or from a WMI property.
+        /// </summary>
+        /// <param name="WMIPath">The WMI path.</param>
+        /// <param name="ResultProperty">The name of the property you are trying to retrieve.</param>
+        /// <param name="Reload">Enforce reload. i.e. don't use cached results.</param>
+        /// <returns>Command results as a string.</returns>
+        /// <example><code>string siteCode = base.GetStringFromClassMethod(@"ROOT\ccm:CCM_Client=@", "ClientVersion", True);</code></example>
+        public string GetProperty(string WMIPath, string ResultProperty, bool Reload)
+        {
+            //(Get-Wmiobject -class CCM_Client -namespace 'ROOT\CCM').ClientIDChangeDate
+            //$a=([wmi]"ROOT\ccm:SMS_Client=@").ClientVersion
+            if (!ResultProperty.StartsWith("."))
+                ResultProperty = "." + ResultProperty;
+
+            string sResult = "";
+            string sPSCode = string.Format("([wmi]\"{0}\"){1}", WMIPath, ResultProperty);
+
+            if (!bShowPSCodeOnly)
+            {
+                string sHash = CreateHash(WMIPath + ResultProperty);
+
+                if ((Cache.Get(sHash) != null) & !Reload)
+                {
+                    sResult = Cache.Get(sHash) as string;
+                }
+                else
+                {
+                    foreach (PSObject obj in WSMan.RunPSScript(sPSCode, remoteRunspace))
+                    {
+                        try
+                        {
+                            sResult = obj.BaseObject.ToString();
+                            if (obj.BaseObject.GetType() == typeof(ErrorRecord))
+                            {
+                                Trace.TraceError(obj.ToString());
+                                Trace.WriteLineIf(debugLevel.TraceError, obj.ToString());
+                                tsPSCode.TraceInformation("#ERROR:" + obj.ToString());
+                                sResult = "";
+                            }
+                            else
+                            {
+                                Cache.Add(sHash, sResult, DateTime.Now + cacheTime);
+                            }
+                            break;
+                        }
+                        catch (Exception ex)
+                        {
+                            Trace.WriteLineIf(debugLevel.TraceError, ex.Message);
+                        }
+                    }
+                }
+            }
+
+            //Trace the PowerShell Command
+            tsPSCode.TraceInformation(sPSCode);
+
+            return sResult;
+        }
+
+        /// <summary>
+        /// Gets a list of PSObjects from cache or from a WMI property.
+        /// </summary>
+        /// <param name="WMIPath">The WMI path.</param>
+        /// <param name="ResultProperty">The name of the property you are trying to retrieve.</param>
+        /// <returns>Command results as a list of PSObjects.</returns>
+        /// <example><code>List&lt;PSObject&gt; lPSAppDts = base.GetProperties(@"ROOT\ccm\clientsdk:CCM_Application", "AppDTs");</code></example>
+        public List<PSObject> GetProperties(string WMIPath, string ResultProperty)
+        {
+            return GetProperties(WMIPath, ResultProperty, false);
+        }
+
+        /// <summary>
+        /// Gets a list of PSObjects from cache(if Reload==False) or from a WMI property.
+        /// </summary>
+        /// <param name="WMIPath">The WMI path.</param>
+        /// <param name="ResultProperty">The name of the property you are trying to retrieve.</param>
+        /// <param name="Reload">Enforce reload. i.e. don't use cached results.</param>
+        /// <returns>Command results as a list of PSObjects.</returns>
+        /// <example><code>List&lt;PSObject&gt; lPSAppDts = base.GetProperties(@"ROOT\ccm\clientsdk:CCM_Application", "AppDTs", True);</code></example>
+        public List<PSObject> GetProperties(string WMIPath, string ResultProperty, bool Reload)
+        {
+            //$a=([wmi]"ROOT\ccm:SMS_Client=@").ClientVersion
+            if (!ResultProperty.StartsWith("."))
+                ResultProperty = "." + ResultProperty;
+
+            List<PSObject> lResult = new List<PSObject>();
+            string sPSCode = string.Format("([wmi]'{0}'){1}", WMIPath, ResultProperty);
+
+            if (!bShowPSCodeOnly)
+            {
+                string sHash = CreateHash(WMIPath + ResultProperty);
+
+                if ((Cache.Get(sHash) != null) & !Reload)
+                {
+                    lResult = Cache.Get(sHash) as List<PSObject>;
+                }
+                else
+                {
+                    foreach (PSObject obj in WSMan.RunPSScript(sPSCode, remoteRunspace))
+                    {
+                        try
+                        {
+                            lResult.Add(obj);
+                        }
+                        catch (Exception ex)
+                        {
+                            Trace.WriteLineIf(debugLevel.TraceError, ex.Message);
+                        }
+                    }
+                 Cache.Add(sHash, lResult, DateTime.Now + cacheTime);
+                }
+            }
+
+            //Trace the PowerShell Command
+            tsPSCode.TraceInformation(sPSCode);
+
+            return lResult;
+        }
+
+        /// <summary>
+        /// Sets a WMI property.
+        /// </summary>
+        /// <param name="WMIPath">The WMI path.</param>
+        /// <param name="Property">The property.</param>
+        /// <param name="Value">The value.</param>
+        /// <example><code>base.SetProperty(@"ROOT\ccm:SMS_Client=@", "EnableAutoAssignment", "$True");</code></example>
+        public void SetProperty(string WMIPath, string Property, string Value)
+        {
+            //$a=([wmi]"ROOT\ccm:SMS_Client=@");$a.AllowLocalAdminOverride=$false;$a.Put()
+
+            string sPSCode = string.Format("$a=([wmi]\"{0}\");$a.{1}={2};$a.Put()", WMIPath, Property, Value);
+
+            tsPSCode.TraceInformation(sPSCode);
+
+            if (!bShowPSCodeOnly)
+            {
+                string sHash = CreateHash(WMIPath + "." + Property);
+
+                if (Value.StartsWith("$"))
+                    Value = Value.Remove(0, 1);
+                
+                Cache.Add(sHash, Value, DateTime.Now + cacheTime);
+
+                foreach (PSObject obj in WSMan.RunPSScript(sPSCode, remoteRunspace))
+                {
+                    try
+                    {
+                        string sResult = obj.BaseObject.ToString();
+                        break;
+                    }
+                    catch (Exception ex)
+                    {
+                        Trace.WriteLineIf(debugLevel.TraceError, ex.Message);
+                    }
+                }
+
+            }
+
+            //Trace the PowerShell Command
+            tsPSCode.TraceInformation(sPSCode);
+        }
+
+        /// <summary>
+        /// Gets a list of PSObjects from cache or from a given WMI namespace using a given WQL query
+        /// </summary>
+        /// <param name="WMINamespace">The WMI namespace.</param>
+        /// <param name="WQLQuery">The WQL query.</param>
+        /// <returns>Command results as list of PSObjects.</returns>
+        /// <example><code>List&lt;PSObject&gt; lResult = base.GetObjects(@"ROOT\CCM", "SELECT * FROM SMS_MPProxyInformation Where State = 'Active'");</code></example>
+        public List<PSObject> GetObjects(string WMINamespace, string WQLQuery)
+        {
+            //return cached Items
+            return GetObjects(WMINamespace, WQLQuery, false);
+        }
+
+        /// <summary>
+        /// Gets a list of PSObjects from cache or from a given WMI namespace using the PowerShell CmdLet Get-CimInstance
+        /// </summary>
+        /// <param name="WMINamespace">The WMI namespace.</param>
+        /// <param name="WQLQuery">The WQL query.</param>
+        /// <returns>Command results as list of PSObjects.</returns>
+        /// <example><code>List&lt;PSObject&gt; lResult = base.GetObjects(@"ROOT\CCM", "SELECT * FROM SMS_MPProxyInformation Where State = 'Active'");</code></example>
+        public List<PSObject> GetCimObjects(string WMINamespace, string WQLQuery)
+        {
+            //return cached Items
+            return GetCimObjects(WMINamespace, WQLQuery, false);
+        }
+
+        /// <summary>
+        /// Gets a list of PSObjects from cache(if Reload==False) or from a given WMI namespace the PowerShell CmdLet Get-WmiObject
+        /// </summary>
+        /// <param name="WMINamespace">The WMI namespace.</param>
+        /// <param name="WQLQuery">The WQL query.</param>
+        /// <param name="Reload">Enforce reload. i.e. don't use cached results.</param>
+        /// <returns>Command results as a list of PSObjects.</returns>
+        /// <example><code>List&lt;PSObject&gt; lResult = base.GetObjects(@"ROOT\CCM", "SELECT * FROM SMS_MPProxyInformation Where State = 'Active'", True);</code></example>
+        public List<PSObject> GetObjects(string WMINamespace, string WQLQuery, bool Reload)
+        {
+            return GetObjects(WMINamespace, WQLQuery, Reload, cacheTime);
+        }
+
+        /// <summary>
+        /// Gets a list of PSObjects from cache(if Reload==False) or from a given WMI namespace using the PowerShell CmdLet Get-CimInstance
+        /// </summary>
+        /// <param name="WMINamespace">The WMI namespace.</param>
+        /// <param name="WQLQuery">The WQL query.</param>
+        /// <param name="Reload">Enforce reload. i.e. don't use cached results.</param>
+        /// <returns>Command results as a list of PSObjects.</returns>
+        /// <example><code>List&lt;PSObject&gt; lResult = base.GetObjects(@"ROOT\CCM", "SELECT * FROM SMS_MPProxyInformation Where State = 'Active'", True);</code></example>
+        public List<PSObject> GetCimObjects(string WMINamespace, string WQLQuery, bool Reload)
+        {
+            return GetCimObjects(WMINamespace, WQLQuery, Reload, cacheTime);
+        }
+
+        /// <summary>
+        /// Gets a list of PSObjects from cache(if Reload==False) or from a given WMI namespace using the PowerShell CmdLet Get-WmiObject
+        /// </summary>
+        /// <param name="WMINamespace">The WMI namespace.</param>
+        /// <param name="WQLQuery">The WQL query.</param>
+        /// <param name="Reload">Enforce reload. i.e. don't use cached results.</param>
+        /// <param name="tCacheTime">Custom cache time.</param>
+        /// <returns>Command results as a list of PSObjects.</returns>
+        /// <example><code>List&lt;PSObject&gt; lResult = base.GetObjects(@"ROOT\CCM", "SELECT * FROM SMS_MPProxyInformation Where State = 'Active'", True, new TimeSpan(0,0,30));</code></example>
+        public List<PSObject> GetObjects(string WMINamespace, string WQLQuery, bool Reload, TimeSpan tCacheTime)
+        {
+            //get-wmiobject -query "SELECT * FROM CacheInfoEx" -namespace "root\ccm\SoftMgmtAgent"
+            List<PSObject> lResult = new List<PSObject>();
+            string sPSCode = string.Format("get-wmiobject -query \"{0}\" -namespace \"{1}\"", WQLQuery, WMINamespace);
+
+            if (!bShowPSCodeOnly)
+            {
+                string sHash = CreateHash(WMINamespace + WQLQuery);
+                if ((Cache.Get(sHash) != null) & !Reload)
+                {
+                    lResult = Cache.Get(sHash) as List<PSObject>;
+                }
+                else
+                {
+                    foreach (PSObject obj in WSMan.RunPSScript(sPSCode, remoteRunspace, true))
+                    {
+                        try
+                        {
+                            lResult.Add(obj);
+                        }
+                        catch (Exception ex)
+                        {
+                            Trace.WriteLineIf(debugLevel.TraceError, ex.Message);
+                        }
+                    }
+                    Cache.Set(sHash, lResult, DateTime.Now + tCacheTime);
+                }
+            }
+
+            //Trace the PowerShell Command
+            tsPSCode.TraceInformation(sPSCode);
+
+            return lResult;
+        }
+
+        /// <summary>
+        /// Gets a list of PSObjects from cache(if Reload==False) or from a given WMI namespace using the PowerShell CmdLet Get-CimInstance
+        /// </summary>
+        /// <param name="WMINamespace">The WMI namespace.</param>
+        /// <param name="WQLQuery">The WQL query.</param>
+        /// <param name="Reload">Enforce reload. i.e. don't use cached results.</param>
+        /// <param name="tCacheTime">Custom cache time.</param>
+        /// <returns>Command results as a list of PSObjects.</returns>
+        /// <example><code>List&lt;PSObject&gt; lResult = base.GetObjects(@"ROOT\CCM", "SELECT * FROM SMS_MPProxyInformation Where State = 'Active'", True, new TimeSpan(0,0,30));</code></example>
+        public List<PSObject> GetCimObjects(string WMINamespace, string WQLQuery, bool Reload, TimeSpan tCacheTime)
+        {
+            //get-wmiobject -query "SELECT * FROM CacheInfoEx" -namespace "root\ccm\SoftMgmtAgent"
+            List<PSObject> lResult = new List<PSObject>();
+            string sPSCode = string.Format("Get-CimInstance -query \"{0}\" -namespace \"{1}\"", WQLQuery, WMINamespace);
+
+            if (!bShowPSCodeOnly)
+            {
+                string sHash = CreateHash(WMINamespace + WQLQuery);
+                if ((Cache.Get(sHash) != null) & !Reload)
+                {
+                    lResult = Cache.Get(sHash) as List<PSObject>;
+                }
+                else
+                {
+                    foreach (PSObject obj in WSMan.RunPSScript(sPSCode, remoteRunspace, true))
+                    {
+                        try
+                        {
+                            lResult.Add(obj);
+                        }
+                        catch (Exception ex)
+                        {
+                            Trace.WriteLineIf(debugLevel.TraceError, ex.Message);
+                        }
+                    }
+                    Cache.Set(sHash, lResult, DateTime.Now + tCacheTime);
+                }
+            }
+
+            //Trace the PowerShell Command
+            tsPSCode.TraceInformation(sPSCode);
+
+            return lResult;
+        }
+
+        /// <summary>
+        /// Get Object from PowerShell Command
+        /// </summary>
+        /// <param name="PSCode">PowerShell code</param>
+        /// <returns>Command results as a list of PSObjects.</returns>
+        /// <example><code>List&lt;PSObject&gt; lResult = base.GetObjectsFromPS("(Get-ItemProperty(\"HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\")).$(\"PendingFileRenameOperations\")");</code></example>
+        public List<PSObject> GetObjectsFromPS(string PSCode)
+        {
+            return GetObjectsFromPS(PSCode, false, cacheTime);
+        }
+
+        /// <summary>
+        /// Get Object from PowerShell Command
+        /// </summary>
+        /// <param name="PSCode">PowerShell code</param>
+        /// <param name="Reload">Ignore cached results, always reload Objects</param>
+        /// <returns>Command results as a list of PSObjects.</returns>
+        /// <example><code>List&lt;PSObject&gt; lResult = base.GetObjectsFromPS("(Get-ItemProperty(\"HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\")).$(\"PendingFileRenameOperations\")", True);</code></example>
+        public List<PSObject> GetObjectsFromPS(string PSCode, bool Reload)
+        {
+            return GetObjectsFromPS(PSCode, Reload, cacheTime);
+        }
+
+        /// <summary>
+        /// Get Object from PowerShell Command
+        /// </summary>
+        /// <param name="PSCode">PowerShell code</param>
+        /// <param name="Reload">enforce reload</param>
+        /// <param name="tCacheTime">custom cache time</param>
+        /// <returns>Command results as list of PSObjects.</returns>
+        /// <example><code>List&lt;PSObject&gt; lResult = base.GetObjectsFromPS("(Get-ItemProperty(\"HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\")).$(\"PendingFileRenameOperations\")", True, new TimeSpan(0,0,30));</code></example>
+        public List<PSObject> GetObjectsFromPS(string PSCode, bool Reload, TimeSpan tCacheTime)
+        {
+            List<PSObject> lResult = new List<PSObject>();
+
+            if (!bShowPSCodeOnly)
+            {
+                string sHash = CreateHash(PSCode);
+
+                if ((Cache.Get(sHash) != null) & !Reload)
+                {
+                    lResult = Cache.Get(sHash) as List<PSObject>;
+                }
+                else
+                {
+                    foreach (PSObject obj in WSMan.RunPSScript(PSCode, remoteRunspace))
+                    {
+                        try
+                        {
+                            lResult.Add(obj);
+                        }
+                        catch (Exception ex)
+                        {
+                            Trace.WriteLineIf(debugLevel.TraceError, ex.Message);
+                        }
+                    }
+                    Cache.Add(sHash, lResult, DateTime.Now + tCacheTime);
+                }
+            }
+
+            //Trace the PowerShell Command
+            tsPSCode.TraceInformation(PSCode);
+
+            return lResult;
+        }
+
+   }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public class ccm : baseInit
     {
-      string hash = this.CreateHash(WMIPath + ResultProperty);
-      if (this.Cache.Get(hash, (string) null) != null & !Reload)
-      {
-        properties = this.Cache.Get(hash, (string) null) as List<PSObject>;
-      }
-      else
-      {
-        foreach (PSObject psObject in WSMan.RunPSScript(str, this.remoteRunspace))
+        #pragma warning disable 1591 // Disable warnings about missing XML comments
+
+        public functions.agentproperties AgentProperties;
+        public functions.agentactions AgentActions;
+        public functions.softwaredistribution SoftwareDistribution;
+        public functions.swcache SWCache;
+        public functions.softwareupdates SoftwareUpdates;
+        public functions.inventory Inventory;
+        public functions.components Components;
+        public functions.services Services;
+        public functions.processes Process;
+        public functions.dcm DCM;
+        public functions.locationservices LocationServices;
+        public policy.requestedConfig RequestedConfig;
+        public policy.actualConfig ActualConfig;
+        public functions.monitoring Monitoring;
+        public functions.health Health;
+        public functions.appv5 AppV5;
+        public functions.appv4 AppV4;
+
+        #pragma warning restore 1591 // Enable warnings about missing XML comments
+
+        /// <summary>
+        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        /// </summary>
+        public new void Dispose()
         {
-          try
-          {
-            properties.Add(psObject);
-          }
-          catch (Exception ex)
-          {
-            Trace.WriteLineIf(this.debugLevel.TraceError, ex.Message);
-          }
+            AgentProperties.Dispose();
+            AgentActions.Dispose();
+            Health.Dispose();
+            Monitoring.Dispose();
+            ActualConfig.Dispose();
+            RequestedConfig.Dispose();
+            Process.Dispose();
+            Services.Dispose();
+            Components.Dispose();
+            Inventory.Dispose();
+            SoftwareUpdates.Dispose();
+            SWCache.Dispose();
+            SoftwareDistribution.Dispose();
+            DCM.Dispose();
+            SWCache.Dispose();
+            AppV4.Dispose();
+            AppV5.Dispose();
+            LocationServices.Dispose();
         }
-        this.Cache.Add(hash, (object) properties, (DateTimeOffset) (DateTime.Now + this.cacheTime));
-      }
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="RemoteRunspace"></param>
+        /// <param name="PSCode"></param>
+        internal ccm(Runspace RemoteRunspace, TraceSource PSCode) : base(RemoteRunspace, PSCode)
+        {
+            AgentProperties = new functions.agentproperties(RemoteRunspace, PSCode, this);
+            AgentActions = new functions.agentactions(RemoteRunspace, PSCode, this);
+            SoftwareDistribution = new functions.softwaredistribution(RemoteRunspace, PSCode, this);
+            SWCache = new functions.swcache(RemoteRunspace, PSCode, this);
+            SoftwareUpdates = new functions.softwareupdates(RemoteRunspace, PSCode, this);
+            Inventory = new functions.inventory(RemoteRunspace, PSCode, this);
+            Components = new functions.components(RemoteRunspace, PSCode, this);
+            RequestedConfig = new policy.requestedConfig(RemoteRunspace, PSCode, this);
+            ActualConfig = new policy.actualConfig(RemoteRunspace, PSCode, this);
+            Services = new functions.services(RemoteRunspace, PSCode, this);
+            Process = new functions.processes(RemoteRunspace, PSCode, this);
+            Monitoring = new functions.monitoring(RemoteRunspace, PSCode, this);
+            Health = new functions.health(RemoteRunspace, PSCode, this);
+            DCM = new functions.dcm(RemoteRunspace, PSCode, this);
+            AppV5 = new functions.appv5(RemoteRunspace, PSCode, this);
+            AppV4 = new functions.appv4(RemoteRunspace, PSCode, this);
+            LocationServices = new functions.locationservices(RemoteRunspace, PSCode, this);
+        }
     }
-    this.tsPSCode.TraceInformation(str);
-    return properties;
-  }
-
-  /// <summary>Sets a WMI property.</summary>
-  /// <param name="WMIPath">The WMI path.</param>
-  /// <param name="Property">The property.</param>
-  /// <param name="Value">The value.</param>
-  /// <example><code>base.SetProperty(@"ROOT\ccm:SMS_Client=@", "EnableAutoAssignment", "$True");</code></example>
-  public void SetProperty(string WMIPath, string Property, string Value)
-  {
-    string str = $"{WmiPathToCimQuery(WMIPath)} | Set-CimInstance -Property @{{{Property}={Value}}}";
-    this.tsPSCode.TraceInformation(str);
-    if (!this.bShowPSCodeOnly)
-    {
-      string hash = this.CreateHash($"{WMIPath}.{Property}");
-      if (Value.StartsWith("$"))
-        Value = Value.Remove(0, 1);
-      this.Cache.Add(hash, (object) Value, (DateTimeOffset) (DateTime.Now + this.cacheTime));
-      foreach (PSObject psObject in WSMan.RunPSScript(str, this.remoteRunspace))
-      {
-        try
-        {
-          psObject.BaseObject.ToString();
-          break;
-        }
-        catch (Exception ex)
-        {
-          Trace.WriteLineIf(this.debugLevel.TraceError, ex.Message);
-        }
-      }
-    }
-    this.tsPSCode.TraceInformation(str);
-  }
-
-  /// <summary>
-  /// Gets a list of PSObjects from cache or from a given WMI namespace using a given WQL query
-  /// </summary>
-  /// <param name="WMINamespace">The WMI namespace.</param>
-  /// <param name="WQLQuery">The WQL query.</param>
-  /// <returns>Command results as list of PSObjects.</returns>
-  /// <example><code>List&lt;PSObject&gt; lResult = base.GetObjects(@"ROOT\CCM", "SELECT * FROM SMS_MPProxyInformation Where State = 'Active'");</code></example>
-  public List<PSObject> GetObjects(string WMINamespace, string WQLQuery)
-  {
-    return this.GetObjects(WMINamespace, WQLQuery, false);
-  }
-
-  /// <summary>
-  /// Gets a list of PSObjects from cache or from a given WMI namespace using the PowerShell CmdLet Get-CimInstance
-  /// </summary>
-  /// <param name="WMINamespace">The WMI namespace.</param>
-  /// <param name="WQLQuery">The WQL query.</param>
-  /// <returns>Command results as list of PSObjects.</returns>
-  /// <example><code>List&lt;PSObject&gt; lResult = base.GetObjects(@"ROOT\CCM", "SELECT * FROM SMS_MPProxyInformation Where State = 'Active'");</code></example>
-  public List<PSObject> GetCimObjects(string WMINamespace, string WQLQuery)
-  {
-    return this.GetCimObjects(WMINamespace, WQLQuery, false);
-  }
-
-  /// <summary>
-  /// Gets a list of PSObjects from cache(if Reload==False) or from a given WMI namespace the PowerShell CmdLet Get-CimInstance
-  /// </summary>
-  /// <param name="WMINamespace">The WMI namespace.</param>
-  /// <param name="WQLQuery">The WQL query.</param>
-  /// <param name="Reload">Enforce reload. i.e. don't use cached results.</param>
-  /// <returns>Command results as a list of PSObjects.</returns>
-  /// <example><code>List&lt;PSObject&gt; lResult = base.GetObjects(@"ROOT\CCM", "SELECT * FROM SMS_MPProxyInformation Where State = 'Active'", True);</code></example>
-  public List<PSObject> GetObjects(string WMINamespace, string WQLQuery, bool Reload)
-  {
-    return this.GetObjects(WMINamespace, WQLQuery, Reload, this.cacheTime);
-  }
-
-  /// <summary>
-  /// Gets a list of PSObjects from cache(if Reload==False) or from a given WMI namespace using the PowerShell CmdLet Get-CimInstance
-  /// </summary>
-  /// <param name="WMINamespace">The WMI namespace.</param>
-  /// <param name="WQLQuery">The WQL query.</param>
-  /// <param name="Reload">Enforce reload. i.e. don't use cached results.</param>
-  /// <returns>Command results as a list of PSObjects.</returns>
-  /// <example><code>List&lt;PSObject&gt; lResult = base.GetObjects(@"ROOT\CCM", "SELECT * FROM SMS_MPProxyInformation Where State = 'Active'", True);</code></example>
-  public List<PSObject> GetCimObjects(string WMINamespace, string WQLQuery, bool Reload)
-  {
-    return this.GetCimObjects(WMINamespace, WQLQuery, Reload, this.cacheTime);
-  }
-
-  /// <summary>
-  /// Gets a list of PSObjects from cache(if Reload==False) or from a given WMI namespace using the PowerShell CmdLet Get-CimInstance
-  /// </summary>
-  /// <param name="WMINamespace">The WMI namespace.</param>
-  /// <param name="WQLQuery">The WQL query.</param>
-  /// <param name="Reload">Enforce reload. i.e. don't use cached results.</param>
-  /// <param name="tCacheTime">Custom cache time.</param>
-  /// <returns>Command results as a list of PSObjects.</returns>
-  /// <example><code>List&lt;PSObject&gt; lResult = base.GetObjects(@"ROOT\CCM", "SELECT * FROM SMS_MPProxyInformation Where State = 'Active'", True, new TimeSpan(0,0,30));</code></example>
-  public List<PSObject> GetObjects(
-    string WMINamespace,
-    string WQLQuery,
-    bool Reload,
-    TimeSpan tCacheTime)
-  {
-    List<PSObject> objects = new List<PSObject>();
-    string str = $"Get-CimInstance -query \"{WQLQuery}\" -namespace \"{WMINamespace}\"";
-    if (!this.bShowPSCodeOnly)
-    {
-      string hash = this.CreateHash(WMINamespace + WQLQuery);
-      if (this.Cache.Get(hash, (string) null) != null & !Reload)
-      {
-        objects = this.Cache.Get(hash, (string) null) as List<PSObject>;
-      }
-      else
-      {
-        foreach (PSObject psObject in WSMan.RunPSScript(str, this.remoteRunspace, true))
-        {
-          try
-          {
-            objects.Add(psObject);
-          }
-          catch (Exception ex)
-          {
-            Trace.WriteLineIf(this.debugLevel.TraceError, ex.Message);
-          }
-        }
-        this.Cache.Set(hash, (object) objects, (DateTimeOffset) (DateTime.Now + tCacheTime));
-      }
-    }
-    this.tsPSCode.TraceInformation(str);
-    return objects;
-  }
-
-  /// <summary>
-  /// Gets a list of PSObjects from cache(if Reload==False) or from a given WMI namespace using the PowerShell CmdLet Get-CimInstance
-  /// </summary>
-  /// <param name="WMINamespace">The WMI namespace.</param>
-  /// <param name="WQLQuery">The WQL query.</param>
-  /// <param name="Reload">Enforce reload. i.e. don't use cached results.</param>
-  /// <param name="tCacheTime">Custom cache time.</param>
-  /// <returns>Command results as a list of PSObjects.</returns>
-  /// <example><code>List&lt;PSObject&gt; lResult = base.GetObjects(@"ROOT\CCM", "SELECT * FROM SMS_MPProxyInformation Where State = 'Active'", True, new TimeSpan(0,0,30));</code></example>
-  public List<PSObject> GetCimObjects(
-    string WMINamespace,
-    string WQLQuery,
-    bool Reload,
-    TimeSpan tCacheTime)
-  {
-    List<PSObject> cimObjects = new List<PSObject>();
-    string str = $"Get-CimInstance -query \"{WQLQuery}\" -namespace \"{WMINamespace}\"";
-    if (!this.bShowPSCodeOnly)
-    {
-      string hash = this.CreateHash(WMINamespace + WQLQuery);
-      if (this.Cache.Get(hash, (string) null) != null & !Reload)
-      {
-        cimObjects = this.Cache.Get(hash, (string) null) as List<PSObject>;
-      }
-      else
-      {
-        foreach (PSObject psObject in WSMan.RunPSScript(str, this.remoteRunspace, true))
-        {
-          try
-          {
-            cimObjects.Add(psObject);
-          }
-          catch (Exception ex)
-          {
-            Trace.WriteLineIf(this.debugLevel.TraceError, ex.Message);
-          }
-        }
-        this.Cache.Set(hash, (object) cimObjects, (DateTimeOffset) (DateTime.Now + tCacheTime));
-      }
-    }
-    this.tsPSCode.TraceInformation(str);
-    return cimObjects;
-  }
-
-  /// <summary>Get Object from PowerShell Command</summary>
-  /// <param name="PSCode">PowerShell code</param>
-  /// <returns>Command results as a list of PSObjects.</returns>
-  /// <example><code>List&lt;PSObject&gt; lResult = base.GetObjectsFromPS("(Get-ItemProperty(\"HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\")).$(\"PendingFileRenameOperations\")");</code></example>
-  public List<PSObject> GetObjectsFromPS(string PSCode)
-  {
-    return this.GetObjectsFromPS(PSCode, false, this.cacheTime);
-  }
-
-  /// <summary>Get Object from PowerShell Command</summary>
-  /// <param name="PSCode">PowerShell code</param>
-  /// <param name="Reload">Ignore cached results, always reload Objects</param>
-  /// <returns>Command results as a list of PSObjects.</returns>
-  /// <example><code>List&lt;PSObject&gt; lResult = base.GetObjectsFromPS("(Get-ItemProperty(\"HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\")).$(\"PendingFileRenameOperations\")", True);</code></example>
-  public List<PSObject> GetObjectsFromPS(string PSCode, bool Reload)
-  {
-    return this.GetObjectsFromPS(PSCode, Reload, this.cacheTime);
-  }
-
-  /// <summary>Get Object from PowerShell Command</summary>
-  /// <param name="PSCode">PowerShell code</param>
-  /// <param name="Reload">enforce reload</param>
-  /// <param name="tCacheTime">custom cache time</param>
-  /// <returns>Command results as list of PSObjects.</returns>
-  /// <example><code>List&lt;PSObject&gt; lResult = base.GetObjectsFromPS("(Get-ItemProperty(\"HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\")).$(\"PendingFileRenameOperations\")", True, new TimeSpan(0,0,30));</code></example>
-  public List<PSObject> GetObjectsFromPS(string PSCode, bool Reload, TimeSpan tCacheTime)
-  {
-    List<PSObject> objectsFromPs = new List<PSObject>();
-    if (!this.bShowPSCodeOnly)
-    {
-      string hash = this.CreateHash(PSCode);
-      if (this.Cache.Get(hash, (string) null) != null & !Reload)
-      {
-        objectsFromPs = this.Cache.Get(hash, (string) null) as List<PSObject>;
-      }
-      else
-      {
-        foreach (PSObject psObject in WSMan.RunPSScript(PSCode, this.remoteRunspace))
-        {
-          try
-          {
-            objectsFromPs.Add(psObject);
-          }
-          catch (Exception ex)
-          {
-            Trace.WriteLineIf(this.debugLevel.TraceError, ex.Message);
-          }
-        }
-        this.Cache.Add(hash, (object) objectsFromPs, (DateTimeOffset) (DateTime.Now + tCacheTime));
-      }
-    }
-    this.tsPSCode.TraceInformation(PSCode);
-    return objectsFromPs;
-  }
 }

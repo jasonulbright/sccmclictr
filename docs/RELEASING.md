@@ -1,5 +1,8 @@
 # Releasing
 
+> Recovery is unreleased. Live client parity is a release gate; see the recovery
+> release gate below. Do not overwrite public v1.3.0.1 assets with an unvalidated build.
+
 The `Release` GitHub Actions workflow builds every .NET Framework 4.8 project, Authenticode-signs the first-party executables and DLLs, creates an Inno Setup installer and portable ZIP, generates SHA-256 checksums, adds GitHub build-provenance attestations, and publishes the assets to a GitHub release.
 
 Unsigned releases are deliberately blocked. Signing uses the same Azure Artifact Signing account and public certificate profile as Spectra-PDF; no exportable code-signing certificate is stored in GitHub.
@@ -36,3 +39,14 @@ Published assets:
 - `ClientCenterForConfigMgr-Setup.exe`
 - `ClientCenterForConfigMgr-Portable.zip`
 - `checksums.txt`
+# Recovery release gate
+
+The source recovery is not yet published. Before tagging, validate the rebuilt
+Framework 4.8 app against a live ConfigMgr client, including pending/all-update
+queries, policy retrieval, and deliberately authorized update actions. A green
+offline build alone is insufficient.
+
+Verify that both packages include `library-source` with the original-source
+automation project, local patches, LGPL/GPL license texts, and build instructions.
+The automation DLL is compiled from checked-in source, never fetched from NuGet.
+Keep the source commit and build provenance aligned with the shipped binary.

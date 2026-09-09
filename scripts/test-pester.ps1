@@ -4,10 +4,8 @@ param()
 $ErrorActionPreference = 'Stop'
 $repoRoot = Split-Path $PSScriptRoot -Parent
 $testFiles = @(
-    (Join-Path $repoRoot 'Tests\CimModels.Tests.ps1'),
-    (Join-Path $repoRoot 'Tests\CimMigration.Phase1.Tests.ps1'),
-    (Join-Path $repoRoot 'Tests\CimMigration.Phase2.Tests.ps1'),
-    (Join-Path $repoRoot 'Tests\CimMigration.Integration.Tests.ps1')
+    (Join-Path $repoRoot 'Tests\Recovery.Tests.ps1'),
+    (Join-Path $repoRoot 'Tests\Recovery.Integration.Tests.ps1')
 )
 
 $pester = Get-Module Pester -ListAvailable |

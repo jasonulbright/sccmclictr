@@ -46,7 +46,7 @@ function Get-BareCatchCount {
 # Build current per-file map
 $current = [ordered]@{}
 Get-ChildItem $root -Recurse -Filter '*.cs' -File | Where-Object {
-    $_.FullName -notmatch '\\bin\\|\\obj\\|\\Properties\\Settings\.Designer\.cs$|\\packages\\|\\tools\\'
+    $_.FullName -notmatch '\\bin\\|\\obj\\|\\artifacts\\|\\Properties\\Settings\.Designer\.cs$|\\packages\\|\\tools\\'
 } | Sort-Object FullName | ForEach-Object {
     $rel = $_.FullName.Substring($root.Length + 1) -replace '\\', '/'
     $count = Get-BareCatchCount $_.FullName

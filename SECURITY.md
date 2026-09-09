@@ -2,7 +2,9 @@
 
 ## Supported version
 
-Security fixes are applied to the latest community-fork release. The original upstream releases are retained for project history but are not maintained here.
+Security fixes are developed in this maintenance fork. Published v1.3.0.1 assets predate the current automation-library recovery; do not assume unreleased fixes are present in them. Old fork releases and tags were removed; upstream releases are not maintained here.
+
+The shipping runtime target remains .NET Framework 4.8. Runtime servicing follows the supported host Windows lifecycle, not a blanket support date for every host OS or ConfigMgr version.
 
 ## Reporting a vulnerability
 

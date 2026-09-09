@@ -1,160 +1,184 @@
-﻿// Decompiled with JetBrains decompiler
-// Type: sccmclictr.automation.WSMan
-// Assembly: sccmclictr.automation, Version=1.0.1.0, Culture=neutral, PublicKeyToken=null
-// MVID: 96476B75-C789-4A0A-9F55-EBB7DB29E9AB
-// Assembly location: C:\Users\jason\Downloads\sccmclictrlib.1.0.1\lib\net48\sccmclictr.automation.dll
-// XML documentation location: C:\Users\jason\Downloads\sccmclictrlib.1.0.1\lib\net48\sccmclictr.automation.xml
+//SCCM Client Center Automation Library (SCCMCliCtr.automation)
+//Copyright (c) 2018 by Roger Zander
+
+//This program is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation; either version 3 of the License, or any later version. 
+//This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details. 
+//GNU General Public License: http://www.gnu.org/licenses/lgpl.html
+
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
+using System.Text;
 using System.Management.Automation;
 using System.Management.Automation.Runspaces;
-using System.Security;
-using System.Text;
+using System.Collections.ObjectModel;
+using System.Threading;
 
-#nullable disable
-namespace sccmclictr.automation;
-
-internal static class WSMan
+namespace sccmclictr.automation
 {
-  /// <summary>Connect a remote Runspace</summary>
-  /// <param name="connectionInfo">WSManConnectionInfo</param>
-  /// <param name="remoteRunspace">Reference to a Runspace</param>
-  internal static void openRunspace(WSManConnectionInfo connectionInfo, ref Runspace remoteRunspace)
-  {
-    remoteRunspace = RunspaceFactory.CreateRunspace((RunspaceConnectionInfo) connectionInfo);
-    remoteRunspace.Open();
-  }
-
-  /// <summary>Run a PSScript</summary>
-  /// <param name="scriptText"></param>
-  /// <param name="remoteRunspace"></param>
-  /// <returns></returns>
-  internal static Collection<PSObject> RunPSScript(string scriptText, Runspace remoteRunspace, bool throwOnError = false)
-  {
-    try
+    static class WSMan
     {
-      using (PowerShell powerShell = PowerShell.Create())
-      {
-        powerShell.Runspace = remoteRunspace;
-        powerShell.AddScript(scriptText);
-        List<PSObject> list = powerShell.Invoke().Where<PSObject>((Func<PSObject, bool>) (t => t != null)).ToList<PSObject>();
-        if (throwOnError && powerShell.HadErrors)
-          throw new InvalidOperationException(string.Join(Environment.NewLine, powerShell.Streams.Error.Select(error => error.ToString())));
-        Collection<PSObject> collection = new Collection<PSObject>();
-        foreach (PSObject psObject in list)
+        /// <summary>
+        /// Connect a remote Runspace
+        /// </summary>
+        /// <param name="connectionInfo">WSManConnectionInfo</param>
+        /// <param name="remoteRunspace">Reference to a Runspace</param>
+        internal static void openRunspace(WSManConnectionInfo connectionInfo, ref Runspace remoteRunspace)
         {
-          if (psObject != null)
-            collection.Add(psObject);
+            remoteRunspace = RunspaceFactory.CreateRunspace(connectionInfo);
+            remoteRunspace.Open();
         }
-        if (list.Count == 0)
+
+        /// <summary>
+        /// Run a PSScript
+        /// </summary>
+        /// <param name="scriptText"></param>
+        /// <param name="remoteRunspace"></param>
+        /// <returns></returns>
+        internal static Collection<PSObject> RunPSScript(string scriptText, Runspace remoteRunspace, bool throwOnError = false)
         {
-          foreach (object obj in powerShell.Streams.Error.ReadAll())
-          {
-            PSObject psObject = new PSObject(obj);
-            collection.Add(psObject);
-          }
+
+            try
+            {
+                using (PowerShell powershell = PowerShell.Create())
+                {
+                    powershell.Runspace = remoteRunspace;
+                    powershell.AddScript(scriptText);
+                    Collection<PSObject> PSresults = powershell.Invoke();
+                    if (throwOnError && powershell.HadErrors)
+                        throw new InvalidOperationException(string.Join(Environment.NewLine,
+                            powershell.Streams.Error.Select(error => error.ToString())));
+                    List<PSObject> loRes = PSresults.Where(t => t != null).ToList();
+                    Collection<PSObject> results = new Collection<PSObject>();
+                    foreach (PSObject po in loRes)
+                    {
+                        if (po != null)
+                            results.Add(po);
+                    }
+                    
+                    if (loRes.Count == 0)
+                    {
+                        Collection<ErrorRecord> errors = powershell.Streams.Error.ReadAll();
+                        foreach (ErrorRecord er in errors)
+                        {
+                            PSObject pErr = new PSObject(er);
+                            results.Add(pErr);
+                        }
+                    }
+
+                    return results;
+
+                }
+
+            }
+            catch
+            {
+                if (throwOnError) throw;
+            }
+
+            return null;
         }
-        return collection;
-      }
-    }
-    catch
-    {
-      if (throwOnError) throw;
-    }
-    return (Collection<PSObject>) null;
-  }
 
-  /// <summary>Run a PSScript and return the result as string</summary>
-  /// <param name="scriptText"></param>
-  /// <param name="remoteRunspace"></param>
-  /// <returns></returns>
-  internal static string RunPSScriptAsString(string scriptText, Runspace remoteRunspace)
-  {
-    StringBuilder stringBuilder = new StringBuilder();
-    foreach (PSObject psObject in WSMan.RunPSScript(scriptText, remoteRunspace))
-    {
-      try
-      {
-        if (psObject != null)
-          stringBuilder.AppendLine(psObject.ToString());
-      }
-      catch
-      {
-      }
-    }
-    return stringBuilder.ToString();
-  }
-
-  private static void openRunspace(
-    string uri,
-    string schema,
-    string username,
-    string livePass,
-    ref Runspace remoteRunspace)
-  {
-    SecureString password = new SecureString();
-    foreach (char c in livePass.ToCharArray())
-      password.AppendChar(c);
-    PSCredential credential = new PSCredential(username, password);
-    WSManConnectionInfo connectionInfo = new WSManConnectionInfo(new Uri(uri), schema, credential);
-    connectionInfo.AuthenticationMechanism = AuthenticationMechanism.Kerberos;
-    connectionInfo.ProxyAuthentication = AuthenticationMechanism.Negotiate;
-    remoteRunspace = RunspaceFactory.CreateRunspace((RunspaceConnectionInfo) connectionInfo);
-    remoteRunspace.Open();
-  }
-
-  private static void openRunspace(string uri, ref Runspace remoteRunspace)
-  {
-    WSManConnectionInfo connectionInfo = new WSManConnectionInfo(new Uri(uri));
-    connectionInfo.AuthenticationMechanism = AuthenticationMechanism.Kerberos;
-    connectionInfo.ProxyAuthentication = AuthenticationMechanism.Negotiate;
-    remoteRunspace = RunspaceFactory.CreateRunspace((RunspaceConnectionInfo) connectionInfo);
-    remoteRunspace.Open();
-  }
-
-  private static string RunScriptAsString(
-    string scriptText,
-    string servername,
-    string username,
-    string password)
-  {
-    return WSMan.RunScriptAsString(scriptText, servername, username, password, 5985);
-  }
-
-  private static string RunScriptAsString(
-    string scriptText,
-    string servername,
-    string username,
-    string password,
-    int port)
-  {
-    Runspace remoteRunspace = (Runspace) null;
-    if (!string.IsNullOrEmpty(username))
-      WSMan.openRunspace($"http://{servername}:{port}/wsman", "http://schemas.microsoft.com/powershell/Microsoft.PowerShell", username, password, ref remoteRunspace);
-    else
-      WSMan.openRunspace($"http://{servername}:{port}/wsman", ref remoteRunspace);
-    StringBuilder stringBuilder = new StringBuilder();
-    using (PowerShell powerShell = PowerShell.Create())
-    {
-      powerShell.Runspace = remoteRunspace;
-      powerShell.AddScript(scriptText);
-      powerShell.Invoke();
-      Collection<PSObject> collection = powerShell.Invoke();
-      remoteRunspace.Close();
-      foreach (PSObject psObject in collection)
-      {
-        try
+        /// <summary>
+        /// Run a PSScript and return the result as string
+        /// </summary>
+        /// <param name="scriptText"></param>
+        /// <param name="remoteRunspace"></param>
+        /// <returns></returns>
+        internal static string RunPSScriptAsString(string scriptText, Runspace remoteRunspace)
         {
-          stringBuilder.AppendLine(psObject.ToString());
+            StringBuilder stringBuilder = new StringBuilder();
+
+            Collection<PSObject> results = RunPSScript(scriptText, remoteRunspace);
+
+            foreach (PSObject obj in results)
+            {
+                try
+                {
+                    if (obj != null)
+                    {
+                        stringBuilder.AppendLine(obj.ToString());
+                    }
+                }
+                catch { }
+            }
+
+
+            return stringBuilder.ToString();
         }
-        catch
+
+        private static void openRunspace(string uri, string schema, string username, string livePass, ref Runspace remoteRunspace)
         {
+            System.Security.SecureString password = new System.Security.SecureString();
+            foreach (char c in livePass.ToCharArray())
+            {
+                password.AppendChar(c);
+            }
+
+            PSCredential psc = new PSCredential(username, password);
+            WSManConnectionInfo rri = new WSManConnectionInfo(new Uri(uri), schema, psc);
+            rri.AuthenticationMechanism = AuthenticationMechanism.Kerberos;
+            rri.ProxyAuthentication = AuthenticationMechanism.Negotiate;
+            remoteRunspace = RunspaceFactory.CreateRunspace(rri);
+            remoteRunspace.Open();
         }
-      }
+
+        private static void openRunspace(string uri, ref Runspace remoteRunspace)
+        {
+            WSManConnectionInfo rri = new WSManConnectionInfo(new Uri(uri));
+            rri.AuthenticationMechanism = AuthenticationMechanism.Kerberos;
+            rri.ProxyAuthentication = AuthenticationMechanism.Negotiate;
+            
+            remoteRunspace = RunspaceFactory.CreateRunspace(rri);
+            remoteRunspace.Open();
+        }
+
+        private static string RunScriptAsString(string scriptText, string servername, string username, string password)
+        {
+            return RunScriptAsString(scriptText, servername, username, password, 5985);
+        }
+
+        private static string RunScriptAsString(string scriptText, string servername, string username, string password, int port)
+        {
+            Runspace remoteRunspace = null;
+
+            if (!string.IsNullOrEmpty(username))
+            {
+                openRunspace(string.Format("http://{0}:{1}/wsman", servername, port),
+                    "http://schemas.microsoft.com/powershell/Microsoft.PowerShell",
+                    @username, password, ref remoteRunspace);
+            }
+            else
+            {
+                openRunspace(string.Format("http://{0}:{1}/wsman", servername, port), ref remoteRunspace);
+            }
+
+            StringBuilder stringBuilder = new StringBuilder();
+
+            using (PowerShell powershell = PowerShell.Create())
+            {
+                powershell.Runspace = remoteRunspace;
+                powershell.AddScript(scriptText);
+                powershell.Invoke();
+                Collection<PSObject> results = powershell.Invoke();
+
+                remoteRunspace.Close();
+
+                foreach (PSObject obj in results)
+                {
+                    try
+                    {
+                        stringBuilder.AppendLine(obj.ToString());
+                    }
+                    catch { }
+                }
+            }
+
+            return stringBuilder.ToString();
+        }
+
+
+
     }
-    return stringBuilder.ToString();
-  }
 }
