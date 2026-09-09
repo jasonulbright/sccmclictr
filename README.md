@@ -16,7 +16,7 @@ This is a maintenance-focused community continuation of [Roger Zander's original
 
 This is **one of several community forks**, not the only maintained fork. See also [drummachine24's fork](https://github.com/drummachine24/sccmclictr), which takes a .NET 10 modernization approach.
 
-**Recovery release (1.3.0.2):** restores Roger's original automation-library source and WMI behavior after regressions in our reconstructed WMI-to-CIM migration. Manual workstation checks were completed, including a live single-update installation, restart and Installed status. Log access and additional domain-context checks remain unverified from that workstation; see [CODE_REVIEW.md](CODE_REVIEW.md). Version 1.3.0.1 predates this recovery.
+**Recovery release (1.3.0.2):** restores Roger's original automation-library source and WMI behavior after regressions in our reconstructed WMI-to-CIM migration. Manual workstation checks were completed, including a live single-update installation, restart and Installed status. The maintainer also confirmed log-file opening works. Additional domain-context checks are deferred; see [CODE_REVIEW.md](CODE_REVIEW.md). Version 1.3.0.1 predates this recovery.
 
 ## Install
 
@@ -158,6 +158,9 @@ This is a maintenance-focused fork. Changes should improve compatibility, reliab
 We intentionally remain on **.NET Framework 4.8** to align runtime servicing with the supported host Windows lifecycle, rather than adopting modern .NET's recurring major-runtime upgrade schedule. Framework 4.8.1 ships with Server 2025, whose extended support ends November 14, 2034. This is not a promise that every older Windows version or ConfigMgr release is supported until then: each host OS, runtime combination, and ConfigMgr version must remain supported. See [Microsoft's Framework lifecycle policy](https://learn.microsoft.com/en-us/lifecycle/faq/dotnet-framework) and [Server 2025 lifecycle](https://learn.microsoft.com/en-us/lifecycle/products/windows-server-2025).
 
 Functional fixes can be shared with other forks without adopting their runtime or feature roadmap. Preserve original behavior first; require evidence and regression tests for changes.
+
+Current work, completed checks and deferred items are recorded in the
+[maintenance ledger](MAINTENANCE_LEDGER.md).
 
 ## License and credits
 

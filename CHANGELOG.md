@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased
+
+- Fixed PowerShell script-result refresh retaining an older cached result,
+  including when the new result is empty. Error records are returned to legacy
+  callers but no longer cached as successful data or substituted for prior good data.
+- Added four offline regression tests for script-result cache behavior.
+- Recorded the maintainer's confirmation that log-file opening works and added
+  an active maintenance ledger. No additional live verification was required.
+
 ## v1.3.0.2 -- Original-source recovery (2026-09-09)
 
 - Fixed upstream installed-software metadata overwriting the class name with

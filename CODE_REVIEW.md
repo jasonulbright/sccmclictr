@@ -64,8 +64,10 @@ builds are unsigned.
   This validates that update/restart path, not every administrative feature.
 - The maintainer reports completing all manual checks available from the workstation.
   This is manual validation, not a completed automated feature-by-feature parity run.
-  Log access and additional verification must be tested inside the target domain;
+  The maintainer subsequently confirmed that opening log files works. Earlier
   cross-domain credential attempts did not establish a library or UI defect.
+  Further live verification, if needed, must run inside the target domain; it is
+  deferred rather than requiring more workstation authentication attempts.
 - Bulk update-install actions and individual policy triggers have no separately
   recorded results. Automated live tests remain uncompleted; the install and restart
   above were user-run.
@@ -76,3 +78,7 @@ alone do not establish full functional parity.
 
 The [old review](docs/history/PRE_RECOVERY_REVIEW.md) is retained solely as history;
 its source-availability and completed-migration claims are superseded.
+
+Active maintenance work and its evidence are tracked in
+[MAINTENANCE_LEDGER.md](MAINTENANCE_LEDGER.md). Unreleased fixes there are not
+automatically present in the published 1.3.0.2 binaries.

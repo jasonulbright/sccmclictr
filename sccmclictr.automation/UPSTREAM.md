@@ -39,6 +39,9 @@ be tested separately.
   overwrote __CLASS with namespace and relative path. Preserve WMI fields separately
   and obtain class/namespace from serialized CIM system properties for the original
   CIM inventory query. A WMI relative path is not invented for CIM rows.
+- After 1.3.0.2 (unreleased): script-result refresh now replaces existing cache
+  entries, including empty success. Legacy error records are returned but not
+  cached, preserving prior good data after a failed refresh.
 
 No blanket CIM conversion, modern .NET retarget, or new NuGet dependency is part
 of this recovery. The source files keep their upstream notices. The former

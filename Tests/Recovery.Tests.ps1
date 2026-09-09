@@ -20,6 +20,39 @@ BeforeAll {
 }
 AfterAll { $runspace.Dispose(); $trace.Close() }
 
+Describe 'PowerShell script result cache' {
+    BeforeEach {
+        $local = [Management.Automation.Runspaces.RunspaceFactory]::CreateRunspace()
+        $local.Open()
+        $helper = [sccmclictr.automation.baseInit]::new($runspace, $trace)
+        [sccmclictr.automation.baseInit].GetProperty('remoteRunspace', [Reflection.BindingFlags]'NonPublic,Instance').SetValue($helper, $local)
+    }
+    AfterEach { $helper.Dispose(); $local.Dispose() }
+    It 'keeps refreshed script results instead of returning the older cached result' {
+        $script = '$global:counter++; [pscustomobject]@{Value=$global:counter}'
+        $helper.GetObjectsFromPS($script, $false)[0].Value | Should -Be 1
+        $helper.GetObjectsFromPS($script, $true)[0].Value | Should -Be 2
+        $helper.GetObjectsFromPS($script, $false)[0].Value | Should -Be 2
+    }
+    It 'replaces a populated cache with an empty successful refresh' {
+        $script = '$global:counter++; if ($global:counter -eq 1) { [pscustomobject]@{Value=1} }'
+        $helper.GetObjectsFromPS($script, $false).Count | Should -Be 1
+        $helper.GetObjectsFromPS($script, $true).Count | Should -Be 0
+        $helper.GetObjectsFromPS($script, $false).Count | Should -Be 0
+    }
+    It 'returns legacy error records without storing them as successful data' {
+        $script = '$global:counter++; if ($global:counter -eq 1) { Write-Error "test provider failure" } else { [pscustomobject]@{Value=$global:counter} }'
+        $helper.GetObjectsFromPS($script, $false)[0].ToString() | Should -Match 'test provider failure'
+        $helper.GetObjectsFromPS($script, $false)[0].Value | Should -Be 2
+    }
+    It 'does not replace last known good data with a failed refresh' {
+        $script = '$global:counter++; if ($global:counter -eq 2) { Write-Error "test provider failure" } else { [pscustomobject]@{Value=$global:counter} }'
+        $helper.GetObjectsFromPS($script, $false)[0].Value | Should -Be 1
+        $helper.GetObjectsFromPS($script, $true)[0].ToString() | Should -Match 'test provider failure'
+        $helper.GetObjectsFromPS($script, $false)[0].Value | Should -Be 1
+    }
+}
+
 Describe 'Recovered compiled automation library' {
     It 'targets Framework 4.8 and retains the 1.0.1.0 library identity' {
         $assembly = [sccmclictr.automation.common].Assembly

@@ -837,7 +837,11 @@ namespace sccmclictr.automation
                             Trace.WriteLineIf(debugLevel.TraceError, ex.Message);
                         }
                     }
-                    Cache.Add(sHash, lResult, DateTime.Now + tCacheTime);
+                    // Keep the legacy error-record return contract, but never cache
+                    // those errors as successful data. A successful refresh must
+                    // replace the prior entry, including when the result is empty.
+                    if (!lResult.Exists(obj => obj.BaseObject is ErrorRecord))
+                        Cache.Set(sHash, lResult, DateTime.Now + tCacheTime);
                 }
             }
 
