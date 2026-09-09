@@ -88,6 +88,29 @@ Describe 'Recovered compiled automation library' {
             Join-Path $stage "library-source\$file" | Should -Exist
         }
     }
+    It 'preserves all three installed-software metadata fields for WMI input' {
+        $fields = @{ __CLASS='SMS_InstalledSoftware'; __NAMESPACE='root\cimv2\sms'; __RELPATH='SMS_InstalledSoftware.SoftwareCode="test"' }
+        foreach ($property in [sccmclictr.automation.functions.inventory+AI_InstalledSoftwareCache].GetProperties()) {
+            if ($property.PropertyType -eq [string]) { $fields[$property.Name]='test' }
+        }
+        $model = [sccmclictr.automation.functions.inventory+AI_InstalledSoftwareCache]::new([pscustomobject]$fields, $runspace, $trace)
+        foreach ($name in @('__CLASS','__NAMESPACE','__RELPATH')) {
+            $model.GetType().GetProperty($name, [Reflection.BindingFlags]'NonPublic,Instance').GetValue($model) | Should -Be $fields[$name]
+        }
+    }
+    It 'reads the original CIM-based installed-software query shape' {
+        $fields = @{}
+        foreach ($property in [sccmclictr.automation.functions.inventory+AI_InstalledSoftwareCache].GetProperties()) {
+            if ($property.PropertyType -eq [string]) { $fields[$property.Name]='test' }
+        }
+        $row = New-CimInstance -Namespace 'root/cimv2/sms' -ClassName SMS_InstalledSoftware -ClientOnly -Property $fields
+        $row = [Management.Automation.PSSerializer]::Deserialize([Management.Automation.PSSerializer]::Serialize($row))
+        $model = [sccmclictr.automation.functions.inventory+AI_InstalledSoftwareCache]::new($row, $runspace, $trace)
+        $model.SoftwareCode | Should -Be 'test'
+        $flags = [Reflection.BindingFlags]'NonPublic,Instance'
+        $model.GetType().GetProperty('__CLASS', $flags).GetValue($model) | Should -Be 'SMS_InstalledSoftware'
+        $model.GetType().GetProperty('__NAMESPACE', $flags).GetValue($model) | Should -Be 'root\cimv2\sms'
+    }
     It 'constructs a mandatory-update call with a typed collection and deadline filter without executing it' {
         $writer = [IO.StringWriter]::new()
         $listener = [Diagnostics.TextWriterTraceListener]::new($writer)

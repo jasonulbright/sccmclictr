@@ -26,4 +26,16 @@ If a change affects remote client behavior, state the Windows version, ConfigMgr
 
 ## Pull requests
 
+For a read-only live smoke test of the recovered library, run Windows PowerShell:
+
+```powershell
+.\scripts\test-live-smoke.ps1 -ComputerName <client> -PromptForCredential
+```
+
+It defaults to artifacts/recovery-stage, accepts -StageDirectory for other builds,
+and writes a local report under artifacts/diagnostics. Credentials are not written
+to the report. Log excerpts and machine details are private: do not commit or post
+the report without sanitizing it. Empty providers are reported, not treated as
+proof that populated models work. This tests the library, not every UI interaction.
+
 Explain the failure mode, keep compatibility changes narrow, add or update tests when practical, and update `CHANGELOG.md` for user-visible fixes. Do not commit `bin`, `obj`, `artifacts`, PFX files, or locally assembled plugin DLLs.

@@ -16,7 +16,7 @@ This is a maintenance-focused community continuation of [Roger Zander's original
 
 This is **one of several community forks**, not the only maintained fork. See also [drummachine24's fork](https://github.com/drummachine24/sccmclictr), which takes a .NET 10 modernization approach.
 
-**Recovery status:** current source restores Roger's original automation-library source and WMI behavior after regressions in our reconstructed WMI-to-CIM migration. The published v1.3.0.1 assets predate this recovery. A successful build is not proof of live ConfigMgr parity; see [CODE_REVIEW.md](CODE_REVIEW.md) for validation status.
+**Recovery status:** current source restores Roger's original automation-library source and WMI behavior after regressions in our reconstructed WMI-to-CIM migration. The user has verified the single-update installation and restart workflow on a live client. Broader feature checks remain pending. The published v1.3.0.1 assets predate this recovery; see [CODE_REVIEW.md](CODE_REVIEW.md) for validation status.
 
 ## Install
 
@@ -108,7 +108,7 @@ The original library was not closed-source: it is available at [rzander/sccmclic
 | Plaintext password persistence | Removed |
 | `Invoke-Expression` command injection | Removed |
 | Password on the command line | Removed |
-| Query compatibility | Original Windows PowerShell WMI behavior restored; live parity validation pending |
+| Query compatibility | Original WMI behavior restored; single-update workflow live-validated, broader checks pending |
 | Bare catch blocks | Legacy instances remain; a regression baseline prevents new ones |
 | Vendored UI dependencies | Accepted for the .NET Framework maintenance lifecycle |
 | Release integrity | Authenticode, SHA-256 checksums, and GitHub attestations |
